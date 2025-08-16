@@ -1,7 +1,7 @@
-import "./App.css";
-import { Button, Container, Typography } from "@mui/material";
+import './App.css';
+import { Button, Container, Typography } from '@mui/material';
 
-import Navbar from "@/components/Navbar";
+import Navbar from '@/components/Navbar';
 
 function App() {
   return (
