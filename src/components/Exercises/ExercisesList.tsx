@@ -3,6 +3,7 @@ import type { Exercise } from "@/types/exercices";
 import ExercisesListItem from "./ExercisesListItem";
 import { useState, useMemo } from "react";
 import DeleteConfirmationModal from "../Common/DeleteConfirmationModal";
+import { useConfirm } from "@/providers/confirmProvider";
 
 interface ExercisesListProps {
   exercises: Exercise[];
@@ -11,7 +12,7 @@ interface ExercisesListProps {
 export default function ExercisesList({ exercises }: ExercisesListProps) {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [search, setSearch] = useState('');
-
+  const confirm = useConfirm();
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
@@ -24,9 +25,15 @@ export default function ExercisesList({ exercises }: ExercisesListProps) {
     setSelectedExercise(exercise);
   };
 
-  const handleDelete = (exerciseId: string) => {
-    console.log('delete', exerciseId);
-  };
+  const handleDelete = async (id: string, name?: string) => {
+    const ok = await confirm({
+      title: `Delete “${name ?? 'item'}”?`,
+      danger: true,
+    })
+    if (ok) {
+      await deleteController(id);
+    }
+  }
 
   
   return (
