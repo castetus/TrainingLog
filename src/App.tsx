@@ -1,7 +1,7 @@
 import './App.css';
 import { Button, Container, Typography } from '@mui/material';
-
-import Navbar from '@/components/Navbar';
+import { RouterProvider } from 'react-router-dom'
+import { router } from '@/router/router'
 
 function App() {
   return (
@@ -14,8 +14,7 @@ function App() {
           Start Workout
         </Button>
       </Container>
-
-      <Navbar />
+      <RouterProvider router={router} />
     </>
   );
 }
