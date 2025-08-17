@@ -10,9 +10,6 @@ function App() {
         <Typography variant="h4" gutterBottom>
           My Training Log
         </Typography>
-        <Button variant="contained" color="primary">
-          Start Workout
-        </Button>
       </Container>
       <RouterProvider router={router} />
     </>

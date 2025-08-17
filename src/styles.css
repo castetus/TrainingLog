@@ -1,0 +1,6 @@
+.fab-button {
+  position: fixed !important;
+  right: 16px;
+  bottom: 72px;
+  z-index: 1200;
+}

@@ -5,6 +5,7 @@ import WorkoutsPage from '@/pages/WorkoutsPage';
 import TrainingsPage from '@/pages/TrainingsPage';
 import ExercisesPage from '@/pages/ExercisesPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import ExerciseForm from '@/components/Exercises/ExerciseForm';
 
 export const router = createBrowserRouter([
   {
@@ -14,7 +15,10 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'workouts', element: <WorkoutsPage /> },
       { path: 'trainings', element: <TrainingsPage /> },
-      { path: 'exercises', element: <ExercisesPage /> },
+      { path: 'exercises', element: <ExercisesPage />, children: [
+        { path: 'new', element: <ExerciseForm /> },
+        { path: ':id/edit', element: <ExerciseForm /> },
+      ] },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
