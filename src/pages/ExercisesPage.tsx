@@ -1,11 +1,10 @@
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import { Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Routes } from '@/router/routes';
 
 import ExercisesList from '@/components/Exercises/ExercisesList';
-import { mockExercises } from '@/components/Exercises/mock';
 
 const ExercisesPage = () => {
   const navigate = useNavigate();
@@ -17,7 +16,7 @@ const ExercisesPage = () => {
           <AddIcon />
         </Fab>
       </Stack>
-      <ExercisesList exercises={mockExercises} />
+      <ExercisesList />
     </Stack>
   );
 }

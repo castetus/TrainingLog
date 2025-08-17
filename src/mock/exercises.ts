@@ -1,5 +1,5 @@
 // src/mocks/exercises.ts
-import type { Exercise } from '@/types/exercices';
+import type { Exercise } from '@/types/exercises';
 
 export const mockExercises: Exercise[] = [
   {

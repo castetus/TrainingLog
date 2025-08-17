@@ -1,20 +1,34 @@
 import { List, Input, Stack } from "@mui/material";
-import type { Exercise } from "@/types/exercices";
+import type { Exercise } from "@/types/exercises";
 import ExercisesListItem from "./ExercisesListItem";
 import { useState, useMemo } from "react";
 import { useConfirm } from "@/providers/confirmProvider";
+import { useExercisesController } from "@/controllers/exercisesController";
+import { useAppStore } from "@/store";
 
 interface ExercisesListProps {
   exercises: Exercise[];
 }
 
-export default function ExercisesList({ exercises }: ExercisesListProps) {
+export default function ExercisesList() {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [search, setSearch] = useState('');
   const confirm = useConfirm();
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
+
+  const { remove: removeExercise } = useExercisesController();
+
+  const exercises = [] as Exercise[];
+
+  const exercisesById = useAppStore(s => s.exercisesById);
+
+  const items = useMemo(() => {
+    const exercises = Object.values(exercisesById);
+    console.log(exercises);
+    return exercises;
+  }, [exercises]);
 
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => exercise.name.toLowerCase().includes(search.toLowerCase()));
@@ -25,16 +39,14 @@ export default function ExercisesList({ exercises }: ExercisesListProps) {
   };
 
   const handleDelete = async ({ id, name }: { id: string, name?: string }) => {
-    console.log('delete', id, name);
     const ok = await confirm({
       title: `Delete “${name}”?`,
       danger: true,
     });
     if (ok) {
-      await deleteController(id);
+      await removeExercise(id);
     }
-  }
-
+  };
   
   return (
     <Stack spacing={2}>

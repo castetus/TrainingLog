@@ -1,4 +1,4 @@
-import type { Exercise } from "@/types/exercices";
+import type { Exercise } from "@/types/exercises";
 import { IconButton, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
