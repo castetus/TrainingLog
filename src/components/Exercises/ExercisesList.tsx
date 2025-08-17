@@ -2,7 +2,6 @@ import { List, Input, Stack } from "@mui/material";
 import type { Exercise } from "@/types/exercices";
 import ExercisesListItem from "./ExercisesListItem";
 import { useState, useMemo } from "react";
-import DeleteConfirmationModal from "../Common/DeleteConfirmationModal";
 import { useConfirm } from "@/providers/confirmProvider";
 
 interface ExercisesListProps {
@@ -25,11 +24,12 @@ export default function ExercisesList({ exercises }: ExercisesListProps) {
     setSelectedExercise(exercise);
   };
 
-  const handleDelete = async (id: string, name?: string) => {
+  const handleDelete = async ({ id, name }: { id: string, name?: string }) => {
+    console.log('delete', id, name);
     const ok = await confirm({
-      title: `Delete “${name ?? 'item'}”?`,
+      title: `Delete “${name}”?`,
       danger: true,
-    })
+    });
     if (ok) {
       await deleteController(id);
     }

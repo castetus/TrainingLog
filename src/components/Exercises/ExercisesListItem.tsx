@@ -8,14 +8,14 @@ import { RowActions } from "@/components/Common";
 interface ExercisesListItemProps {
   exercise: Exercise;
   onEdit: (exercise: Exercise) => void;
-  onDelete: (id: string) => void;
+  onDelete: ({ id, name }: { id: string, name?: string }) => void;
 }
 
 export default function ExercisesListItem({ exercise, onEdit, onDelete }: ExercisesListItemProps) {
   
   const handleDelete: MouseEventHandler = useCallback(
-    (e) => { e.stopPropagation(); onDelete?.(exercise.id) },
-    [onDelete, exercise.id],
+    (e) => { e.stopPropagation(); onDelete?.({ id: exercise.id, name: exercise.name }) },
+    [onDelete, { id: exercise.id, name: exercise.name }],
   );
 
   const handleEdit: MouseEventHandler = useCallback(
