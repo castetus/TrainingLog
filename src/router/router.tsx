@@ -16,7 +16,15 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'workouts', element: <WorkoutsPage /> },
+      {
+        path: 'workouts',
+        element: <WorkoutsPage />,
+        children: [
+          { path: 'new', element: <WorkoutsPage /> },
+          { path: ':id', element: <WorkoutsPage /> },
+          { path: ':id/edit', element: <WorkoutsPage /> },
+        ],
+      },
       {
         path: 'trainings',
         element: <TrainingsPage />,

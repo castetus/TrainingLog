@@ -17,6 +17,7 @@ import { useExercisesController } from '@/controllers/exercisesController';
 import { useAppStore } from '@/store';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
+import { ExerciseType } from '@/types/exercises';
 
 export default function ExerciseForm() {
   const { id } = useParams();
@@ -34,7 +35,7 @@ export default function ExerciseForm() {
   const [formData, setFormData] = useState<{
     name: string;
     description: string;
-    type: 'weight' | 'time' | undefined;
+    type: ExerciseType | undefined;
   }>({
     name: '',
     description: '',
@@ -89,7 +90,7 @@ export default function ExerciseForm() {
     }
   };
 
-  const handleTypeChange = (newType: 'weight' | 'time' | undefined) => {
+  const handleTypeChange = (newType: ExerciseType | undefined) => {
     setFormData((prev) => ({
       ...prev,
       type: newType,
@@ -175,13 +176,13 @@ export default function ExerciseForm() {
               <Select
                 value={formData.type || ''}
                 onChange={(e) =>
-                  handleTypeChange(e.target.value as 'weight' | 'time' | undefined)
+                  handleTypeChange(e.target.value as ExerciseType | undefined)
                 }
                 label="Exercise Type"
               >
                 <MenuItem value="">Reps Only</MenuItem>
-                <MenuItem value="weight">Weight-based</MenuItem>
-                <MenuItem value="time">Time-based</MenuItem>
+                <MenuItem value={ExerciseType.WEIGHT}>Weight-based</MenuItem>
+                <MenuItem value={ExerciseType.TIME}>Time-based</MenuItem>
               </Select>
             </FormControl>
           </Stack>

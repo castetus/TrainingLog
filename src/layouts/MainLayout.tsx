@@ -36,13 +36,12 @@ const MainLayout = () => {
         label: 'Add Training',
       };
     }
-    // Add more routes here as needed
-    // if (pathname === Routes.WORKOUTS) {
-    //   return {
-    //     to: Routes.WORKOUT_NEW,
-    //     label: 'Add Workout',
-    //   };
-    // }
+    if (pathname === Routes.WORKOUTS) {
+      return {
+        to: Routes.WORKOUT_NEW,
+        label: 'Add Workout',
+      };
+    }
 
     return null;
   };
