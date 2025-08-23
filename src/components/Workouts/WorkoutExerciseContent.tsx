@@ -1,5 +1,5 @@
-import { AccordionDetails, Typography, Stack, TextField, Box, Divider } from '@mui/material';
-import { useState } from 'react';
+import { AccordionDetails, Typography, Stack, TextField, Box, Divider, Chip } from '@mui/material';
+import { useState, useMemo } from 'react';
 
 import type { WorkoutExercise, WorkoutSet } from '@/types/workouts';
 
@@ -23,6 +23,22 @@ export default function WorkoutExerciseContent({ workoutExercise }: WorkoutExerc
       prev.map((set, index) => (index === setIndex ? { ...set, [field]: value } : set)),
     );
   };
+
+  // Check if exercise is completed (all sets have required fields filled)
+  const isExerciseCompleted = useMemo(() => {
+    return actualSets.every((set) => {
+      // Reps are always required
+      if (set.actualReps <= 0) return false;
+
+      // Weight is required for weight-based exercises
+      if (workoutExercise.exercise.type === 'weight' && !set.actualWeight) return false;
+
+      // Duration is required for time-based exercises
+      if (workoutExercise.exercise.type === 'time' && !set.actualDuration) return false;
+
+      return true;
+    });
+  }, [actualSets, workoutExercise.exercise.type]);
 
   return (
     <AccordionDetails>
@@ -53,13 +69,34 @@ export default function WorkoutExerciseContent({ workoutExercise }: WorkoutExerc
 
         {/* Actual Results Form */}
         <Stack spacing={2}>
-          <Typography variant="h6">Actual Results</Typography>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Typography variant="h6">Actual Results</Typography>
+            {isExerciseCompleted && (
+              <Chip label="Completed" color="success" size="small" sx={{ fontWeight: 'medium' }} />
+            )}
+          </Stack>
 
           {actualSets.map((set, setIndex) => (
             <Box key={setIndex} sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Set {setIndex + 1}
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+                <Typography variant="subtitle2">Set {setIndex + 1}</Typography>
+                {(() => {
+                  const set = actualSets[setIndex];
+                  const isSetCompleted =
+                    set.actualReps > 0 &&
+                    (workoutExercise.exercise.type !== 'weight' || set.actualWeight) &&
+                    (workoutExercise.exercise.type !== 'time' || set.actualDuration);
+
+                  return isSetCompleted ? (
+                    <Chip
+                      label="✓"
+                      color="success"
+                      size="small"
+                      sx={{ minWidth: 24, height: 24 }}
+                    />
+                  ) : null;
+                })()}
+              </Stack>
 
               <Stack direction="row" spacing={2} alignItems="center">
                 <TextField

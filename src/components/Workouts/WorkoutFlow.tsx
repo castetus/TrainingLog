@@ -1,13 +1,8 @@
-import {
-  Box,
-  Accordion,
-  AccordionSummary,
-  Typography,
-  Stack,
-  Chip,
-} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import type { Workout } from '@/types/workouts';
+import { Box, Accordion, AccordionSummary, Typography, Stack, Chip } from '@mui/material';
+
+import type { Workout, WorkoutExercise } from '@/types/workouts';
+
 import { WorkoutExerciseContent } from './index';
 
 interface WorkoutFlowProps {
@@ -15,6 +10,22 @@ interface WorkoutFlowProps {
 }
 
 export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
+  // Helper function to check if an exercise is completed
+  const isExerciseCompleted = (workoutExercise: WorkoutExercise): boolean => {
+    return workoutExercise.actualSets.every((set) => {
+      // Reps are always required
+      if (set.actualReps <= 0) return false;
+
+      // Weight is required for weight-based exercises
+      if (workoutExercise.exercise.type === 'weight' && !set.actualWeight) return false;
+
+      // Duration is required for time-based exercises
+      if (workoutExercise.exercise.type === 'time' && !set.actualDuration) return false;
+
+      return true;
+    });
+  };
+
   return (
     <Box>
       <Stack spacing={2}>
@@ -43,6 +54,9 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                     color="secondary"
                     size="small"
                   />
+                )}
+                {isExerciseCompleted(workoutExercise) && (
+                  <Chip label="✓" color="success" size="small" sx={{ minWidth: 24, height: 24 }} />
                 )}
               </Stack>
             </AccordionSummary>
