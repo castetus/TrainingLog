@@ -1,31 +1,43 @@
-import type { Exercise } from "@/types/exercises";
-import { IconButton, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useCallback, type MouseEventHandler } from "react";
-import { RowActions } from "@/components/Common";
+import { ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { useCallback, type MouseEventHandler } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { RowActions } from '@/components/Common';
+import { Routes } from '@/router/routes';
+import type { Exercise } from '@/types/exercises';
 
 interface ExercisesListItemProps {
   exercise: Exercise;
-  onEdit: (exercise: Exercise) => void;
-  onDelete: ({ id, name }: { id: string, name?: string }) => void;
+  onDelete: ({ id, name }: { id: string; name?: string }) => void;
 }
 
-export default function ExercisesListItem({ exercise, onEdit, onDelete }: ExercisesListItemProps) {
-  
+export default function ExercisesListItem({ exercise, onDelete }: ExercisesListItemProps) {
+  const navigate = useNavigate();
+
   const handleDelete: MouseEventHandler = useCallback(
-    (e) => { e.stopPropagation(); onDelete?.({ id: exercise.id, name: exercise.name }) },
+    (e) => {
+      e.stopPropagation();
+      onDelete?.({ id: exercise.id, name: exercise.name });
+    },
     [onDelete, { id: exercise.id, name: exercise.name }],
   );
 
   const handleEdit: MouseEventHandler = useCallback(
-    (e) => { e.stopPropagation(); onEdit?.(exercise) },
-    [onEdit, exercise],
+    (e) => {
+      e.stopPropagation();
+      navigate(Routes.EXERCISE_EDIT.replace(':id', exercise.id));
+    },
+    [navigate, exercise.id],
   );
 
   return (
-    <ListItem alignItems="flex-start" secondaryAction={<RowActions onEdit={handleEdit} onDelete={handleDelete} />}>
-      <ListItemText primary={exercise.name} secondary={exercise.description} />
+    <ListItem
+      alignItems="flex-start"
+      secondaryAction={<RowActions onEdit={handleEdit} onDelete={handleDelete} />}
+    >
+      <ListItemButton onClick={handleEdit} sx={{ px: 0 }}>
+        <ListItemText primary={exercise.name} secondary={exercise.description} />
+      </ListItemButton>
     </ListItem>
   );
-};
+}

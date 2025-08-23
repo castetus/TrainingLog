@@ -1,24 +1,24 @@
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { Routes } from '@/router/routes';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import ExercisesList from '@/components/Exercises/ExercisesList';
+import { Routes } from '@/router/routes';
 
 const ExercisesPage = () => {
-  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we're on a nested route
+  const isNestedRoute = location.pathname !== Routes.EXERCISES;
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Fab color="primary" aria-label="add" className='fab-button' onClick={() => navigate(Routes.EXERCISE_NEW)}>
-          <AddIcon />
-        </Fab>
-      </Stack>
-      <ExercisesList />
+      {/* Always show the add button */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between"></Stack>
+
+      {/* Show exercises list only on main page, otherwise show nested route */}
+      {isNestedRoute ? <Outlet /> : <ExercisesList />}
     </Stack>
   );
-}
+};
 
 export default ExercisesPage;

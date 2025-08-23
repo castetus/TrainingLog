@@ -1,44 +1,39 @@
-import { List, Input, Stack } from "@mui/material";
-import type { Exercise } from "@/types/exercises";
-import ExercisesListItem from "./ExercisesListItem";
-import { useState, useMemo } from "react";
-import { useConfirm } from "@/providers/confirmProvider";
-import { useExercisesController } from "@/controllers/exercisesController";
-import { useAppStore } from "@/store";
+import { List, Input, Stack } from '@mui/material';
+import { useState, useMemo, useEffect } from 'react';
 
-interface ExercisesListProps {
-  exercises: Exercise[];
-}
+import { useExercisesController } from '@/controllers/exercisesController';
+import { useConfirm } from '@/providers/confirmProvider';
+import { useAppStore } from '@/store';
+
+import ExercisesListItem from './ExercisesListItem';
 
 export default function ExercisesList() {
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [search, setSearch] = useState('');
   const confirm = useConfirm();
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
 
-  const { remove: removeExercise } = useExercisesController();
+  const { remove: removeExercise, loadAll } = useExercisesController();
 
-  const exercises = [] as Exercise[];
+  // Load exercises from database when component mounts
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
-  const exercisesById = useAppStore(s => s.exercisesById);
+  const exercisesById = useAppStore((s) => s.exercisesById);
 
   const items = useMemo(() => {
     const exercises = Object.values(exercisesById);
-    console.log(exercises);
+
     return exercises;
-  }, [exercises]);
+  }, [exercisesById]);
 
   const filteredExercises = useMemo(() => {
-    return exercises.filter((exercise) => exercise.name.toLowerCase().includes(search.toLowerCase()));
-  }, [exercises, search]);
+    return items.filter((exercise) => exercise.name.toLowerCase().includes(search.toLowerCase()));
+  }, [items, search]);
 
-  const handleEdit = (exercise: Exercise) => {
-    setSelectedExercise(exercise);
-  };
-
-  const handleDelete = async ({ id, name }: { id: string, name?: string }) => {
+  const handleDelete = async ({ id, name }: { id: string; name?: string }) => {
     const ok = await confirm({
       title: `Delete “${name}”?`,
       danger: true,
@@ -47,15 +42,15 @@ export default function ExercisesList() {
       await removeExercise(id);
     }
   };
-  
+
   return (
     <Stack spacing={2}>
       <Input placeholder="Search" onChange={handleSearch} />
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {filteredExercises.map((exercise) => (
-          <ExercisesListItem key={exercise.id} exercise={exercise} onEdit={handleEdit} onDelete={handleDelete} />
+          <ExercisesListItem key={exercise.id} exercise={exercise} onDelete={handleDelete} />
         ))}
       </List>
     </Stack>
   );
-};
+}
