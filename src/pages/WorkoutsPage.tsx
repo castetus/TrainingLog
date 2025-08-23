@@ -44,7 +44,7 @@ export default function WorkoutsPage() {
   if (isFlowRoute && workout) {
     return (
       <NestedPageLayout title={workout.name} subtitle="Workout Session">
-        <WorkoutFlow />
+        <WorkoutFlow workout={workout} />
       </NestedPageLayout>
     );
   }

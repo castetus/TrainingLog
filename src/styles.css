@@ -4,3 +4,40 @@
   bottom: 72px;
   z-index: 1200;
 }
+
+/* Remove all outlines globally */
+* {
+  outline: none !important;
+}
+
+/* Remove focus outlines specifically */
+*:focus {
+  outline: none !important;
+}
+
+/* Remove button outlines */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+}
+
+/* Remove Material-UI component outlines */
+.MuiButton-outlined,
+.MuiChip-outlined,
+.MuiPaper-outlined,
+.MuiTableContainer-root .MuiPaper-outlined {
+  outline: none !important;
+}
+
+/* Remove border outlines from form elements */
+.MuiTextField-root .MuiOutlinedInput-root,
+.MuiFormControl-root .MuiOutlinedInput-root {
+  outline: none !important;
+}
+
+/* Remove focus rings and borders */
+.Mui-focused .MuiOutlinedInput-notchedOutline {
+  outline: none !important;
+}
