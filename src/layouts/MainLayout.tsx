@@ -55,7 +55,7 @@ const MainLayout = () => {
           {pageTitle}
         </Typography>
       )}
-      <Container maxWidth="xl" sx={{ py: 1 }}>
+      <Container maxWidth="xl" sx={{ py: 1 }} disableGutters>
         <Outlet />
       </Container>
 

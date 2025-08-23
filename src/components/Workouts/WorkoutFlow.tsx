@@ -1,6 +1,7 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Accordion, AccordionSummary, Typography, Stack, Chip } from '@mui/material';
+import { Box, Accordion, AccordionSummary, Typography, Stack, Chip, Button } from '@mui/material';
 
+import { useConfirm } from '@/providers/confirmProvider';
 import type { Workout, WorkoutExercise } from '@/types/workouts';
 
 import { WorkoutExerciseContent } from './index';
@@ -10,6 +11,8 @@ interface WorkoutFlowProps {
 }
 
 export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
+  const confirm = useConfirm();
+
   // Helper function to check if an exercise is completed
   const isExerciseCompleted = (workoutExercise: WorkoutExercise): boolean => {
     return workoutExercise.actualSets.every((set) => {
@@ -24,6 +27,22 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
 
       return true;
     });
+  };
+
+  const handleFinishWorkout = async () => {
+    const confirmed = await confirm({
+      title: 'Finish Workout',
+      message: 'Are you sure you want to finish this workout? This action cannot be undone.',
+      confirmText: 'Finish',
+      cancelText: 'Cancel',
+      danger: false,
+    });
+
+    if (confirmed) {
+      // TODO: Implement workout completion logic
+      console.log('Workout finished:', workout.id);
+      // Navigate back to workouts list or show completion screen
+    }
   };
 
   return (
@@ -63,6 +82,19 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
             <WorkoutExerciseContent workoutExercise={workoutExercise} />
           </Accordion>
         ))}
+
+        {/* Finish Workout Button */}
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            color="success"
+            size="large"
+            onClick={handleFinishWorkout}
+            sx={{ px: 4, py: 1.5 }}
+          >
+            Finish Workout
+          </Button>
+        </Box>
       </Stack>
     </Box>
   );

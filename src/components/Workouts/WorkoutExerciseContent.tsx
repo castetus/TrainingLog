@@ -1,6 +1,7 @@
-import { AccordionDetails, Typography, Stack, TextField, Box, Divider, Chip } from '@mui/material';
+import { AccordionDetails, Typography, Stack, TextField, Divider, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useState, useMemo } from 'react';
 
+import { ExerciseType } from '@/types';
 import type { WorkoutExercise, WorkoutSet } from '@/types/workouts';
 
 interface WorkoutExerciseContentProps {
@@ -70,85 +71,103 @@ export default function WorkoutExerciseContent({ workoutExercise }: WorkoutExerc
         {/* Actual Results Form */}
         <Stack spacing={2}>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="h6">Actual Results</Typography>
             {isExerciseCompleted && (
               <Chip label="Completed" color="success" size="small" sx={{ fontWeight: 'medium' }} />
             )}
           </Stack>
 
-          {actualSets.map((set, setIndex) => (
-            <Box key={setIndex} sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-                <Typography variant="subtitle2">Set {setIndex + 1}</Typography>
-                {(() => {
-                  const set = actualSets[setIndex];
+          <TableContainer component={Paper} variant="outlined">
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}></TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Set</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Reps</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>
+                    {workoutExercise.exercise.type === ExerciseType.WEIGHT ? 'kg' : 
+                     workoutExercise.exercise.type === ExerciseType.TIME ? 'sec' : 'Field'}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {actualSets.map((set, setIndex) => {
                   const isSetCompleted =
                     set.actualReps > 0 &&
-                    (workoutExercise.exercise.type !== 'weight' || set.actualWeight) &&
-                    (workoutExercise.exercise.type !== 'time' || set.actualDuration);
+                    (workoutExercise.exercise.type !== ExerciseType.WEIGHT || set.actualWeight) &&
+                    (workoutExercise.exercise.type !== ExerciseType.TIME || set.actualDuration);
 
-                  return isSetCompleted ? (
-                    <Chip
-                      label="✓"
-                      color="success"
-                      size="small"
-                      sx={{ minWidth: 24, height: 24 }}
-                    />
-                  ) : null;
-                })()}
-              </Stack>
-
-              <Stack direction="row" spacing={2} alignItems="center">
-                <TextField
-                  label="Reps"
-                  type="number"
-                  value={set.actualReps || ''}
-                  onChange={(e) =>
-                    handleSetChange(setIndex, 'actualReps', parseInt(e.target.value) || 0)
-                  }
-                  size="small"
-                  sx={{ width: 100 }}
-                  inputProps={{ min: 0, max: 100 }}
-                />
-
-                {workoutExercise.exercise.type === 'weight' && (
-                  <TextField
-                    label="Weight (kg)"
-                    type="number"
-                    value={set.actualWeight || ''}
-                    onChange={(e) =>
-                      handleSetChange(
-                        setIndex,
-                        'actualWeight',
-                        parseFloat(e.target.value) || undefined,
-                      )
-                    }
-                    size="small"
-                    sx={{ width: 120 }}
-                    inputProps={{ min: 0, step: 0.5 }}
-                  />
-                )}
-
-                {workoutExercise.exercise.type === 'time' && (
-                  <TextField
-                    label="Duration (sec)"
-                    type="number"
-                    value={set.actualDuration || ''}
-                    onChange={(e) =>
-                      handleSetChange(
-                        setIndex,
-                        'actualDuration',
-                        parseInt(e.target.value) || undefined,
-                      )
-                    }
-                    size="small"
-                    sx={{ width: 120 }}
-                    inputProps={{ min: 0 }}
-                  />
-                )}
-              </Stack>
-            </Box>
-          ))}
+                  return (
+                    <TableRow key={setIndex}>
+                      <TableCell align="center">
+                        {isSetCompleted ? (
+                          <Chip label="✓" color="success" size="small" sx={{ minWidth: 24, height: 24 }} />
+                        ) : (
+                          <Chip label="—" color="default" size="small" sx={{ minWidth: 24, height: 24 }} />
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="subtitle2">{setIndex + 1}</Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <TextField
+                          type="number"
+                          value={set.actualReps || ''}
+                          onChange={(e) =>
+                            handleSetChange(setIndex, 'actualReps', parseInt(e.target.value) || 0)
+                          }
+                          size="small"
+                          sx={{ width: 80 }}
+                          inputProps={{ min: 0, max: 100 }}
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        {workoutExercise.exercise.type === ExerciseType.WEIGHT && (
+                          <TextField
+                            type="number"
+                            value={set.actualWeight || ''}
+                            onChange={(e) =>
+                              handleSetChange(
+                                setIndex,
+                                'actualWeight',
+                                parseFloat(e.target.value) || undefined,
+                              )
+                            }
+                            size="small"
+                            sx={{ width: 80 }}
+                            inputProps={{ min: 0, step: 0.5 }}
+                            variant="outlined"
+                          />
+                        )}
+                        {workoutExercise.exercise.type === ExerciseType.TIME && (
+                          <TextField
+                            type="number"
+                            value={set.actualDuration || ''}
+                            onChange={(e) =>
+                              handleSetChange(
+                                setIndex,
+                                'actualDuration',
+                                parseInt(e.target.value) || undefined,
+                              )
+                            }
+                            size="small"
+                            sx={{ width: 80 }}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                          />
+                        )}
+                        {workoutExercise.exercise.type !== ExerciseType.WEIGHT && workoutExercise.exercise.type !== ExerciseType.TIME && (
+                          <Typography variant="body2" color="text.secondary">
+                            —
+                          </Typography>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Stack>
       </Stack>
     </AccordionDetails>
