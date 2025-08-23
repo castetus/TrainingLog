@@ -6,7 +6,7 @@ const NotFoundPage = () => {
   const goHome = () => navigate('/')
 
   return (
-    <Stack spacing={2} alignItems="flex-start">
+    <Stack spacing={1.5} alignItems="flex-start">
       <Typography variant="h5">Page not found</Typography>
       <Button variant="contained" onClick={goHome}>Go Home</Button>
     </Stack>

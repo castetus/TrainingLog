@@ -1,5 +1,4 @@
 import {
-  Paper,
   Box,
   Typography,
   TextField,
@@ -144,69 +143,67 @@ export default function ExerciseForm() {
 
   return (
     <NestedPageLayout backTo={Routes.EXERCISES} title={title} subtitle={subtitle}>
-      <Paper elevation={1} sx={{ p: 3 }}>
-        <Box component="form" onSubmit={handleSubmit}>
-          <Stack spacing={3}>
-            {/* Basic Information */}
-            <Stack spacing={2}>
-              <Typography variant="h6">Basic Information</Typography>
+      <Box component="form" onSubmit={handleSubmit}>
+        <Stack spacing={2}>
+          {/* Basic Information */}
+          <Stack spacing={1.5}>
+            <Typography variant="h6">Basic Information</Typography>
 
-              <TextField
-                label="Exercise Name"
-                value={formData.name || ''}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                error={!!errors.name}
-                helperText={errors.name}
-                fullWidth
-                required
-              />
+            <TextField
+              label="Exercise Name"
+              value={formData.name || ''}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              error={!!errors.name}
+              helperText={errors.name}
+              fullWidth
+              required
+              size="small"
+            />
 
-              <TextField
-                label="Description"
-                value={formData.description || ''}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                multiline
-                rows={2}
-                fullWidth
-              />
+            <TextField
+              label="Description"
+              value={formData.description || ''}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              multiline
+              rows={2}
+              fullWidth
+              size="small"
+            />
 
-              <FormControl fullWidth>
-                <InputLabel>Exercise Type</InputLabel>
-                <Select
-                  value={formData.type || ''}
-                  onChange={(e) =>
-                    handleTypeChange(e.target.value as 'weight' | 'time' | undefined)
-                  }
-                  label="Exercise Type"
-                >
-                  <MenuItem value="">Reps Only</MenuItem>
-                  <MenuItem value="weight">Weight-based</MenuItem>
-                  <MenuItem value="time">Time-based</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-
-            
-
-            {/* Error Messages */}
-            {errors.load && <FormHelperText error>{errors.load}</FormHelperText>}
-            {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
-
-            {/* Form Actions */}
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="contained" disabled={isLoading}>
-                {isLoading 
-                  ? (isEditing ? 'Updating...' : 'Creating...') 
-                  : (isEditing ? 'Update Exercise' : 'Create Exercise')
+            <FormControl fullWidth size="small">
+              <InputLabel>Exercise Type</InputLabel>
+              <Select
+                value={formData.type || ''}
+                onChange={(e) =>
+                  handleTypeChange(e.target.value as 'weight' | 'time' | undefined)
                 }
-              </Button>
-            </Stack>
+                label="Exercise Type"
+              >
+                <MenuItem value="">Reps Only</MenuItem>
+                <MenuItem value="weight">Weight-based</MenuItem>
+                <MenuItem value="time">Time-based</MenuItem>
+              </Select>
+            </FormControl>
           </Stack>
-        </Box>
-      </Paper>
+
+          {/* Error Messages */}
+          {errors.load && <FormHelperText error>{errors.load}</FormHelperText>}
+          {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
+
+          {/* Form Actions */}
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" disabled={isLoading}>
+              {isLoading 
+                ? (isEditing ? 'Updating...' : 'Creating...') 
+                : (isEditing ? 'Update Exercise' : 'Create Exercise')
+              }
+            </Button>
+          </Stack>
+        </Stack>
+      </Box>
     </NestedPageLayout>
   );
 }

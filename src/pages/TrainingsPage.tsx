@@ -11,7 +11,7 @@ const TrainingsPage = () => {
   const isNestedRoute = location.pathname !== Routes.TRAININGS;
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={1}>
       {/* Show trainings list only on main page, otherwise show nested route */}
       {isNestedRoute ? <Outlet /> : <TrainingsList />}
     </Stack>

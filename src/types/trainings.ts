@@ -21,18 +21,13 @@ export interface Training {
   id: TrainingID;
   name: string;
   description?: string;
-  date: string; // ISO date string
-  duration?: number; // in minutes
   exercises: TrainingExercise[];
   notes?: string;
-  completed: boolean;
 }
 
 export interface TrainingFormData {
   name: string;
   description: string;
-  date: string;
-  duration: number;
   exercises: TrainingExercise[];
   notes: string;
 }

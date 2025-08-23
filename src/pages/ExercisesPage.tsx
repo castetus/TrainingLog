@@ -11,10 +11,7 @@ const ExercisesPage = () => {
   const isNestedRoute = location.pathname !== Routes.EXERCISES;
 
   return (
-    <Stack spacing={2}>
-      {/* Always show the add button */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between"></Stack>
-
+    <Stack spacing={1}>
       {/* Show exercises list only on main page, otherwise show nested route */}
       {isNestedRoute ? <Outlet /> : <ExercisesList />}
     </Stack>

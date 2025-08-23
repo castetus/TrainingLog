@@ -1,4 +1,5 @@
 import type { Exercise } from '@/types/exercises'
+import type { Training } from '@/types/trainings'
 
 export type Id = string
 
@@ -11,4 +12,5 @@ export type Table<T> = {
 
 export type Db = {
   exercises: Table<Exercise>
+  trainings: Table<Training>
 }

@@ -44,8 +44,8 @@ export default function ExercisesList() {
   };
 
   return (
-    <Stack spacing={2}>
-      <Input placeholder="Search" onChange={handleSearch} />
+    <Stack spacing={1.5}>
+      <Input placeholder="Search" onChange={handleSearch} size="small" />
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {filteredExercises.map((exercise) => (
           <ExercisesListItem key={exercise.id} exercise={exercise} onDelete={handleDelete} />

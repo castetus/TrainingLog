@@ -6,8 +6,6 @@ export const mockTrainings: Training[] = [
     id: 'tr-0001',
     name: 'Upper Body Strength',
     description: 'Focus on chest, shoulders, and triceps',
-    date: '2024-01-15',
-    duration: 75,
     exercises: [
       {
         exercise: mockExercises[0], // Bench Press
@@ -37,8 +35,6 @@ export const mockTrainings: Training[] = [
     id: 'tr-0002',
     name: 'Lower Body Power',
     description: 'Squats and deadlifts focus',
-    date: '2024-01-17',
-    duration: 90,
     exercises: [
       {
         exercise: mockExercises[1], // Back Squat
@@ -69,8 +65,6 @@ export const mockTrainings: Training[] = [
     id: 'tr-0003',
     name: 'Full Body Circuit',
     description: 'High intensity circuit training',
-    date: '2024-01-20',
-    duration: 60,
     exercises: [
       {
         exercise: mockExercises[5], // Push-ups

@@ -24,10 +24,10 @@ export default function NestedPageLayout({
   onBack,
 }: NestedPageLayoutProps) {
   return (
-    <Container maxWidth="md" sx={{ py: 2 }}>
-      <Stack spacing={3}>
+    <Container maxWidth="xl" sx={{ py: 1 }}>
+      <Stack spacing={2}>
         {/* Header with back button and title */}
-        <Stack direction="row" alignItems="flex-start" spacing={2}>
+        <Stack direction="row" alignItems="flex-start" spacing={1.5}>
           <BackButton to={backTo} onClick={onBack} sx={{ mt: 0.5 }} />
           <Box sx={{ flex: 1 }}>
             <Typography variant="h4" component="h1" gutterBottom>
