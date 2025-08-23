@@ -1,12 +1,11 @@
 import AddIcon from '@mui/icons-material/Add';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Typography,
   TextField,
-  FormControl,
-  Select,
-  MenuItem,
   Button,
   Stack,
   FormHelperText,
@@ -25,7 +24,11 @@ import { useTrainingsController } from '@/controllers/trainingsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { mockExercises } from '@/mock/exercises';
 import { Routes } from '@/router/routes';
+import type { Exercise } from '@/types/exercises';
+import { ExerciseType } from '@/types/exercises';
 import type { TrainingFormData, TrainingExercise } from '@/types/trainings';
+
+import AddExerciseSubform from './AddExerciseSubform';
 
 export default function TrainingForm() {
   const { id } = useParams();
@@ -81,17 +84,60 @@ export default function TrainingForm() {
     }
   };
 
+  const [showAddExerciseForm, setShowAddExerciseForm] = useState(false);
+  const [newExerciseData, setNewExerciseData] = useState<{
+    exercise: Exercise;
+    plannedSets: number;
+    plannedReps: number;
+    plannedWeight?: number;
+    plannedDuration?: number;
+    notes: string;
+  }>({
+    exercise: mockExercises[0],
+    plannedSets: 1,
+    plannedReps: 10,
+    plannedWeight: 0,
+    plannedDuration: 60,
+    notes: '',
+  });
+
   const addExercise = () => {
+    setShowAddExerciseForm(true);
+  };
+
+  const handleAddExercise = () => {
     const newExercise: TrainingExercise = {
-      exercise: mockExercises[0], // Default to first exercise
-      plannedSets: 1,
-      plannedReps: [10],
-      notes: '',
+      exercise: newExerciseData.exercise,
+      plannedSets: newExerciseData.plannedSets,
+      plannedReps: [newExerciseData.plannedReps],
+      notes: newExerciseData.notes,
     };
     setFormData((prev) => ({
       ...prev,
       exercises: [...prev.exercises, newExercise],
     }));
+    setShowAddExerciseForm(false);
+    // Reset form data
+    setNewExerciseData({
+      exercise: mockExercises[0],
+      plannedSets: 1,
+      plannedReps: 10,
+      plannedWeight: 0,
+      plannedDuration: 60,
+      notes: '',
+    });
+  };
+
+  const cancelAddExercise = () => {
+    setShowAddExerciseForm(false);
+    setNewExerciseData({
+      exercise: mockExercises[0],
+      plannedSets: 1,
+      plannedReps: 10,
+      plannedWeight: 0,
+      plannedDuration: 60,
+      notes: '',
+    });
   };
 
   const removeExercise = (index: number) => {
@@ -99,19 +145,6 @@ export default function TrainingForm() {
       ...prev,
       exercises: prev.exercises.filter((_, i) => i !== index),
     }));
-  };
-
-  const updateExercise = (index: number, field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      exercises: prev.exercises.map((ex, i) => (i === index ? { ...ex, [field]: value } : ex)),
-    }));
-
-    // Clear field-specific errors
-    const errorKey = `exercise${index}${field.charAt(0).toUpperCase() + field.slice(1)}`;
-    if (errors[errorKey]) {
-      setErrors((prev) => ({ ...prev, [errorKey]: '' }));
-    }
   };
 
   const validateForm = () => {
@@ -211,10 +244,60 @@ export default function TrainingForm() {
           <Stack spacing={1.5}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography variant="h6">Exercises</Typography>
-              <Button startIcon={<AddIcon />} onClick={addExercise} variant="outlined" size="small">
-                Add Exercise
-              </Button>
+              {!showAddExerciseForm ? (
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={addExercise}
+                  variant="outlined"
+                  size="small"
+                >
+                  Add Exercise
+                </Button>
+              ) : (
+                <Stack direction="row" spacing={1}>
+                  <IconButton onClick={cancelAddExercise} color="error" size="small" title="Cancel">
+                    <CloseIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleAddExercise}
+                    color="primary"
+                    size="small"
+                    title="Add Exercise"
+                  >
+                    <CheckIcon />
+                  </IconButton>
+                </Stack>
+              )}
             </Stack>
+
+            <AddExerciseSubform
+              showAddExerciseForm={showAddExerciseForm}
+              newExerciseData={newExerciseData}
+              onExerciseChange={(exercise) => {
+                setNewExerciseData((prev) => ({
+                  ...prev,
+                  exercise,
+                  plannedSets: exercise.sets,
+                  plannedReps: exercise.reps[0] || 10,
+                  plannedWeight: exercise.type === ExerciseType.WEIGHT ? (exercise.weightKg?.[0] || 0) : 0,
+                  plannedDuration: exercise.type === ExerciseType.TIME ? (exercise.seconds?.[0] || 60) : 60,
+                }));
+              }}
+              onSetsChange={(sets) =>
+                setNewExerciseData((prev) => ({ ...prev, plannedSets: sets }))
+              }
+              onRepsChange={(reps) =>
+                setNewExerciseData((prev) => ({ ...prev, plannedReps: reps }))
+              }
+              onWeightChange={(weight) =>
+                setNewExerciseData((prev) => ({ ...prev, plannedWeight: weight }))
+              }
+              onDurationChange={(duration) =>
+                setNewExerciseData((prev) => ({ ...prev, plannedDuration: duration }))
+              }
+              onNotesChange={(notes) => setNewExerciseData((prev) => ({ ...prev, notes }))}
+              mockExercises={mockExercises}
+            />
 
             {errors.exercises && <FormHelperText error>{errors.exercises}</FormHelperText>}
 
@@ -234,7 +317,6 @@ export default function TrainingForm() {
                       <TableCell align="center" sx={{ width: '12%' }}>
                         Reps
                       </TableCell>
-                      <TableCell sx={{ width: '35%' }}>Notes</TableCell>
                       <TableCell align="center" sx={{ width: '6%' }}>
                         Actions
                       </TableCell>
@@ -244,68 +326,20 @@ export default function TrainingForm() {
                     {formData.exercises.map((exercise, index) => (
                       <TableRow key={index}>
                         <TableCell>
-                          <FormControl fullWidth size="small">
-                            <Select
-                              value={exercise.exercise.id}
-                              onChange={(e) => {
-                                const selectedExercise = mockExercises.find(
-                                  (ex) => ex.id === e.target.value,
-                                );
-                                if (selectedExercise) {
-                                  updateExercise(index, 'exercise', selectedExercise);
-                                  // Reset planned values to match exercise defaults
-                                  updateExercise(index, 'plannedSets', selectedExercise.sets);
-                                  updateExercise(index, 'plannedReps', selectedExercise.reps);
-                                }
-                              }}
-                              required
-                            >
-                              {mockExercises.map((ex) => (
-                                <MenuItem key={ex.id} value={ex.id}>
-                                  {ex.name}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
+                          <Stack>
+                            <Typography variant="subtitle2" fontWeight="medium">
+                              {exercise.exercise.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {exercise.exercise.description}
+                            </Typography>
+                          </Stack>
                         </TableCell>
                         <TableCell align="center">
-                          <TextField
-                            type="number"
-                            value={exercise.plannedSets}
-                            onChange={(e) =>
-                              updateExercise(index, 'plannedSets', parseInt(e.target.value) || 1)
-                            }
-                            error={!!errors[`exercise${index}Sets`]}
-                            helperText={errors[`exercise${index}Sets`]}
-                            inputProps={{ min: 1, max: 20 }}
-                            size="small"
-                            sx={{ width: 70 }}
-                            required
-                          />
+                          <Typography variant="body2">{exercise.plannedSets}</Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <TextField
-                            type="number"
-                            value={exercise.plannedReps[0] || 10}
-                            onChange={(e) =>
-                              updateExercise(index, 'plannedReps', [parseInt(e.target.value) || 10])
-                            }
-                            error={!!errors[`exercise${index}Reps`]}
-                            helperText={errors[`exercise${index}Reps`]}
-                            inputProps={{ min: 1, max: 100 }}
-                            size="small"
-                            sx={{ width: 70 }}
-                            required
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            value={exercise.notes || ''}
-                            onChange={(e) => updateExercise(index, 'notes', e.target.value)}
-                            placeholder="Optional notes"
-                            size="small"
-                            fullWidth
-                          />
+                          <Typography variant="body2">{exercise.plannedReps[0] || 10}</Typography>
                         </TableCell>
                         <TableCell align="center">
                           <IconButton

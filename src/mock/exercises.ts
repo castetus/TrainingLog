@@ -1,12 +1,13 @@
 // src/mocks/exercises.ts
 import type { Exercise } from '@/types/exercises';
+import { ExerciseType } from '@/types/exercises';
 
 export const mockExercises: Exercise[] = [
   {
     id: 'ex-0001',
     name: 'Bench Press',
     description: 'Flat barbell bench',
-    type: 'weight',
+    type: ExerciseType.WEIGHT,
     sets: 5,
     reps: [5, 5, 5, 5, 5],
     weightKg: [60, 70, 80, 80, 70],
@@ -15,7 +16,7 @@ export const mockExercises: Exercise[] = [
     id: 'ex-0002',
     name: 'Back Squat',
     description: 'High-bar squat',
-    type: 'weight',
+    type: ExerciseType.WEIGHT,
     sets: 5,
     reps: [5, 5, 5, 5, 5],
     weightKg: [80, 90, 100, 100, 90],
@@ -23,7 +24,7 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0003',
     name: 'Deadlift',
-    type: 'weight',
+    type: ExerciseType.WEIGHT,
     sets: 3,
     reps: [5, 5, 5],
     weightKg: [100, 110, 120],
@@ -31,7 +32,7 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0004',
     name: 'Overhead Press',
-    type: 'weight',
+    type: ExerciseType.WEIGHT,
     sets: 4,
     reps: [8, 8, 8, 8],
     weightKg: [40, 40, 35, 35],
@@ -40,19 +41,21 @@ export const mockExercises: Exercise[] = [
     id: 'ex-0005',
     name: 'Pull-ups',
     description: 'Bodyweight',
+    type: ExerciseType.REPS_ONLY,
     sets: 4,
     reps: [10, 8, 7, 6],
   },
   {
     id: 'ex-0006',
     name: 'Push-ups',
+    type: ExerciseType.REPS_ONLY,
     sets: 3,
     reps: [20, 15, 12],
   },
   {
     id: 'ex-0007',
     name: 'Plank',
-    type: 'time',
+    type: ExerciseType.TIME,
     sets: 3,
     reps: [1, 1, 1],
     seconds: [60, 60, 45],
@@ -60,7 +63,7 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0008',
     name: 'Hollow Hold',
-    type: 'time',
+    type: ExerciseType.TIME,
     sets: 3,
     reps: [1, 1, 1],
     seconds: [45, 45, 45],
@@ -69,7 +72,7 @@ export const mockExercises: Exercise[] = [
     id: 'ex-0009',
     name: 'Biceps Curl',
     description: 'Dumbbells',
-    type: 'weight',
+    type: ExerciseType.WEIGHT,
     sets: 3,
     reps: [12, 12, 12],
     weightKg: [12, 12, 12],
@@ -78,7 +81,7 @@ export const mockExercises: Exercise[] = [
     id: 'ex-0010',
     name: 'Bulgarian Split Squat',
     description: 'Dumbbells',
-    type: 'weight',
+    type: ExerciseType.WEIGHT,
     sets: 3,
     reps: [10, 10, 10],
     weightKg: [20, 20, 20],
@@ -86,7 +89,7 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0011',
     name: 'Plank',
-    type: 'time',
+    type: ExerciseType.TIME,
     sets: 3,
     reps: [1, 1, 1],
     seconds: [60, 60, 45],
@@ -94,7 +97,7 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0012',
     name: 'Plank',
-    type: 'time',
+    type: ExerciseType.TIME,
     sets: 3,
     reps: [1, 1, 1],
     seconds: [60, 60, 45],
@@ -102,7 +105,7 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0013',
     name: 'Plank',
-    type: 'time',
+    type: ExerciseType.TIME,
     sets: 3,
     reps: [1, 1, 1],
     seconds: [60, 60, 45],
@@ -110,7 +113,7 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0014',
     name: 'Plank',
-    type: 'time',
+    type: ExerciseType.TIME,
     sets: 3,
     reps: [1, 1, 1],
     seconds: [60, 60, 45],

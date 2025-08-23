@@ -1,5 +1,11 @@
 export type ID = string
 
+export enum ExerciseType {
+  WEIGHT = 'weight',
+  TIME = 'time',
+  REPS_ONLY = 'reps_only'
+}
+
 export interface BaseExercise {
   id: ID
   name: string
@@ -12,22 +18,22 @@ export interface BaseExercise {
 
 /** Weight-based exercise */
 export interface WeightExercise extends BaseExercise {
-  type: 'weight'
+  type: ExerciseType.WEIGHT
   /** weight per set, length must equal sets */
   weightKg: number[]
 }
 
 /** Time-based exercise */
 export interface TimeExercise extends BaseExercise {
-  type: 'time'
+  type: ExerciseType.TIME
   /** duration per set, in seconds */
   seconds: number[]
 }
 
 /** Reps-only exercise (no weight or time dimension) */
 export interface RepsOnlyExercise extends BaseExercise {
-  type?: undefined
+  type: ExerciseType.REPS_ONLY
 }
 
-export type Exercise = WeightExercise | TimeExercise | RepsOnlyExercise
+export type Exercise = WeightExercise | RepsOnlyExercise | TimeExercise
 
