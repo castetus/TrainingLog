@@ -9,7 +9,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Chip,
 } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,9 +33,7 @@ export default function WorkoutForm() {
     name: '',
     description: '',
     date: new Date().toISOString().split('T')[0], // Today's date
-    duration: undefined,
     exercises: [],
-    notes: '',
   });
 
   const [selectedTrainingId, setSelectedTrainingId] = useState<string>('');
@@ -43,8 +43,30 @@ export default function WorkoutForm() {
     loadAll();
   }, [loadAll]);
 
+  // Auto-select training based on day of the week
+  useEffect(() => {
+    if (Object.keys(trainingsById).length > 0 && !selectedTrainingId) {
+      const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+      
+      // Find training that matches today's day of the week
+      const matchingTraining = Object.values(trainingsById).find(
+        training => training.dayOfTheWeek === today
+      );
+      
+      if (matchingTraining) {
+        handleTrainingChange(matchingTraining.id);
+      }
+    }
+  }, [trainingsById, selectedTrainingId]);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const getDayName = (dayOfTheWeek?: number): string => {
+    if (dayOfTheWeek === undefined) return '';
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[dayOfTheWeek];
+  };
 
   const generateWorkoutName = (trainingId: string, date: string) => {
     if (!trainingId || !date) return '';
@@ -75,7 +97,6 @@ export default function WorkoutForm() {
           plannedReps: ex.plannedReps[0] || 10, // Use first planned rep value
           plannedWeight: ex.plannedWeightKg?.[0], // Use first planned weight value
           plannedDuration: ex.plannedSeconds?.[0], // Use first planned duration value
-          notes: ex.notes || '',
         })),
         }));
       }
@@ -124,8 +145,8 @@ export default function WorkoutForm() {
 
     setIsLoading(true);
     try {
-      await create(formData);
-      navigate(Routes.WORKOUTS);
+      const newWorkout = await create(formData);
+      navigate(Routes.WORKOUT_FLOW.replace(':id', newWorkout.id));
     } catch (error) {
       console.error('Error creating workout:', error);
       setErrors({ submit: 'Failed to create workout' });
@@ -134,17 +155,15 @@ export default function WorkoutForm() {
     }
   };
 
-  const handleCancel = () => {
-    navigate(Routes.WORKOUTS);
-  };
+
 
   return (
-    <NestedPageLayout title="New Workout" subtitle="Create a new workout session">
+    <NestedPageLayout title="Start Workout" subtitle="Begin a new workout session based on a training plan">
       <Box component="form" onSubmit={handleSubmit}>
         <Stack spacing={2}>
           {/* Training Selection */}
           <Stack spacing={1.5}>
-            <Typography variant="h6">Training Plan</Typography>
+            <Typography variant="h6">Select Training Plan</Typography>
             
             <FormControl fullWidth size="small" error={!!errors.training}>
               <InputLabel>Select Training</InputLabel>
@@ -156,11 +175,33 @@ export default function WorkoutForm() {
                 <MenuItem value="">
                   <em>Choose a training plan...</em>
                 </MenuItem>
-                {Object.values(trainingsById).map((training) => (
-                  <MenuItem key={training.id} value={training.id}>
-                    {training.name}
-                  </MenuItem>
-                ))}
+                {Object.values(trainingsById).map((training) => {
+                  const today = new Date().getDay();
+                  const isToday = training.dayOfTheWeek === today;
+                  
+                  return (
+                    <MenuItem key={training.id} value={training.id}>
+                      <Stack>
+                        <Typography variant="body2">
+                          {training.name}
+                          {isToday && (
+                            <Chip
+                              label="Today"
+                              size="small"
+                              color="primary"
+                              sx={{ ml: 1, height: 20 }}
+                            />
+                          )}
+                        </Typography>
+                        {training.dayOfTheWeek !== undefined && (
+                          <Typography variant="caption" color="text.secondary">
+                            {getDayName(training.dayOfTheWeek)}
+                          </Typography>
+                        )}
+                      </Stack>
+                    </MenuItem>
+                  );
+                })}
               </Select>
               {errors.training && (
                 <FormHelperText error>{errors.training}</FormHelperText>
@@ -168,9 +209,9 @@ export default function WorkoutForm() {
             </FormControl>
           </Stack>
 
-          {/* Basic Information */}
+          {/* Workout Details */}
           <Stack spacing={1.5}>
-            <Typography variant="h6">Basic Information</Typography>
+            <Typography variant="h6">Workout Details</Typography>
 
             <TextField
               label="Workout Name"
@@ -207,42 +248,18 @@ export default function WorkoutForm() {
               InputLabelProps={{ shrink: true }}
             />
 
-            <TextField
-              label="Duration (minutes)"
-              type="number"
-              value={formData.duration || ''}
-              onChange={(e) => handleInputChange('duration', e.target.value ? parseInt(e.target.value) : undefined)}
-              fullWidth
-              size="small"
-              inputProps={{ min: 1, max: 480 }}
-            />
+
           </Stack>
 
-          {/* Notes */}
-          <Stack spacing={1.5}>
-            <Typography variant="h6">Notes</Typography>
-            <TextField
-              label="Workout Notes"
-              value={formData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              multiline
-              rows={3}
-              fullWidth
-              size="small"
-              placeholder="Any notes about this workout session..."
-            />
-          </Stack>
+
 
           {/* Error Messages */}
           {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
 
           {/* Form Actions */}
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create Workout'}
+          <Stack direction="row" justifyContent="flex-end">
+            <Button type="submit" variant="contained" disabled={isLoading} startIcon={<PlayArrowIcon />}>
+              {isLoading ? 'Starting...' : 'Start Workout'}
             </Button>
           </Stack>
         </Stack>

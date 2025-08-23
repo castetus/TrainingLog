@@ -2,7 +2,7 @@ import { Box, Typography, Stack, Button } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate, Outlet } from 'react-router-dom';
 
-import { WorkoutsList, WorkoutView, WorkoutForm } from '@/components/Workouts';
+import { WorkoutsList, WorkoutView, WorkoutForm, WorkoutFlow } from '@/components/Workouts';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
@@ -19,11 +19,12 @@ export default function WorkoutsPage() {
 
   const isNestedRoute = location.pathname !== Routes.WORKOUTS;
   const isDetailRoute =
-    id && !location.pathname.includes('/edit') && !location.pathname.includes('/new');
+    id && !location.pathname.includes('/edit') && !location.pathname.includes('/new') && !location.pathname.includes('/flow');
   const isNewRoute = location.pathname.includes('/new');
+  const isFlowRoute = location.pathname.includes('/flow');
 
   useEffect(() => {
-    if (isDetailRoute && id) {
+    if ((isDetailRoute || isFlowRoute) && id) {
       setIsLoading(true);
       findById(id)
         .then((foundWorkout) => {
@@ -34,10 +35,18 @@ export default function WorkoutsPage() {
           setIsLoading(false);
         });
     }
-  }, [isDetailRoute, id, findById]);
+  }, [isDetailRoute, isFlowRoute, id, findById]);
 
   if (isNewRoute) {
     return <WorkoutForm />;
+  }
+
+  if (isFlowRoute && workout) {
+    return (
+      <NestedPageLayout title={workout.name} subtitle="Workout Session">
+        <WorkoutFlow />
+      </NestedPageLayout>
+    );
   }
 
   if (isDetailRoute && workout) {

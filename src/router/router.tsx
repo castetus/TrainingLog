@@ -23,6 +23,7 @@ export const router = createBrowserRouter([
           { path: 'new', element: <WorkoutsPage /> },
           { path: ':id', element: <WorkoutsPage /> },
           { path: ':id/edit', element: <WorkoutsPage /> },
+          { path: ':id/flow', element: <WorkoutsPage /> },
         ],
       },
       {

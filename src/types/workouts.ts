@@ -51,9 +51,7 @@ export interface CreateWorkoutData {
   name: string;
   description?: string;
   date: string;
-  duration?: number;
   exercises: Omit<WorkoutExercise, 'actualSets'>[];
-  notes?: string;
 }
 
 export interface UpdateWorkoutData extends Partial<CreateWorkoutData> {

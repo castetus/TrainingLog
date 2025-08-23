@@ -21,6 +21,8 @@ export interface Training {
   id: TrainingID;
   name: string;
   description?: string;
+  /** Optional day of the week for this training (0-6, where 0 is Sunday) */
+  dayOfTheWeek?: number;
   exercises: TrainingExercise[];
   notes?: string;
 }
@@ -28,6 +30,8 @@ export interface Training {
 export interface TrainingFormData {
   name: string;
   description: string;
+  /** Optional day of the week for this training (0-6, where 0 is Sunday) */
+  dayOfTheWeek?: number;
   exercises: TrainingExercise[];
   notes: string;
 }

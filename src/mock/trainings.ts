@@ -6,6 +6,7 @@ export const mockTrainings: Training[] = [
     id: 'tr-0001',
     name: 'Upper Body Strength',
     description: 'Focus on chest, shoulders, and triceps',
+    dayOfTheWeek: 1, // Monday
     exercises: [
       {
         exercise: mockExercises[0], // Bench Press
@@ -29,12 +30,12 @@ export const mockTrainings: Training[] = [
       },
     ],
     notes: 'Great session, felt strong today. Need to work on bench press form.',
-    completed: true,
   },
   {
     id: 'tr-0002',
     name: 'Lower Body Power',
     description: 'Squats and deadlifts focus',
+    dayOfTheWeek: 6, // Saturday
     exercises: [
       {
         exercise: mockExercises[1], // Back Squat
@@ -59,12 +60,12 @@ export const mockTrainings: Training[] = [
       },
     ],
     notes: 'Legs were tired but pushed through. Good progress on squats.',
-    completed: true,
   },
   {
     id: 'tr-0003',
     name: 'Full Body Circuit',
     description: 'High intensity circuit training',
+    dayOfTheWeek: 5, // Friday
     exercises: [
       {
         exercise: mockExercises[5], // Push-ups
@@ -88,6 +89,5 @@ export const mockTrainings: Training[] = [
       },
     ],
     notes: 'Quick but effective workout. Good cardio component.',
-    completed: false,
   },
 ];
