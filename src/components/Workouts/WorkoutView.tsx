@@ -12,6 +12,7 @@ import {
   Paper,
 } from '@mui/material';
 
+import { formatLongDate, formatMediumDate, formatDuration, formatTime } from '@/utils';
 import type { Workout } from '@/types/workouts';
 
 interface WorkoutViewProps {
@@ -20,32 +21,7 @@ interface WorkoutViewProps {
 
 export default function WorkoutView({ workout }: WorkoutViewProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const formatDuration = (minutes?: number) => {
-    if (!minutes) return 'Not recorded';
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return `${hours}h ${mins}m`;
-    }
-    return `${mins} minutes`;
-  };
-
-  const formatTime = (seconds?: number) => {
-    if (!seconds) return '-';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    if (mins > 0) {
-      return `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${secs}s`;
+    return formatLongDate(dateString);
   };
 
   return (
@@ -57,7 +33,11 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
         </Typography>
         <Stack direction="row" spacing={2} alignItems="center">
           <Chip label={formatDate(workout.date)} color="primary" />
-          {workout.duration && <Chip label={formatDuration(workout.duration)} color="secondary" />}
+          {workout.duration ? (
+            <Chip label={formatDuration(workout.duration)} color="secondary" />
+          ) : (
+            <Chip label="Not recorded" color="default" variant="outlined" />
+          )}
         </Stack>
         {workout.description && (
           <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
@@ -143,9 +123,9 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
       {/* Metadata */}
       <Box>
         <Typography variant="caption" color="text.secondary">
-          Created: {new Date(workout.createdAt).toLocaleString()}
+          Created: {formatMediumDate(workout.createdAt)}
           {workout.updatedAt !== workout.createdAt &&
-            ` • Updated: ${new Date(workout.updatedAt).toLocaleString()}`}
+            ` • Updated: ${formatMediumDate(workout.updatedAt)}`}
         </Typography>
       </Box>
     </Stack>

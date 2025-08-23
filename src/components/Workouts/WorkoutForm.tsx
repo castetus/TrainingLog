@@ -5,18 +5,27 @@ import {
   Button,
   Stack,
   FormHelperText,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useWorkoutsController } from '@/controllers/workoutsController';
+import { useTrainingsController } from '@/controllers/trainingsController';
+import { useAppStore } from '@/store';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
+import { formatShortDate } from '@/utils';
 import type { CreateWorkoutData } from '@/types/workouts';
 
 export default function WorkoutForm() {
   const navigate = useNavigate();
   const { create } = useWorkoutsController();
+  const { loadAll } = useTrainingsController();
+  const trainingsById = useAppStore((s) => s.trainingsById);
 
   const [formData, setFormData] = useState<CreateWorkoutData>({
     name: '',
@@ -27,11 +36,61 @@ export default function WorkoutForm() {
     notes: '',
   });
 
+  const [selectedTrainingId, setSelectedTrainingId] = useState<string>('');
+
+  // Load trainings on component mount
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const generateWorkoutName = (trainingId: string, date: string) => {
+    if (!trainingId || !date) return '';
+    
+    const training = trainingsById[trainingId];
+    if (!training) return '';
+    
+    const formattedDate = formatShortDate(date);
+    
+    return `${training.name} - ${formattedDate}`;
+  };
+
+  const handleTrainingChange = (trainingId: string) => {
+    setSelectedTrainingId(trainingId);
+    
+    if (trainingId) {
+      const training = trainingsById[trainingId];
+      if (training) {
+        // Auto-generate workout name
+        const workoutName = generateWorkoutName(trainingId, formData.date);
+        setFormData(prev => ({
+          ...prev,
+          name: workoutName,
+          description: training.description || '',
+                  exercises: training.exercises.map(ex => ({
+          exercise: ex.exercise,
+          plannedSets: ex.plannedSets,
+          plannedReps: ex.plannedReps[0] || 10, // Use first planned rep value
+          plannedWeight: ex.plannedWeightKg?.[0], // Use first planned weight value
+          plannedDuration: ex.plannedSeconds?.[0], // Use first planned duration value
+          notes: ex.notes || '',
+        })),
+        }));
+      }
+    }
+  };
+
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    
+    // If date changes, regenerate workout name
+    if (field === 'date' && selectedTrainingId) {
+      const workoutName = generateWorkoutName(selectedTrainingId, value);
+      setFormData(prev => ({ ...prev, name: workoutName }));
+    }
+    
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
     }
@@ -39,6 +98,10 @@ export default function WorkoutForm() {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
+
+    if (!selectedTrainingId) {
+      newErrors.training = 'Please select a training plan';
+    }
 
     if (!formData.name?.trim()) {
       newErrors.name = 'Workout name is required';
@@ -79,6 +142,32 @@ export default function WorkoutForm() {
     <NestedPageLayout title="New Workout" subtitle="Create a new workout session">
       <Box component="form" onSubmit={handleSubmit}>
         <Stack spacing={2}>
+          {/* Training Selection */}
+          <Stack spacing={1.5}>
+            <Typography variant="h6">Training Plan</Typography>
+            
+            <FormControl fullWidth size="small" error={!!errors.training}>
+              <InputLabel>Select Training</InputLabel>
+              <Select
+                value={selectedTrainingId}
+                onChange={(e) => handleTrainingChange(e.target.value)}
+                label="Select Training"
+              >
+                <MenuItem value="">
+                  <em>Choose a training plan...</em>
+                </MenuItem>
+                {Object.values(trainingsById).map((training) => (
+                  <MenuItem key={training.id} value={training.id}>
+                    {training.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.training && (
+                <FormHelperText error>{errors.training}</FormHelperText>
+              )}
+            </FormControl>
+          </Stack>
+
           {/* Basic Information */}
           <Stack spacing={1.5}>
             <Typography variant="h6">Basic Information</Typography>
@@ -92,6 +181,7 @@ export default function WorkoutForm() {
               fullWidth
               required
               size="small"
+              placeholder="Auto-generated from training and date"
             />
 
             <TextField
