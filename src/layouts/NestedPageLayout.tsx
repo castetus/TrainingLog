@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 import { BackButton } from '@/components/Common';
 
 interface NestedPageLayoutProps {
-  /** Where the back button should navigate to */
-  backTo: string;
+  /** Where the back button should navigate to. If not provided, uses browser history */
+  backTo?: string;
   /** Page title to display */
   title: string;
   /** Optional subtitle or description */

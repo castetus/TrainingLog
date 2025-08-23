@@ -7,6 +7,7 @@ export const mockExercises: Exercise[] = [
     id: 'ex-0001',
     name: 'Bench Press',
     description: 'Flat barbell bench',
+    videoUrl: 'https://www.youtube.com/watch?v=rT7DgCr-3pg',
     type: ExerciseType.WEIGHT,
     sets: 5,
     reps: [5, 5, 5, 5, 5],
@@ -55,6 +56,8 @@ export const mockExercises: Exercise[] = [
   {
     id: 'ex-0007',
     name: 'Plank',
+    description: 'Core strengthening exercise',
+    videoUrl: 'https://www.youtube.com/watch?v=ASdvN_XEl_c',
     type: ExerciseType.TIME,
     sets: 3,
     reps: [1, 1, 1],

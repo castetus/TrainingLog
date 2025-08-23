@@ -22,6 +22,14 @@ export default function ExercisesListItem({ exercise, onDelete }: ExercisesListI
     [onDelete, { id: exercise.id, name: exercise.name }],
   );
 
+  const handleView: MouseEventHandler = useCallback(
+    (e) => {
+      e.stopPropagation();
+      navigate(Routes.EXERCISE_DETAIL.replace(':id', exercise.id));
+    },
+    [navigate, exercise.id],
+  );
+
   const handleEdit: MouseEventHandler = useCallback(
     (e) => {
       e.stopPropagation();
@@ -35,7 +43,7 @@ export default function ExercisesListItem({ exercise, onDelete }: ExercisesListI
       alignItems="flex-start"
       secondaryAction={<RowActions onEdit={handleEdit} onDelete={handleDelete} />}
     >
-      <ListItemButton onClick={handleEdit} sx={{ px: 0 }}>
+      <ListItemButton onClick={handleView} sx={{ px: 0 }}>
         <ListItemText primary={exercise.name} secondary={exercise.description} />
       </ListItemButton>
     </ListItem>

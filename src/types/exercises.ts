@@ -10,6 +10,8 @@ export interface BaseExercise {
   id: ID
   name: string
   description?: string
+  /** optional video tutorial URL */
+  videoUrl?: string
   /** total number of sets (must equal reps.length) */
   sets: number
   /** repeats per set */

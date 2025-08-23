@@ -327,7 +327,19 @@ export default function TrainingForm() {
                       <TableRow key={index}>
                         <TableCell>
                           <Stack>
-                            <Typography variant="subtitle2" fontWeight="medium">
+                            <Typography 
+                              variant="subtitle2" 
+                              fontWeight="medium"
+                              sx={{
+                                cursor: 'pointer',
+                                color: 'primary.main',
+                                '&:hover': {
+                                  textDecoration: 'underline',
+                                  color: 'primary.dark'
+                                }
+                              }}
+                              onClick={() => navigate(Routes.EXERCISE_DETAIL.replace(':id', exercise.exercise.id))}
+                            >
                               {exercise.exercise.name}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">

@@ -9,6 +9,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 import TrainingsPage from '@/pages/TrainingsPage';
 import WorkoutsPage from '@/pages/WorkoutsPage';
 
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
         element: <ExercisesPage />,
         children: [
           { path: 'new', element: <ExerciseForm /> },
+          { path: ':id', element: <ExerciseForm /> },
           { path: ':id/edit', element: <ExerciseForm /> },
         ],
       },
