@@ -97,6 +97,7 @@ export default function WorkoutForm() {
             plannedReps: ex.plannedReps[0] || 10, // Use first planned rep value
             plannedWeight: ex.plannedWeightKg?.[0], // Use first planned weight value
             plannedDuration: ex.plannedSeconds?.[0], // Use first planned duration value
+            actualSets: [], // Initialize with empty actual sets
           })),
         }));
       }

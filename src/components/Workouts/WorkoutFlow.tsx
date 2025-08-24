@@ -1,7 +1,10 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Accordion, AccordionSummary, Typography, Stack, Chip, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
+import { useWorkoutsController } from '@/controllers/workoutsController';
 import { useConfirm } from '@/providers/confirmProvider';
+import { Routes } from '@/router/routes';
 import type { Workout, WorkoutExercise } from '@/types/workouts';
 
 import { WorkoutExerciseContent } from './index';
@@ -12,6 +15,8 @@ interface WorkoutFlowProps {
 
 export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   const confirm = useConfirm();
+  const { finishWorkout } = useWorkoutsController();
+  const navigate = useNavigate();
 
   // Helper function to check if an exercise is completed
   const isExerciseCompleted = (workoutExercise: WorkoutExercise): boolean => {
@@ -39,9 +44,14 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     });
 
     if (confirmed) {
-      // TODO: Implement workout completion logic
-      console.log('Workout finished:', workout.id);
-      // Navigate back to workouts list or show completion screen
+      try {
+        await finishWorkout(workout.id);
+        navigate(Routes.WORKOUTS);
+        console.log('Workout finished successfully:', workout.id);
+      } catch (error) {
+        console.error('Failed to finish workout:', error);
+        // Error is already handled by the controller
+      }
     }
   };
 

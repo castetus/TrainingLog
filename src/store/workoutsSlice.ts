@@ -1,7 +1,6 @@
-import { create } from 'zustand';
 import type { StateCreator } from 'zustand';
 
-import type { Workout, CreateWorkoutData, UpdateWorkoutData } from '@/types/workouts';
+import type { Workout } from '@/types/workouts';
 
 export interface WorkoutsState {
   workoutsById: Record<string, Workout>;
@@ -27,10 +26,13 @@ export const createWorkoutsSlice: StateCreator<WorkoutsSlice> = (set, get) => ({
   error: null,
 
   setWorkouts: (workouts) => {
-    const workoutsById = workouts.reduce((acc, workout) => {
-      acc[workout.id] = workout;
-      return acc;
-    }, {} as Record<string, Workout>);
+    const workoutsById = workouts.reduce(
+      (acc, workout) => {
+        acc[workout.id] = workout;
+        return acc;
+      },
+      {} as Record<string, Workout>,
+    );
     set({ workoutsById });
   },
 

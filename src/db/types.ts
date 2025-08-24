@@ -1,5 +1,6 @@
 import type { Exercise } from '@/types/exercises'
 import type { Training } from '@/types/trainings'
+import type { Workout } from '@/types/workouts'
 
 export type Id = string
 

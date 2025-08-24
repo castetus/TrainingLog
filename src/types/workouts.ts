@@ -45,13 +45,15 @@ export interface Workout {
   createdAt: string;
   /** When the workout was last updated */
   updatedAt: string;
+  /** When the workout was completed (optional) */
+  completedAt?: string;
 }
 
 export interface CreateWorkoutData {
   name: string;
   description?: string;
   date: string;
-  exercises: Omit<WorkoutExercise, 'actualSets'>[];
+  exercises: WorkoutExercise[];
 }
 
 export interface UpdateWorkoutData extends Partial<CreateWorkoutData> {
