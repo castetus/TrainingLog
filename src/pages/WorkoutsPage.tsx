@@ -19,7 +19,10 @@ export default function WorkoutsPage() {
 
   const isNestedRoute = location.pathname !== Routes.WORKOUTS;
   const isDetailRoute =
-    id && !location.pathname.includes('/edit') && !location.pathname.includes('/new') && !location.pathname.includes('/flow');
+    id &&
+    !location.pathname.includes('/edit') &&
+    !location.pathname.includes('/new') &&
+    !location.pathname.includes('/flow');
   const isNewRoute = location.pathname.includes('/new');
   const isFlowRoute = location.pathname.includes('/flow');
 

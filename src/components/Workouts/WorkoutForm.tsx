@@ -1,3 +1,4 @@
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import {
   Box,
   Typography,
@@ -11,17 +12,16 @@ import {
   MenuItem,
   Chip,
 } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useWorkoutsController } from '@/controllers/workoutsController';
 import { useTrainingsController } from '@/controllers/trainingsController';
-import { useAppStore } from '@/store';
+import { useWorkoutsController } from '@/controllers/workoutsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
-import { formatShortDate } from '@/utils';
+import { useAppStore } from '@/store';
 import type { CreateWorkoutData } from '@/types/workouts';
+import { formatShortDate } from '@/utils';
 
 export default function WorkoutForm() {
   const navigate = useNavigate();
@@ -47,12 +47,12 @@ export default function WorkoutForm() {
   useEffect(() => {
     if (Object.keys(trainingsById).length > 0 && !selectedTrainingId) {
       const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
-      
+
       // Find training that matches today's day of the week
       const matchingTraining = Object.values(trainingsById).find(
-        training => training.dayOfTheWeek === today
+        (training) => training.dayOfTheWeek === today,
       );
-      
+
       if (matchingTraining) {
         handleTrainingChange(matchingTraining.id);
       }
@@ -70,34 +70,34 @@ export default function WorkoutForm() {
 
   const generateWorkoutName = (trainingId: string, date: string) => {
     if (!trainingId || !date) return '';
-    
+
     const training = trainingsById[trainingId];
     if (!training) return '';
-    
+
     const formattedDate = formatShortDate(date);
-    
+
     return `${training.name} - ${formattedDate}`;
   };
 
   const handleTrainingChange = (trainingId: string) => {
     setSelectedTrainingId(trainingId);
-    
+
     if (trainingId) {
       const training = trainingsById[trainingId];
       if (training) {
         // Auto-generate workout name
         const workoutName = generateWorkoutName(trainingId, formData.date);
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           name: workoutName,
           description: training.description || '',
-                  exercises: training.exercises.map(ex => ({
-          exercise: ex.exercise,
-          plannedSets: ex.plannedSets,
-          plannedReps: ex.plannedReps[0] || 10, // Use first planned rep value
-          plannedWeight: ex.plannedWeightKg?.[0], // Use first planned weight value
-          plannedDuration: ex.plannedSeconds?.[0], // Use first planned duration value
-        })),
+          exercises: training.exercises.map((ex) => ({
+            exercise: ex.exercise,
+            plannedSets: ex.plannedSets,
+            plannedReps: ex.plannedReps[0] || 10, // Use first planned rep value
+            plannedWeight: ex.plannedWeightKg?.[0], // Use first planned weight value
+            plannedDuration: ex.plannedSeconds?.[0], // Use first planned duration value
+          })),
         }));
       }
     }
@@ -105,13 +105,13 @@ export default function WorkoutForm() {
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    
+
     // If date changes, regenerate workout name
     if (field === 'date' && selectedTrainingId) {
       const workoutName = generateWorkoutName(selectedTrainingId, value);
-      setFormData(prev => ({ ...prev, name: workoutName }));
+      setFormData((prev) => ({ ...prev, name: workoutName }));
     }
-    
+
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
     }
@@ -155,16 +155,17 @@ export default function WorkoutForm() {
     }
   };
 
-
-
   return (
-    <NestedPageLayout title="Start Workout" subtitle="Begin a new workout session based on a training plan">
+    <NestedPageLayout
+      title="Start Workout"
+      subtitle="Begin a new workout session based on a training plan"
+    >
       <Box component="form" onSubmit={handleSubmit}>
         <Stack spacing={2}>
           {/* Training Selection */}
           <Stack spacing={1.5}>
             <Typography variant="h6">Select Training Plan</Typography>
-            
+
             <FormControl fullWidth size="small" error={!!errors.training}>
               <InputLabel>Select Training</InputLabel>
               <Select
@@ -178,7 +179,7 @@ export default function WorkoutForm() {
                 {Object.values(trainingsById).map((training) => {
                   const today = new Date().getDay();
                   const isToday = training.dayOfTheWeek === today;
-                  
+
                   return (
                     <MenuItem key={training.id} value={training.id}>
                       <Stack>
@@ -203,9 +204,7 @@ export default function WorkoutForm() {
                   );
                 })}
               </Select>
-              {errors.training && (
-                <FormHelperText error>{errors.training}</FormHelperText>
-              )}
+              {errors.training && <FormHelperText error>{errors.training}</FormHelperText>}
             </FormControl>
           </Stack>
 
@@ -247,18 +246,19 @@ export default function WorkoutForm() {
               size="small"
               InputLabelProps={{ shrink: true }}
             />
-
-
           </Stack>
-
-
 
           {/* Error Messages */}
           {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
 
           {/* Form Actions */}
           <Stack direction="row" justifyContent="flex-end">
-            <Button type="submit" variant="contained" disabled={isLoading} startIcon={<PlayArrowIcon />}>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isLoading}
+              startIcon={<PlayArrowIcon />}
+            >
               {isLoading ? 'Starting...' : 'Start Workout'}
             </Button>
           </Stack>

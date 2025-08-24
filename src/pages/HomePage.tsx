@@ -1,9 +1,17 @@
-import { Button, Stack, Typography } from '@mui/material'
+import { Button, Stack } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const HomePage = () => (
-  <Stack spacing={1.5}>
-    <Button variant="contained">Start Workout</Button>
-  </Stack>
-);
+import { Routes } from '@/router/routes';
+
+const HomePage = () => {
+  const navigate = useNavigate();
+  return (
+    <Stack spacing={1.5}>
+      <Button variant="contained" onClick={() => navigate(Routes.WORKOUT_NEW)}>
+        Start Workout
+      </Button>
+    </Stack>
+  );
+};
 
 export default HomePage;
