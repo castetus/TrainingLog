@@ -1,5 +1,21 @@
+import { IndexedDbDb } from './indexedDb';
 import { MockDb } from './mockDb';
 import type { Db } from './types';
 
-// Swap this line later to use IndexedDbDb or HttpDb, same interface.
-export const db: Db = new MockDb();
+// Use IndexedDB with fallback to MockDb
+let dbInstance: Db;
+
+try {
+  // Check if IndexedDB is available
+  if (typeof window !== 'undefined' && 'indexedDB' in window) {
+    dbInstance = new IndexedDbDb();
+    console.log('Using IndexedDB for data persistence');
+  } else {
+    throw new Error('IndexedDB not available');
+  }
+} catch (error) {
+  console.warn('Falling back to MockDb:', error);
+  dbInstance = new MockDb();
+}
+
+export const db: Db = dbInstance;

@@ -14,9 +14,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useExercisesController } from '@/controllers/exercisesController';
-import { useAppStore } from '@/store';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
+import { useAppStore } from '@/store';
 import { ExerciseType } from '@/types/exercises';
 
 export default function ExerciseForm() {
@@ -127,7 +127,7 @@ export default function ExerciseForm() {
         // Create new exercise
         await create(formData as any); // Type assertion needed due to simplified form data
       }
-      
+
       // Navigate back to exercises list
       navigate(Routes.EXERCISES);
     } catch (error) {
@@ -175,9 +175,7 @@ export default function ExerciseForm() {
               <InputLabel>Exercise Type</InputLabel>
               <Select
                 value={formData.type || ''}
-                onChange={(e) =>
-                  handleTypeChange(e.target.value as ExerciseType | undefined)
-                }
+                onChange={(e) => handleTypeChange(e.target.value as ExerciseType | undefined)}
                 label="Exercise Type"
               >
                 <MenuItem value="">Reps Only</MenuItem>
@@ -197,10 +195,13 @@ export default function ExerciseForm() {
               Cancel
             </Button>
             <Button type="submit" variant="contained" disabled={isLoading}>
-              {isLoading 
-                ? (isEditing ? 'Updating...' : 'Creating...') 
-                : (isEditing ? 'Update Exercise' : 'Create Exercise')
-              }
+              {isLoading
+                ? isEditing
+                  ? 'Updating...'
+                  : 'Creating...'
+                : isEditing
+                  ? 'Update Exercise'
+                  : 'Create Exercise'}
             </Button>
           </Stack>
         </Stack>
