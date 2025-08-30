@@ -281,7 +281,7 @@ export default function WorkoutForm() {
             <Button
               type="submit"
               variant="contained"
-              disabled={isLoading || Object.keys(trainingsById).length === 0}
+              disabled={isLoading || Object.keys(trainingsById).length === 0 || !selectedTrainingId}
               startIcon={<PlayArrowIcon />}
             >
               {isLoading ? 'Starting...' : 'Start Workout'}

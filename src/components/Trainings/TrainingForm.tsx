@@ -89,33 +89,27 @@ export default function TrainingForm() {
     setNewExerciseData((prev) => ({
       ...prev,
       exercise,
-      plannedSets: exercise.sets || 1,
-      plannedReps: exercise.reps?.[0] || 10,
-      plannedWeight:
-        exercise.type === ExerciseType.WEIGHT && exercise.weightKg && exercise.weightKg.length > 0 
-          ? exercise.weightKg[0] 
-          : 0,
-      plannedDuration:
-        exercise.type === ExerciseType.TIME && exercise.seconds && exercise.seconds.length > 0 
-          ? exercise.seconds[0] 
-          : 60,
+      plannedSets: '',
+      plannedReps: '',
+      plannedWeight: '',
+      plannedDuration: '',
     }));
   }, []);
 
   const [showAddExerciseForm, setShowAddExerciseForm] = useState(false);
   const [newExerciseData, setNewExerciseData] = useState<{
     exercise: Exercise | null;
-    plannedSets: number;
-    plannedReps: number;
-    plannedWeight: number;
-    plannedDuration: number;
+    plannedSets: string;
+    plannedReps: string;
+    plannedWeight: string;
+    plannedDuration: string;
     notes: string;
   }>({
     exercise: null,
-    plannedSets: 1,
-    plannedReps: 10,
-    plannedWeight: 0,
-    plannedDuration: 60,
+    plannedSets: '',
+    plannedReps: '',
+    plannedWeight: '',
+    plannedDuration: '',
     notes: '',
   });
 
@@ -142,10 +136,10 @@ export default function TrainingForm() {
     // Reset form data
     setNewExerciseData({
       exercise: null,
-      plannedSets: 1,
-      plannedReps: 10,
-      plannedWeight: 0,
-      plannedDuration: 60,
+      plannedSets: '',
+      plannedReps: '',
+      plannedWeight: '',
+      plannedDuration: '',
       notes: '',
     });
   };
@@ -154,10 +148,10 @@ export default function TrainingForm() {
     setShowAddExerciseForm(false);
     setNewExerciseData({
       exercise: null,
-      plannedSets: 1,
-      plannedReps: 10,
-      plannedWeight: 0,
-      plannedDuration: 60,
+      plannedSets: '',
+      plannedReps: '',
+      plannedWeight: '',
+      plannedDuration: '',
       notes: '',
     });
   };

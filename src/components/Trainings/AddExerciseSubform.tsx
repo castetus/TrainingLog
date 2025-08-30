@@ -93,6 +93,7 @@ export default function AddExerciseSubform({
                 }
               }
             }}
+            disabled={!newExerciseData.exercise}
             size="small"
             sx={{ width: 100 }}
           />
@@ -120,6 +121,7 @@ export default function AddExerciseSubform({
                   }
                 }
               }}
+              disabled={!newExerciseData.exercise}
               size="small"
               sx={{ width: 100 }}
             />
@@ -147,6 +149,7 @@ export default function AddExerciseSubform({
                   }
                 }
               }}
+              disabled={!newExerciseData.exercise}
               size="small"
               sx={{ width: 100 }}
             />
@@ -174,6 +177,7 @@ export default function AddExerciseSubform({
                 }
               }
             }}
+            disabled={!newExerciseData.exercise}
             size="small"
             sx={{ width: 100 }}
           />
@@ -188,6 +192,7 @@ export default function AddExerciseSubform({
             value={newExerciseData.notes}
             onChange={(e) => onNotesChange(e.target.value)}
             placeholder="Optional notes"
+            disabled={!newExerciseData.exercise}
             size="small"
             sx={{ flex: 1 }}
           />

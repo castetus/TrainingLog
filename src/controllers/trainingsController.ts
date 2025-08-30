@@ -34,9 +34,15 @@ export const useTrainingsController = () => {
   const create = useCallback(
     async (trainingData: TrainingFormData): Promise<Training> => {
       try {
-        const newTraining = await db.trainings.put(trainingData as Training);
-        store.upsertTrainings([newTraining]);
-        return newTraining;
+        // Generate a unique ID for the new training
+        const newTraining: Training = {
+          ...trainingData,
+          id: crypto.randomUUID(),
+        };
+        
+        const savedTraining = await db.trainings.put(newTraining);
+        store.upsertTrainings([savedTraining]);
+        return savedTraining;
       } catch (error) {
         console.error('Error creating training:', error);
         throw error;

@@ -74,8 +74,12 @@ export const useWorkoutsController = () => {
           updatedAt: new Date().toISOString(),
         };
 
-        addWorkout(newWorkout);
-        return newWorkout;
+        // Save to database first
+        const savedWorkout = await db.workouts.put(newWorkout);
+        
+        // Then update local store
+        addWorkout(savedWorkout);
+        return savedWorkout;
       } catch (error) {
         setError('Failed to create workout');
         console.error('Error creating workout:', error);
@@ -104,8 +108,12 @@ export const useWorkoutsController = () => {
           updatedAt: new Date().toISOString(),
         };
 
-        updateWorkout(updatedWorkout);
-        return updatedWorkout;
+        // Save to database first
+        const savedWorkout = await db.workouts.put(updatedWorkout);
+        
+        // Then update local store
+        updateWorkout(savedWorkout);
+        return savedWorkout;
       } catch (error) {
         setError('Failed to update workout');
         console.error('Error updating workout:', error);
@@ -123,6 +131,10 @@ export const useWorkoutsController = () => {
         setLoading(true);
         clearError();
 
+        // Remove from database first
+        await db.workouts.remove(id);
+        
+        // Then remove from local store
         removeWorkout(id);
       } catch (error) {
         setError('Failed to delete workout');
@@ -153,8 +165,12 @@ export const useWorkoutsController = () => {
           updatedAt: new Date().toISOString(),
         };
 
-        updateWorkout(finishedWorkout);
-        return finishedWorkout;
+        // Save to database first
+        const savedWorkout = await db.workouts.put(finishedWorkout);
+        
+        // Then update local store
+        updateWorkout(savedWorkout);
+        return savedWorkout;
       } catch (error) {
         setError('Failed to finish workout');
         console.error('Error finishing workout:', error);

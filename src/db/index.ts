@@ -9,7 +9,6 @@ try {
   // Check if IndexedDB is available
   if (typeof window !== 'undefined' && 'indexedDB' in window) {
     dbInstance = new IndexedDbDb();
-    console.log('Using IndexedDB for data persistence');
   } else {
     throw new Error('IndexedDB not available');
   }
