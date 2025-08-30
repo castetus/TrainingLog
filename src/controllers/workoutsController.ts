@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { db } from '@/db';
-import { mockWorkouts } from '@/mock/workouts';
+
 import { useAppStore } from '@/store';
 import type { Workout, CreateWorkoutData, UpdateWorkoutData } from '@/types/workouts';
 
@@ -22,19 +22,8 @@ export const useWorkoutsController = () => {
       setLoading(true);
       clearError();
 
-      // Try to load from IndexedDB first, fallback to mock data
-      try {
-        const workouts = await db.workouts.list();
-        if (workouts.length > 0) {
-          setWorkouts(workouts);
-        } else {
-          // If no workouts in DB, load mock data
-          setWorkouts(mockWorkouts);
-        }
-      } catch (dbError) {
-        console.warn('IndexedDB not available, using mock data:', dbError);
-        setWorkouts(mockWorkouts);
-      }
+      const workouts = await db.workouts.list();
+      setWorkouts(workouts);
     } catch (error) {
       setError('Failed to load workouts');
       console.error('Error loading workouts:', error);
@@ -53,21 +42,10 @@ export const useWorkoutsController = () => {
         }
 
         // Try to find in database
-        try {
-          const dbWorkout = await db.workouts.get(id);
-          if (dbWorkout) {
-            addWorkout(dbWorkout);
-            return dbWorkout;
-          }
-        } catch (dbError) {
-          console.warn('IndexedDB not available, falling back to mock data:', dbError);
-        }
-
-        // Fallback to mock data
-        const foundWorkout = mockWorkouts.find((w) => w.id === id);
-        if (foundWorkout) {
-          addWorkout(foundWorkout);
-          return foundWorkout;
+        const dbWorkout = await db.workouts.get(id);
+        if (dbWorkout) {
+          addWorkout(dbWorkout);
+          return dbWorkout;
         }
         return null;
       } catch (error) {

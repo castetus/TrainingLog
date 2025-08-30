@@ -2,11 +2,12 @@ import { Box, Typography, TextField, Stack, Autocomplete } from '@mui/material';
 
 import type { Exercise } from '@/types/exercises';
 import { ExerciseType } from '@/types/exercises';
+import { useAppStore } from '@/store';
 
 interface AddExerciseSubformProps {
   showAddExerciseForm: boolean;
   newExerciseData: {
-    exercise: Exercise;
+    exercise: Exercise | null;
     plannedSets: number;
     plannedReps: number;
     plannedWeight?: number;
@@ -19,7 +20,6 @@ interface AddExerciseSubformProps {
   onWeightChange?: (weight: number) => void;
   onDurationChange?: (duration: number) => void;
   onNotesChange: (notes: string) => void;
-  mockExercises: Exercise[];
 }
 
 export default function AddExerciseSubform({
@@ -31,8 +31,9 @@ export default function AddExerciseSubform({
   onWeightChange,
   onDurationChange,
   onNotesChange,
-  mockExercises,
 }: AddExerciseSubformProps) {
+  const exercises = useAppStore((s) => Object.values(s.exercisesById));
+  
   if (!showAddExerciseForm) return null;
 
   return (
@@ -53,9 +54,9 @@ export default function AddExerciseSubform({
                 onExerciseChange(newValue);
               }
             }}
-            options={mockExercises}
+            options={exercises}
             getOptionLabel={(option) => option.name}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === (value?.id || '')}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Stack>
@@ -72,6 +73,11 @@ export default function AddExerciseSubform({
             sx={{ flexGrow: 1 }}
             renderInput={(params) => <TextField {...params} size="small" />}
           />
+          {!newExerciseData.exercise && (
+            <Typography variant="caption" color="error">
+              Please select an exercise to continue
+            </Typography>
+          )}
         </Stack>
 
         <Stack direction="row" spacing={2} alignItems="center">
@@ -85,11 +91,12 @@ export default function AddExerciseSubform({
             inputProps={{ min: 1, max: 20 }}
             size="small"
             sx={{ width: 100 }}
+            disabled={!newExerciseData.exercise}
           />
         </Stack>
 
         {/* Weight-based exercise fields */}
-        {newExerciseData.exercise.type === ExerciseType.WEIGHT && (
+        {newExerciseData.exercise?.type === ExerciseType.WEIGHT && (
           <Stack direction="row" spacing={2} alignItems="center">
             <Typography variant="body2" sx={{ minWidth: 80 }}>
               Weight (kg):
@@ -101,12 +108,13 @@ export default function AddExerciseSubform({
               inputProps={{ min: 0, max: 500, step: 0.5 }}
               size="small"
               sx={{ width: 100 }}
+              disabled={!newExerciseData.exercise}
             />
           </Stack>
         )}
 
         {/* Time-based exercise fields */}
-        {newExerciseData.exercise.type === ExerciseType.TIME && (
+        {newExerciseData.exercise?.type === ExerciseType.TIME && (
           <Stack direction="row" spacing={2} alignItems="center">
             <Typography variant="body2" sx={{ minWidth: 80 }}>
               Duration (sec):
@@ -118,12 +126,13 @@ export default function AddExerciseSubform({
               inputProps={{ min: 10, max: 3600, step: 10 }}
               size="small"
               sx={{ width: 100 }}
+              disabled={!newExerciseData.exercise}
             />
           </Stack>
         )}
 
         {/* Reps field - hidden for time-based exercises */}
-        {newExerciseData.exercise.type !== ExerciseType.TIME && (
+        {newExerciseData.exercise?.type !== ExerciseType.TIME && (
           <Stack direction="row" spacing={2} alignItems="center">
             <Typography variant="body2" sx={{ minWidth: 80 }}>
               Reps:
@@ -135,6 +144,7 @@ export default function AddExerciseSubform({
               inputProps={{ min: 1, max: 100 }}
               size="small"
               sx={{ width: 100 }}
+              disabled={!newExerciseData.exercise}
             />
           </Stack>
         )}
@@ -149,6 +159,7 @@ export default function AddExerciseSubform({
             placeholder="Optional notes"
             size="small"
             sx={{ flex: 1 }}
+            disabled={!newExerciseData.exercise}
           />
         </Stack>
       </Stack>

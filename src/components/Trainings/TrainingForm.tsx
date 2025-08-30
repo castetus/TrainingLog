@@ -22,7 +22,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import { useTrainingsController } from '@/controllers/trainingsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
-import { mockExercises } from '@/mock/exercises';
+
 import { Routes } from '@/router/routes';
 import type { Exercise } from '@/types/exercises';
 import { ExerciseType } from '@/types/exercises';
@@ -86,14 +86,14 @@ export default function TrainingForm() {
 
   const [showAddExerciseForm, setShowAddExerciseForm] = useState(false);
   const [newExerciseData, setNewExerciseData] = useState<{
-    exercise: Exercise;
+    exercise: Exercise | null;
     plannedSets: number;
     plannedReps: number;
     plannedWeight?: number;
     plannedDuration?: number;
     notes: string;
   }>({
-    exercise: mockExercises[0],
+    exercise: null,
     plannedSets: 1,
     plannedReps: 10,
     plannedWeight: 0,
@@ -106,6 +106,10 @@ export default function TrainingForm() {
   };
 
   const handleAddExercise = () => {
+    if (!newExerciseData.exercise) {
+      return; // Don't add if no exercise is selected
+    }
+    
     const newExercise: TrainingExercise = {
       exercise: newExerciseData.exercise,
       plannedSets: newExerciseData.plannedSets,
@@ -119,7 +123,7 @@ export default function TrainingForm() {
     setShowAddExerciseForm(false);
     // Reset form data
     setNewExerciseData({
-      exercise: mockExercises[0],
+      exercise: null,
       plannedSets: 1,
       plannedReps: 10,
       plannedWeight: 0,
@@ -131,7 +135,7 @@ export default function TrainingForm() {
   const cancelAddExercise = () => {
     setShowAddExerciseForm(false);
     setNewExerciseData({
-      exercise: mockExercises[0],
+      exercise: null,
       plannedSets: 1,
       plannedReps: 10,
       plannedWeight: 0,
@@ -296,7 +300,6 @@ export default function TrainingForm() {
                 setNewExerciseData((prev) => ({ ...prev, plannedDuration: duration }))
               }
               onNotesChange={(notes) => setNewExerciseData((prev) => ({ ...prev, notes }))}
-              mockExercises={mockExercises}
             />
 
             {errors.exercises && <FormHelperText error>{errors.exercises}</FormHelperText>}

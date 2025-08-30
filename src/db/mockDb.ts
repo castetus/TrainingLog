@@ -1,6 +1,3 @@
-import { mockExercises } from '@/mock/exercises';
-import { mockTrainings } from '@/mock/trainings';
-import { mockWorkouts } from '@/mock/workouts';
 import type { Exercise } from '@/types/exercises';
 import type { Training } from '@/types/trainings';
 import type { Workout } from '@/types/workouts';
@@ -8,7 +5,7 @@ import type { Workout } from '@/types/workouts';
 import type { Db, Id, Table } from './types';
 
 const makeExercisesTable = (): Table<Exercise> => {
-  const map = new Map<Id, Exercise>(mockExercises.map((x) => [x.id, x]));
+  const map = new Map<Id, Exercise>();
 
   const list = async () => Array.from(map.values());
   const get = async (id: Id) => map.get(id);
@@ -26,7 +23,7 @@ const makeExercisesTable = (): Table<Exercise> => {
 };
 
 const makeTrainingsTable = (): Table<Training> => {
-  const map = new Map<Id, Training>(mockTrainings.map((x) => [x.id, x]));
+  const map = new Map<Id, Training>();
 
   const list = async () => Array.from(map.values());
   const get = async (id: Id) => map.get(id);
@@ -44,7 +41,7 @@ const makeTrainingsTable = (): Table<Training> => {
 };
 
 const makeWorkoutsTable = (): Table<Workout> => {
-  const map = new Map<Id, Workout>(mockWorkouts.map((x) => [x.id, x]));
+  const map = new Map<Id, Workout>();
 
   const list = async () => Array.from(map.values());
   const get = async (id: Id) => map.get(id);
