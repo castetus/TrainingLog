@@ -1,4 +1,4 @@
-import { List, Input, Stack } from '@mui/material';
+import { List, Input, Stack, Typography, Box } from '@mui/material';
 import { useState, useMemo, useEffect } from 'react';
 
 import { useExercisesController } from '@/controllers/exercisesController';
@@ -45,12 +45,50 @@ export default function ExercisesList() {
 
   return (
     <Stack spacing={1.5}>
-      <Input placeholder="Search" onChange={handleSearch} size="small" />
-      <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-        {filteredExercises.map((exercise) => (
-          <ExercisesListItem key={exercise.id} exercise={exercise} onDelete={handleDelete} />
-        ))}
-      </List>
+      {/* Only show search if there are exercises */}
+      {items.length > 0 && (
+        <Input placeholder="Search" onChange={handleSearch} size="small" />
+      )}
+      
+      {items.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 4,
+            px: 2,
+            color: 'text.secondary',
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            No Exercises Yet
+          </Typography>
+          <Typography variant="body2">
+            Create your first exercise to get started with your training vocabulary.
+          </Typography>
+        </Box>
+      ) : filteredExercises.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 4,
+            px: 2,
+            color: 'text.secondary',
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            No Exercises Found
+          </Typography>
+          <Typography variant="body2">
+            No exercises match your search criteria.
+          </Typography>
+        </Box>
+      ) : (
+        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+          {filteredExercises.map((exercise) => (
+            <ExercisesListItem key={exercise.id} exercise={exercise} onDelete={handleDelete} />
+          ))}
+        </List>
+      )}
     </Stack>
   );
 }

@@ -1,4 +1,4 @@
-import { List, Box, Divider } from '@mui/material';
+import { List, Box, Divider, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
 import { useTrainingsController } from '@/controllers/trainingsController';
@@ -29,13 +29,33 @@ export default function TrainingsList() {
   const trainings = Object.values(trainingsById);
 
   return (
-    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-      {trainings.map((training, index) => (
-        <Box key={training.id}>
-          <TrainingListItem training={training} onDelete={handleDelete} />
-          {index < trainings.length - 1 && <Divider component="li" />}
+    <>
+      {trainings.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 4,
+            px: 2,
+            color: 'text.secondary',
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            No Trainings Yet
+          </Typography>
+          <Typography variant="body2">
+            Create your first training plan to organize your exercises and workouts.
+          </Typography>
         </Box>
-      ))}
-    </List>
+      ) : (
+        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+          {trainings.map((training, index) => (
+            <Box key={training.id}>
+              <TrainingListItem training={training} onDelete={handleDelete} />
+              {index < trainings.length - 1 && <Divider component="li" />}
+            </Box>
+          ))}
+        </List>
+      )}
+    </>
   );
 }

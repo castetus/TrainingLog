@@ -22,6 +22,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import { useTrainingsController } from '@/controllers/trainingsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
+import { useAppStore } from '@/store';
 
 import { Routes } from '@/router/routes';
 import type { Exercise } from '@/types/exercises';
@@ -34,6 +35,7 @@ export default function TrainingForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { findById, create, update } = useTrainingsController();
+  const exercisesById = useAppStore((s) => s.exercisesById);
 
   const isEditing = !!id;
   const title = isEditing ? 'Edit Training' : 'New Training';
@@ -254,6 +256,7 @@ export default function TrainingForm() {
                   onClick={addExercise}
                   variant="outlined"
                   size="small"
+                  disabled={Object.keys(exercisesById).length === 0}
                 >
                   Add Exercise
                 </Button>

@@ -167,46 +167,70 @@ export default function WorkoutForm() {
           <Stack spacing={1.5}>
             <Typography variant="h6">Select Training Plan</Typography>
 
-            <FormControl fullWidth size="small" error={!!errors.training}>
-              <InputLabel>Select Training</InputLabel>
-              <Select
-                value={selectedTrainingId}
-                onChange={(e) => handleTrainingChange(e.target.value)}
-                label="Select Training"
+            {Object.keys(trainingsById).length === 0 ? (
+              <Box
+                sx={{
+                  textAlign: 'center',
+                  py: 3,
+                  px: 2,
+                  border: 1,
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  color: 'text.secondary',
+                }}
               >
-                <MenuItem value="">
-                  <em>Choose a training plan...</em>
-                </MenuItem>
-                {Object.values(trainingsById).map((training) => {
-                  const today = new Date().getDay();
-                  const isToday = training.dayOfTheWeek === today;
+                <Typography variant="h6" gutterBottom>
+                  No Training Plans Available
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  You need to create at least one training plan before starting a workout.
+                </Typography>
+                <Typography variant="body2">
+                  Go to the Trainings page to create your first training plan.
+                </Typography>
+              </Box>
+            ) : (
+              <FormControl fullWidth size="small" error={!!errors.training}>
+                <InputLabel>Select Training</InputLabel>
+                <Select
+                  value={selectedTrainingId}
+                  onChange={(e) => handleTrainingChange(e.target.value)}
+                  label="Select Training"
+                >
+                  <MenuItem value="">
+                    <em>Choose a training plan...</em>
+                  </MenuItem>
+                  {Object.values(trainingsById).map((training) => {
+                    const today = new Date().getDay();
+                    const isToday = training.dayOfTheWeek === today;
 
-                  return (
-                    <MenuItem key={training.id} value={training.id}>
-                      <Stack>
-                        <Typography variant="body2" component="div">
-                          {training.name}
-                          {isToday && (
-                            <Chip
-                              label="Today"
-                              size="small"
-                              color="primary"
-                              sx={{ ml: 1, height: 20 }}
-                            />
-                          )}
-                        </Typography>
-                        {training.dayOfTheWeek !== undefined && (
-                          <Typography variant="caption" color="text.secondary">
-                            {getDayName(training.dayOfTheWeek)}
+                    return (
+                      <MenuItem key={training.id} value={training.id}>
+                        <Stack>
+                          <Typography variant="body2" component="div">
+                            {training.name}
+                            {isToday && (
+                              <Chip
+                                label="Today"
+                                size="small"
+                                color="primary"
+                                sx={{ ml: 1, height: 20 }}
+                              />
+                            )}
                           </Typography>
-                        )}
-                      </Stack>
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-              {errors.training && <FormHelperText error>{errors.training}</FormHelperText>}
-            </FormControl>
+                          {training.dayOfTheWeek !== undefined && (
+                            <Typography variant="caption" color="text.secondary">
+                              {getDayName(training.dayOfTheWeek)}
+                            </Typography>
+                          )}
+                        </Stack>
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+                {errors.training && <FormHelperText error>{errors.training}</FormHelperText>}
+              </FormControl>
+            )}
           </Stack>
 
           {/* Workout Details */}
@@ -257,7 +281,7 @@ export default function WorkoutForm() {
             <Button
               type="submit"
               variant="contained"
-              disabled={isLoading}
+              disabled={isLoading || Object.keys(trainingsById).length === 0}
               startIcon={<PlayArrowIcon />}
             >
               {isLoading ? 'Starting...' : 'Start Workout'}

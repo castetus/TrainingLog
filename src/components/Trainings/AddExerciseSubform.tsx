@@ -47,36 +47,46 @@ export default function AddExerciseSubform({
           <Typography variant="body2" sx={{ minWidth: 80 }}>
             Exercise:
           </Typography>
-          <Autocomplete
-            value={newExerciseData.exercise}
-            onChange={(event, newValue) => {
-              if (newValue) {
-                onExerciseChange(newValue);
-              }
-            }}
-            options={exercises}
-            getOptionLabel={(option) => option.name}
-            isOptionEqualToValue={(option, value) => option.id === (value?.id || '')}
-            renderOption={(props, option) => (
-              <Box component="li" {...props} key={option.id}>
-                <Stack>
-                  <Typography variant="body2" fontWeight="medium">
-                    {option.name}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {option.description}
-                  </Typography>
-                </Stack>
-              </Box>
-            )}
-            size="small"
-            sx={{ flexGrow: 1 }}
-            renderInput={(params) => <TextField {...params} size="small" />}
-          />
-          {!newExerciseData.exercise && (
-            <Typography variant="caption" color="error">
-              Please select an exercise to continue
-            </Typography>
+          {exercises.length === 0 ? (
+            <Box sx={{ flexGrow: 1, textAlign: 'center', py: 2 }}>
+              <Typography variant="body2" color="error">
+                No exercises available. Please create some exercises first.
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <Autocomplete
+                value={newExerciseData.exercise}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    onExerciseChange(newValue);
+                  }
+                }}
+                options={exercises}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === (value?.id || '')}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} key={option.id}>
+                    <Stack>
+                      <Typography variant="body2" fontWeight="medium">
+                        {option.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {option.description}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                )}
+                size="small"
+                sx={{ flexGrow: 1 }}
+                renderInput={(params) => <TextField {...params} size="small" />}
+              />
+              {!newExerciseData.exercise && (
+                <Typography variant="caption" color="error">
+                  Please select an exercise to continue
+                </Typography>
+              )}
+            </>
           )}
         </Stack>
 

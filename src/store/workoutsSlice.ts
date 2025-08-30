@@ -1,6 +1,5 @@
 import type { StateCreator } from 'zustand';
 
-import { db } from '@/db';
 import type { Workout } from '@/types/workouts';
 
 export interface WorkoutsState {
@@ -26,72 +25,39 @@ export const createWorkoutsSlice: StateCreator<WorkoutsSlice> = (set) => ({
   isLoading: false,
   error: null,
 
-  setWorkouts: async (workouts) => {
-    try {
-      // Save all workouts to IndexedDB
-      for (const workout of workouts) {
-        await db.workouts.put(workout);
-      }
-
-      const workoutsById = workouts.reduce(
-        (acc, workout) => {
-          acc[workout.id] = workout;
-          return acc;
-        },
-        {} as Record<string, Workout>,
-      );
-      set({ workoutsById });
-    } catch (error) {
-      console.error('Error saving workouts to IndexedDB:', error);
-      set({ error: 'Failed to save workouts to database' });
-    }
+  setWorkouts: (workouts) => {
+    // Only update local state - database operations should be handled by controllers
+    const workoutsById = workouts.reduce(
+      (acc, workout) => {
+        acc[workout.id] = workout;
+        return acc;
+      },
+      {} as Record<string, Workout>,
+    );
+    set({ workoutsById });
   },
 
-  addWorkout: async (workout) => {
-    try {
-      // Save to IndexedDB first
-      await db.workouts.put(workout);
-
-      // Then update local state
-      set((state) => ({
-        workoutsById: { ...state.workoutsById, [workout.id]: workout },
-      }));
-    } catch (error) {
-      console.error('Error adding workout to IndexedDB:', error);
-      set({ error: 'Failed to add workout to database' });
-    }
+  addWorkout: (workout) => {
+    // Only update local state - database operations should be handled by controllers
+    set((state) => ({
+      workoutsById: { ...state.workoutsById, [workout.id]: workout },
+    }));
   },
 
-  updateWorkout: async (workout) => {
-    try {
-      // Update in IndexedDB first
-      await db.workouts.put(workout);
-
-      // Then update local state
-      set((state) => ({
-        workoutsById: { ...state.workoutsById, [workout.id]: workout },
-      }));
-    } catch (error) {
-      console.error('Error updating workout in IndexedDB:', error);
-      set({ error: 'Failed to update workout in database' });
-    }
+  updateWorkout: (workout) => {
+    // Only update local state - database operations should be handled by controllers
+    set((state) => ({
+      workoutsById: { ...state.workoutsById, [workout.id]: workout },
+    }));
   },
 
-  removeWorkout: async (id) => {
-    try {
-      // Remove from IndexedDB first
-      await db.workouts.remove(id);
-
-      // Then update local state
-      set((state) => {
-        const newWorkoutsById = { ...state.workoutsById };
-        delete newWorkoutsById[id];
-        return { workoutsById: newWorkoutsById };
-      });
-    } catch (error) {
-      console.error('Error removing workout from IndexedDB:', error);
-      set({ error: 'Failed to remove workout from database' });
-    }
+  removeWorkout: (id) => {
+    // Only update local state - database operations should be handled by controllers
+    set((state) => {
+      const newWorkoutsById = { ...state.workoutsById };
+      delete newWorkoutsById[id];
+      return { workoutsById: newWorkoutsById };
+    });
   },
 
   setLoading: (loading) => set({ isLoading: loading }),
