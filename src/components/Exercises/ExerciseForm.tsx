@@ -39,7 +39,7 @@ export default function ExerciseForm() {
   }>({
     name: '',
     description: '',
-    type: undefined,
+    type: ExerciseType.WEIGHT,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

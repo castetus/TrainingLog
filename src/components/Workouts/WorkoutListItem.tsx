@@ -21,7 +21,7 @@ export default function WorkoutListItem({ workout }: WorkoutListItemProps) {
   };
 
   return (
-    <ListItem alignItems="flex-start" divider>
+    <ListItem alignItems="flex-start" divider disableGutters>
       <ListItemButton onClick={handleView} sx={{ px: 0 }}>
         <ListItemText
           primary={

@@ -39,6 +39,7 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
           bgcolor: 'action.hover',
         },
       }}
+      disableGutters
     >
       <ListItemButton sx={{ px: 0 }} onClick={handleEdit}>
         <ListItemText
@@ -46,12 +47,12 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
           secondary={
             <>
               {training.description && (
-                <Typography variant="body2" color="text.secondary" component="div" sx={{ mb: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                   {training.description}
                 </Typography>
               )}
 
-              <Typography variant="body2" color="text.secondary" component="div" sx={{ mb: 0.5 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                 {getExerciseSummary(training.exercises)}
               </Typography>
 
@@ -60,7 +61,7 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
                   variant="body2"
                   color="text.secondary"
                   sx={{ fontStyle: 'italic' }}
-                  component="div"
+
                 >
                   "{training.notes}"
                 </Typography>

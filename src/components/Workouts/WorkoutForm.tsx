@@ -184,7 +184,7 @@ export default function WorkoutForm() {
                   return (
                     <MenuItem key={training.id} value={training.id}>
                       <Stack>
-                        <Typography variant="body2">
+                        <Typography variant="body2" component="div">
                           {training.name}
                           {isToday && (
                             <Chip

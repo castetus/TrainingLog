@@ -50,12 +50,12 @@ const MainLayout = () => {
 
   return (
     <Box sx={{ pb: 8 }}>
-      {pageTitle && (
-        <Typography variant="h4" gutterBottom>
-          {pageTitle}
-        </Typography>
-      )}
-      <Container maxWidth="xl" sx={{ py: 1 }} disableGutters>
+      <Container maxWidth="xl" sx={{ py: 1 }} className="main-container" >
+        {pageTitle && (
+          <Typography variant="h4" gutterBottom>
+            {pageTitle}
+          </Typography>
+        )}
         <Outlet />
       </Container>
 

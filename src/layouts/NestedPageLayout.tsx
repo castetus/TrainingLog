@@ -24,7 +24,7 @@ export default function NestedPageLayout({
   onBack,
 }: NestedPageLayoutProps) {
   return (
-    <Container maxWidth="xl" sx={{ py: 1 }}>
+    <Container maxWidth="xl" sx={{ py: 1 }} disableGutters>
       <Stack spacing={2}>
         {/* Header with back button and title */}
         <Stack direction="row" alignItems="flex-start" spacing={1.5}>

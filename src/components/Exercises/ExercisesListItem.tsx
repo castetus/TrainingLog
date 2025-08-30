@@ -42,6 +42,7 @@ export default function ExercisesListItem({ exercise, onDelete }: ExercisesListI
     <ListItem
       alignItems="flex-start"
       secondaryAction={<RowActions onEdit={handleEdit} onDelete={handleDelete} />}
+      disableGutters
     >
       <ListItemButton onClick={handleView} sx={{ px: 0 }}>
         <ListItemText primary={exercise.name} secondary={exercise.description} />
