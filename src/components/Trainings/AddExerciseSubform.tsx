@@ -2,7 +2,6 @@ import { Box, Typography, TextField, Stack, Autocomplete } from '@mui/material';
 
 import type { Exercise } from '@/types/exercises';
 import { ExerciseType } from '@/types/exercises';
-import { useAppStore } from '@/store';
 
 interface AddExerciseSubformProps {
   showAddExerciseForm: boolean;
@@ -10,16 +9,17 @@ interface AddExerciseSubformProps {
     exercise: Exercise | null;
     plannedSets: number;
     plannedReps: number;
-    plannedWeight?: number;
-    plannedDuration?: number;
+    plannedWeight: number;
+    plannedDuration: number;
     notes: string;
   };
   onExerciseChange: (exercise: Exercise) => void;
   onSetsChange: (sets: number) => void;
   onRepsChange: (reps: number) => void;
-  onWeightChange?: (weight: number) => void;
-  onDurationChange?: (duration: number) => void;
+  onWeightChange: (weight: number) => void;
+  onDurationChange: (duration: number) => void;
   onNotesChange: (notes: string) => void;
+  mockExercises: Exercise[];
 }
 
 export default function AddExerciseSubform({
@@ -31,9 +31,8 @@ export default function AddExerciseSubform({
   onWeightChange,
   onDurationChange,
   onNotesChange,
+  mockExercises,
 }: AddExerciseSubformProps) {
-  const exercises = useAppStore((s) => Object.values(s.exercisesById));
-  
   if (!showAddExerciseForm) return null;
 
   return (
@@ -47,47 +46,32 @@ export default function AddExerciseSubform({
           <Typography variant="body2" sx={{ minWidth: 80 }}>
             Exercise:
           </Typography>
-          {exercises.length === 0 ? (
-            <Box sx={{ flexGrow: 1, textAlign: 'center', py: 2 }}>
-              <Typography variant="body2" color="error">
-                No exercises available. Please create some exercises first.
-              </Typography>
-            </Box>
-          ) : (
-            <>
-              <Autocomplete
-                value={newExerciseData.exercise}
-                onChange={(event, newValue) => {
-                  if (newValue) {
-                    onExerciseChange(newValue);
-                  }
-                }}
-                options={exercises}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(option, value) => option.id === (value?.id || '')}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props} key={option.id}>
-                    <Stack>
-                      <Typography variant="body2" fontWeight="medium">
-                        {option.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {option.description}
-                      </Typography>
-                    </Stack>
-                  </Box>
-                )}
-                size="small"
-                sx={{ flexGrow: 1 }}
-                renderInput={(params) => <TextField {...params} size="small" />}
-              />
-              {!newExerciseData.exercise && (
-                <Typography variant="caption" color="error">
-                  Please select an exercise to continue
-                </Typography>
-              )}
-            </>
-          )}
+          <Autocomplete
+            value={newExerciseData.exercise}
+            onChange={(event, newValue) => {
+              if (newValue) {
+                onExerciseChange(newValue);
+              }
+            }}
+            options={mockExercises}
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderOption={(props, option) => (
+              <Box component="li" {...props} key={option.id}>
+                <Stack>
+                  <Typography variant="body2" fontWeight="medium">
+                    {option.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {option.description}
+                  </Typography>
+                </Stack>
+              </Box>
+            )}
+            size="small"
+            sx={{ flexGrow: 1 }}
+            renderInput={(params) => <TextField {...params} size="small" />}
+          />
         </Stack>
 
         <Stack direction="row" spacing={2} alignItems="center">
@@ -97,11 +81,20 @@ export default function AddExerciseSubform({
           <TextField
             type="number"
             value={newExerciseData.plannedSets}
-            onChange={(e) => onSetsChange(parseInt(e.target.value) || 1)}
-            inputProps={{ min: 1, max: 20 }}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '') {
+                // Don't call onSetsChange - let it stay empty temporarily
+                return;
+              } else {
+                const parsed = parseInt(value);
+                if (!isNaN(parsed)) {
+                  onSetsChange(parsed);
+                }
+              }
+            }}
             size="small"
             sx={{ width: 100 }}
-            disabled={!newExerciseData.exercise}
           />
         </Stack>
 
@@ -113,12 +106,22 @@ export default function AddExerciseSubform({
             </Typography>
             <TextField
               type="number"
-              value={newExerciseData.plannedWeight || 0}
-              onChange={(e) => onWeightChange?.(parseFloat(e.target.value) || 0)}
-              inputProps={{ min: 0, max: 500, step: 0.5 }}
+              value={newExerciseData.plannedWeight}
+              onChange={(e) => {
+                const value = e.target.value;
+                console.log('value', value, typeof value);
+                if (value === '') {
+                  // Don't call onWeightChange - let it stay empty temporarily
+                  return;
+                } else {
+                  const parsed = parseFloat(value);
+                  if (!isNaN(parsed)) {
+                    onWeightChange(parsed);
+                  }
+                }
+              }}
               size="small"
               sx={{ width: 100 }}
-              disabled={!newExerciseData.exercise}
             />
           </Stack>
         )}
@@ -131,12 +134,21 @@ export default function AddExerciseSubform({
             </Typography>
             <TextField
               type="number"
-              value={newExerciseData.plannedDuration || 60}
-              onChange={(e) => onDurationChange?.(parseInt(e.target.value) || 60)}
-              inputProps={{ min: 10, max: 3600, step: 10 }}
+              value={newExerciseData.plannedDuration}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  // Don't call onDurationChange - let it stay empty temporarily
+                  return;
+                } else {
+                  const parsed = parseInt(value);
+                  if (!isNaN(parsed)) {
+                    onDurationChange(parsed);
+                  }
+                }
+              }}
               size="small"
               sx={{ width: 100 }}
-              disabled={!newExerciseData.exercise}
             />
           </Stack>
         )}
@@ -147,15 +159,24 @@ export default function AddExerciseSubform({
             <Typography variant="body2" sx={{ minWidth: 80 }}>
               Reps:
             </Typography>
-            <TextField
-              type="number"
-              value={newExerciseData.plannedReps}
-              onChange={(e) => onRepsChange(parseInt(e.target.value) || 10)}
-              inputProps={{ min: 1, max: 100 }}
-              size="small"
-              sx={{ width: 100 }}
-              disabled={!newExerciseData.exercise}
-            />
+          <TextField
+            type="number"
+            value={newExerciseData.plannedReps}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '') {
+                // Don't call onRepsChange - let it stay empty temporarily
+                return;
+              } else {
+                const parsed = parseInt(value);
+                if (!isNaN(parsed)) {
+                  onRepsChange(parsed);
+                }
+              }
+            }}
+            size="small"
+            sx={{ width: 100 }}
+          />
           </Stack>
         )}
 
@@ -169,7 +190,6 @@ export default function AddExerciseSubform({
             placeholder="Optional notes"
             size="small"
             sx={{ flex: 1 }}
-            disabled={!newExerciseData.exercise}
           />
         </Stack>
       </Stack>

@@ -5,6 +5,7 @@ import type { Training } from '@/types/trainings';
 export type TrainingsSlice = {
   trainingsById: Record<string, Training>;
   trainingIds: string[];
+  setTrainings: (trainings: Training[]) => void;
   upsertTrainings: (trainings: Training[]) => void;
   removeTraining: (id: string) => void;
   clearTrainings: () => void;
@@ -15,6 +16,17 @@ export const createTrainingsSlice: StateCreator<TrainingsSlice, [], [], Training
 ) => ({
   trainingsById: {},
   trainingIds: [],
+
+  setTrainings: (trainings) => {
+    // Replace all trainings with new data
+    set((state) => {
+      console.log('setTrainings', trainings);
+      const byId: Record<string, Training> = {};
+      for (const training of trainings) byId[training.id] = training;
+      const ids = trainings.map((x) => x.id);
+      return { trainingsById: byId, trainingIds: ids };
+    });
+  },
 
   upsertTrainings: (trainings) => {
     // Only update local state - database operations should be handled by controllers

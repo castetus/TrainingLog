@@ -5,6 +5,7 @@ import type { Exercise } from '@/types/exercises';
 export type ExercisesSlice = {
   exercisesById: Record<string, Exercise>;
   exerciseIds: string[];
+  setExercises: (items: Exercise[]) => void;
   upsertExercises: (items: Exercise[]) => void;
   removeExercise: (id: string) => void;
   clearExercises: () => void;
@@ -15,6 +16,16 @@ export const createExercisesSlice: StateCreator<ExercisesSlice, [], [], Exercise
 ) => ({
   exercisesById: {},
   exerciseIds: [],
+  setExercises: (items) => {
+    // Replace all exercises with new data
+    set((state) => {
+      console.log('setExercises', items);
+      const byId: Record<string, Exercise> = {};
+      for (const ex of items) byId[ex.id] = ex;
+      const ids = items.map((x) => x.id);
+      return { exercisesById: byId, exerciseIds: ids };
+    });
+  },
   upsertExercises: (items) => {
     // Only update local state - database operations should be handled by controllers
     set((state) => {

@@ -17,14 +17,13 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useTrainingsController } from '@/controllers/trainingsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
-import { useAppStore } from '@/store';
-
 import { Routes } from '@/router/routes';
+import { useAppStore } from '@/store';
 import type { Exercise } from '@/types/exercises';
 import { ExerciseType } from '@/types/exercises';
 import type { TrainingFormData, TrainingExercise } from '@/types/trainings';
@@ -86,13 +85,30 @@ export default function TrainingForm() {
     }
   };
 
+  const handleExerciseChange = useCallback((exercise: Exercise) => {
+    setNewExerciseData((prev) => ({
+      ...prev,
+      exercise,
+      plannedSets: exercise.sets || 1,
+      plannedReps: exercise.reps?.[0] || 10,
+      plannedWeight:
+        exercise.type === ExerciseType.WEIGHT && exercise.weightKg && exercise.weightKg.length > 0 
+          ? exercise.weightKg[0] 
+          : 0,
+      plannedDuration:
+        exercise.type === ExerciseType.TIME && exercise.seconds && exercise.seconds.length > 0 
+          ? exercise.seconds[0] 
+          : 60,
+    }));
+  }, []);
+
   const [showAddExerciseForm, setShowAddExerciseForm] = useState(false);
   const [newExerciseData, setNewExerciseData] = useState<{
     exercise: Exercise | null;
     plannedSets: number;
     plannedReps: number;
-    plannedWeight?: number;
-    plannedDuration?: number;
+    plannedWeight: number;
+    plannedDuration: number;
     notes: string;
   }>({
     exercise: null,
@@ -111,7 +127,7 @@ export default function TrainingForm() {
     if (!newExerciseData.exercise) {
       return; // Don't add if no exercise is selected
     }
-    
+
     const newExercise: TrainingExercise = {
       exercise: newExerciseData.exercise,
       plannedSets: newExerciseData.plannedSets,
@@ -280,16 +296,7 @@ export default function TrainingForm() {
             <AddExerciseSubform
               showAddExerciseForm={showAddExerciseForm}
               newExerciseData={newExerciseData}
-              onExerciseChange={(exercise) => {
-                setNewExerciseData((prev) => ({
-                  ...prev,
-                  exercise,
-                  plannedSets: exercise.sets,
-                  plannedReps: exercise.reps[0] || 10,
-                  plannedWeight: exercise.type === ExerciseType.WEIGHT ? (exercise.weightKg?.[0] || 0) : 0,
-                  plannedDuration: exercise.type === ExerciseType.TIME ? (exercise.seconds?.[0] || 60) : 60,
-                }));
-              }}
+              onExerciseChange={handleExerciseChange}
               onSetsChange={(sets) =>
                 setNewExerciseData((prev) => ({ ...prev, plannedSets: sets }))
               }
@@ -303,6 +310,7 @@ export default function TrainingForm() {
                 setNewExerciseData((prev) => ({ ...prev, plannedDuration: duration }))
               }
               onNotesChange={(notes) => setNewExerciseData((prev) => ({ ...prev, notes }))}
+              mockExercises={Object.values(exercisesById)}
             />
 
             {errors.exercises && <FormHelperText error>{errors.exercises}</FormHelperText>}
@@ -333,18 +341,22 @@ export default function TrainingForm() {
                       <TableRow key={index}>
                         <TableCell>
                           <Stack>
-                            <Typography 
-                              variant="subtitle2" 
+                            <Typography
+                              variant="subtitle2"
                               fontWeight="medium"
                               sx={{
                                 cursor: 'pointer',
                                 color: 'primary.main',
                                 '&:hover': {
                                   textDecoration: 'underline',
-                                  color: 'primary.dark'
-                                }
+                                  color: 'primary.dark',
+                                },
                               }}
-                              onClick={() => navigate(Routes.EXERCISE_DETAIL.replace(':id', exercise.exercise.id))}
+                              onClick={() =>
+                                navigate(
+                                  Routes.EXERCISE_DETAIL.replace(':id', exercise.exercise.id),
+                                )
+                              }
                             >
                               {exercise.exercise.name}
                             </Typography>
