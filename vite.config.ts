@@ -4,6 +4,7 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  base: '/',
   plugins: [
     react(),
     VitePWA({
@@ -31,7 +32,7 @@ export default defineConfig({
       },
       workbox: {
         // sensible defaults; add runtime caching rules if needed
-        navigateFallback: '/index.html',
+        navigateFallback: '/TrainingLog/index.html',
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.destination === 'image',
