@@ -1,4 +1,18 @@
-import { AccordionDetails, Typography, Stack, TextField, Divider, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import {
+  AccordionDetails,
+  Typography,
+  Stack,
+  TextField,
+  Divider,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@mui/material';
 import { useState, useMemo, useEffect } from 'react';
 
 import { ExerciseType } from '@/types';
@@ -10,18 +24,27 @@ interface WorkoutExerciseContentProps {
   onActualSetsUpdate: (exerciseIndex: number, actualSets: WorkoutSet[]) => void;
 }
 
-export default function WorkoutExerciseContent({ workoutExercise, exerciseIndex, onActualSetsUpdate }: WorkoutExerciseContentProps) {
-  const [actualSets, setActualSets] = useState<WorkoutSet[]>(
-    Array(workoutExercise.plannedSets)
+export default function WorkoutExerciseContent({
+  workoutExercise,
+  exerciseIndex,
+  onActualSetsUpdate,
+}: WorkoutExerciseContentProps) {
+  const [actualSets, setActualSets] = useState<WorkoutSet[]>(() => {
+    // Initialize with existing data if available, otherwise create empty sets
+    if (workoutExercise.actualSets && workoutExercise.actualSets.length > 0) {
+      return workoutExercise.actualSets;
+    }
+
+    return Array(workoutExercise.plannedSets)
       .fill(null)
       .map(() => ({
         actualReps: 0,
         actualWeight: undefined,
         actualDuration: undefined,
-      })),
-  );
+      }));
+  });
 
-  // Initialize actual sets with existing data if available
+  // Update actual sets when workoutExercise changes
   useEffect(() => {
     if (workoutExercise.actualSets && workoutExercise.actualSets.length > 0) {
       setActualSets(workoutExercise.actualSets);
@@ -30,13 +53,13 @@ export default function WorkoutExerciseContent({ workoutExercise, exerciseIndex,
 
   const handleSetChange = (setIndex: number, field: keyof WorkoutSet, value: any) => {
     setActualSets((prev) => {
-      const newActualSets = prev.map((set, index) => 
-        index === setIndex ? { ...set, [field]: value } : set
+      const newActualSets = prev.map((set, index) =>
+        index === setIndex ? { ...set, [field]: value } : set,
       );
-      
+
       // Notify parent component of the change
       onActualSetsUpdate(exerciseIndex, newActualSets);
-      
+
       return newActualSets;
     });
   };
@@ -97,11 +120,18 @@ export default function WorkoutExerciseContent({ workoutExercise, exerciseIndex,
               <TableHead>
                 <TableRow>
                   <TableCell align="center" sx={{ fontWeight: 'bold' }}></TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Set</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>Reps</TableCell>
                   <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                    {workoutExercise.exercise.type === ExerciseType.WEIGHT ? 'kg' : 
-                     workoutExercise.exercise.type === ExerciseType.TIME ? 'sec' : 'Field'}
+                    Set
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>
+                    Reps
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>
+                    {workoutExercise.exercise.type === ExerciseType.WEIGHT
+                      ? 'kg'
+                      : workoutExercise.exercise.type === ExerciseType.TIME
+                        ? 'sec'
+                        : 'Field'}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -116,9 +146,19 @@ export default function WorkoutExerciseContent({ workoutExercise, exerciseIndex,
                     <TableRow key={setIndex}>
                       <TableCell align="center">
                         {isSetCompleted ? (
-                          <Chip label="✓" color="success" size="small" sx={{ minWidth: 24, height: 24 }} />
+                          <Chip
+                            label="✓"
+                            color="success"
+                            size="small"
+                            sx={{ minWidth: 24, height: 24 }}
+                          />
                         ) : (
-                          <Chip label="—" color="default" size="small" sx={{ minWidth: 24, height: 24 }} />
+                          <Chip
+                            label="—"
+                            color="default"
+                            size="small"
+                            sx={{ minWidth: 24, height: 24 }}
+                          />
                         )}
                       </TableCell>
                       <TableCell align="center">
@@ -172,11 +212,12 @@ export default function WorkoutExerciseContent({ workoutExercise, exerciseIndex,
                             variant="outlined"
                           />
                         )}
-                        {workoutExercise.exercise.type !== ExerciseType.WEIGHT && workoutExercise.exercise.type !== ExerciseType.TIME && (
-                          <Typography variant="body2" color="text.secondary">
-                            —
-                          </Typography>
-                        )}
+                        {workoutExercise.exercise.type !== ExerciseType.WEIGHT &&
+                          workoutExercise.exercise.type !== ExerciseType.TIME && (
+                            <Typography variant="body2" color="text.secondary">
+                              —
+                            </Typography>
+                          )}
                       </TableCell>
                     </TableRow>
                   );

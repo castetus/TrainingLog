@@ -1,15 +1,15 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Accordion, AccordionSummary, Typography, Stack, Chip, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import { useConfirm } from '@/providers/confirmProvider';
 import { Routes } from '@/router/routes';
 import type { Workout, WorkoutExercise } from '@/types/workouts';
+import type { WorkoutSet } from '@/types/workouts';
 
 import { WorkoutExerciseContent } from './index';
-import type { WorkoutSet } from '@/types/workouts';
 
 interface WorkoutFlowProps {
   workout: Workout;
@@ -19,13 +19,23 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   const confirm = useConfirm();
   const { finishWorkout, update } = useWorkoutsController();
   const navigate = useNavigate();
-  
+
   // Track workout duration
   const [startTime] = useState<Date>(new Date());
   const [currentDuration, setCurrentDuration] = useState<number>(0);
-  
-  // Track actual sets for all exercises
-  const [actualSetsByExercise, setActualSetsByExercise] = useState<Record<number, WorkoutSet[]>>({});
+
+  // Track actual sets for all exercises - initialize with existing data
+  const [actualSetsByExercise, setActualSetsByExercise] = useState<Record<number, WorkoutSet[]>>(
+    () => {
+      const initial: Record<number, WorkoutSet[]> = {};
+      workout.exercises.forEach((exercise, index) => {
+        if (exercise.actualSets && exercise.actualSets.length > 0) {
+          initial[index] = exercise.actualSets;
+        }
+      });
+      return initial;
+    },
+  );
 
   // Update duration every second
   useEffect(() => {
@@ -46,12 +56,12 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   };
 
   // Handle updating actual sets for an exercise
-  const handleActualSetsUpdate = (exerciseIndex: number, actualSets: WorkoutSet[]) => {
-    setActualSetsByExercise(prev => ({
+  const handleActualSetsUpdate = useCallback((exerciseIndex: number, actualSets: WorkoutSet[]) => {
+    setActualSetsByExercise((prev) => ({
       ...prev,
       [exerciseIndex]: actualSets,
     }));
-  };
+  }, []);
 
   // Helper function to check if an exercise is completed
   const isExerciseCompleted = (workoutExercise: WorkoutExercise): boolean => {
@@ -81,28 +91,40 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     if (confirmed) {
       try {
         // Calculate final duration when finishing (in minutes for database)
-        const finalDurationMinutes = Math.floor((new Date().getTime() - startTime.getTime()) / (1000 * 60));
-        
-        // Prepare workout with actual sets data
+        const finalDurationMinutes = Math.floor(
+          (new Date().getTime() - startTime.getTime()) / (1000 * 60),
+        );
+
+        // Prepare workout with actual sets data - ensure we have the latest data
         const workoutWithResults = {
           ...workout,
           exercises: workout.exercises.map((exercise, index) => ({
             ...exercise,
-            actualSets: actualSetsByExercise[index] || exercise.actualSets,
+            actualSets: actualSetsByExercise[index] || exercise.actualSets || [],
           })),
         };
-        
+
         // Update workout with duration and actual sets before finishing
         await update({
           id: workout.id,
           duration: finalDurationMinutes,
           exercises: workoutWithResults.exercises,
         });
-        
+
         // Now finish the workout
-        await finishWorkout(workout.id);
+        await finishWorkout({
+          id: workout.id,
+          duration: finalDurationMinutes,
+          exercises: workoutWithResults.exercises,
+        });
         navigate(Routes.WORKOUTS);
-        console.log('Workout finished successfully:', workout.id, 'Duration:', finalDurationMinutes, 'minutes');
+        console.log(
+          'Workout finished successfully:',
+          workout.id,
+          'Duration:',
+          finalDurationMinutes,
+          'minutes',
+        );
       } catch (error) {
         console.error('Failed to finish workout:', error);
         // Error is already handled by the controller
@@ -114,7 +136,16 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     <Box>
       <Stack spacing={2}>
         {/* Workout Duration Display */}
-        <Box sx={{ textAlign: 'center', py: 2, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 2,
+            bgcolor: 'background.paper',
+            borderRadius: 1,
+            border: 1,
+            borderColor: 'divider',
+          }}
+        >
           <Typography variant="h6" color="primary" gutterBottom>
             Workout Duration
           </Typography>
@@ -157,8 +188,8 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 )}
               </Stack>
             </AccordionSummary>
-            <WorkoutExerciseContent 
-              workoutExercise={workoutExercise} 
+            <WorkoutExerciseContent
+              workoutExercise={workoutExercise}
               exerciseIndex={index}
               onActualSetsUpdate={handleActualSetsUpdate}
             />

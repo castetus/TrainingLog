@@ -12,8 +12,9 @@ import {
   Paper,
 } from '@mui/material';
 
-import { formatLongDate, formatMediumDate, formatDuration, formatTime } from '@/utils';
 import type { Workout } from '@/types/workouts';
+import { formatLongDate, formatMediumDate, formatDuration } from '@/utils';
+import WorkoutViewItem from './WorkoutViewItem';
 
 interface WorkoutViewProps {
   workout: Workout;
@@ -23,7 +24,7 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
   const formatDate = (dateString: string) => {
     return formatLongDate(dateString);
   };
-
+  console.log('Workout:', workout);
   return (
     <Stack spacing={3}>
       {/* Header Info */}
@@ -56,52 +57,14 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
             <TableHead>
               <TableRow>
                 <TableCell>Exercise</TableCell>
+                <TableCell>Sets</TableCell>
                 <TableCell align="center">Planned</TableCell>
-                <TableCell align="center">Actual Results</TableCell>
-                <TableCell>Notes</TableCell>
+                <TableCell align="center">Actual</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {workout.exercises.map((workoutExercise, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Stack>
-                      <Typography variant="subtitle2" fontWeight="medium">
-                        {workoutExercise.exercise.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {workoutExercise.exercise.description}
-                      </Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2">
-                      {workoutExercise.plannedSets} × {workoutExercise.plannedReps}
-                      {/* {workoutExercise.exercise.type === ExerciseType.WEIGHT && workoutExercise.plannedWeight && (
-                        <br /> + {workoutExercise.plannedWeight}kg
-                      )}
-                      {workoutExercise.exercise.type === ExerciseType.TIME && workoutExercise.plannedDuration && (
-                        <br /> + {formatTime(workoutExercise.plannedDuration)}
-                      )} */}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Stack spacing={0.5}>
-                      {workoutExercise.actualSets.map((set, setIndex) => (
-                        <Typography key={setIndex} variant="body2">
-                          Set {setIndex + 1}: {set.actualReps}
-                          {set.actualWeight && ` @ ${set.actualWeight}kg`}
-                          {set.actualDuration && ` @ ${formatTime(set.actualDuration)}`}
-                        </Typography>
-                      ))}
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {workoutExercise.notes}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
+                <WorkoutViewItem key={index} {...workoutExercise} />
               ))}
             </TableBody>
           </Table>

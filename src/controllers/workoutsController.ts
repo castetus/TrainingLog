@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 
 import { db } from '@/db';
-
 import { useAppStore } from '@/store';
 import type { Workout, CreateWorkoutData, UpdateWorkoutData } from '@/types/workouts';
 
@@ -37,6 +36,7 @@ export const useWorkoutsController = () => {
       try {
         // First check store
         const workout = workoutsById[id];
+        console.log('Workout:', workout);
         if (workout) {
           return workout;
         }
@@ -76,7 +76,7 @@ export const useWorkoutsController = () => {
 
         // Save to database first
         const savedWorkout = await db.workouts.put(newWorkout);
-        
+
         // Then update local store
         addWorkout(savedWorkout);
         return savedWorkout;
@@ -93,6 +93,7 @@ export const useWorkoutsController = () => {
 
   const update = useCallback(
     async (data: UpdateWorkoutData): Promise<Workout> => {
+      console.log('Updating workout:', data);
       try {
         setLoading(true);
         clearError();
@@ -110,7 +111,7 @@ export const useWorkoutsController = () => {
 
         // Save to database first
         const savedWorkout = await db.workouts.put(updatedWorkout);
-        
+
         // Then update local store
         updateWorkout(savedWorkout);
         return savedWorkout;
@@ -133,7 +134,7 @@ export const useWorkoutsController = () => {
 
         // Remove from database first
         await db.workouts.remove(id);
-        
+
         // Then remove from local store
         removeWorkout(id);
       } catch (error) {
@@ -148,12 +149,12 @@ export const useWorkoutsController = () => {
   );
 
   const finishWorkout = useCallback(
-    async (id: string): Promise<Workout> => {
+    async (data: UpdateWorkoutData): Promise<Workout> => {
       try {
         setLoading(true);
         clearError();
 
-        const existingWorkout = workoutsById[id];
+        const existingWorkout = workoutsById[data.id];
         if (!existingWorkout) {
           throw new Error('Workout not found');
         }
@@ -161,13 +162,14 @@ export const useWorkoutsController = () => {
         // Mark workout as completed with current timestamp
         const finishedWorkout: Workout = {
           ...existingWorkout,
+          ...data,
           completedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
 
         // Save to database first
         const savedWorkout = await db.workouts.put(finishedWorkout);
-        
+
         // Then update local store
         updateWorkout(savedWorkout);
         return savedWorkout;

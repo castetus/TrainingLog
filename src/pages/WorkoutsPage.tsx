@@ -1,6 +1,6 @@
-import { Box, Typography, Stack, Button } from '@mui/material';
+import { Box, Typography, Stack } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useLocation, useParams, useNavigate, Outlet } from 'react-router-dom';
+import { useLocation, useParams, Outlet } from 'react-router-dom';
 
 import { WorkoutsList, WorkoutView, WorkoutForm, WorkoutFlow } from '@/components/Workouts';
 import { useWorkoutsController } from '@/controllers/workoutsController';
@@ -11,7 +11,6 @@ import type { Workout } from '@/types/workouts';
 export default function WorkoutsPage() {
   const location = useLocation();
   const { id } = useParams();
-  const navigate = useNavigate();
   const { findById } = useWorkoutsController();
 
   const [workout, setWorkout] = useState<Workout | null>(null);
@@ -58,15 +57,6 @@ export default function WorkoutsPage() {
         <Stack spacing={3}>
           <WorkoutView workout={workout} />
 
-          {/* Edit button at bottom */}
-          <Stack direction="row" justifyContent="flex-end">
-            <Button
-              variant="contained"
-              onClick={() => navigate(Routes.WORKOUT_EDIT?.replace(':id', id) || Routes.WORKOUTS)}
-            >
-              Edit Workout
-            </Button>
-          </Stack>
         </Stack>
       </NestedPageLayout>
     );

@@ -87,7 +87,7 @@ const MainLayout = () => {
         >
           {addButtonConfig.variant === 'circular' && <AddIcon />}
           {addButtonConfig.variant === 'extended' && <NavigationIcon />}
-          {addButtonConfig.label}
+          {addButtonConfig.variant === 'extended' && addButtonConfig.label}
         </Fab>
       )}
 

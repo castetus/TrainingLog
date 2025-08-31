@@ -55,6 +55,8 @@ class IndexedDbTable<T> implements Table<T> {
         const store = transaction.objectStore(this.tableName);
         const request = store.put(item);
 
+        console.log(`Putting ${this.tableName}:`, item);
+
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(item);
       });
