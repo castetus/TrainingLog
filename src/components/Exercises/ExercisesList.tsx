@@ -46,10 +46,8 @@ export default function ExercisesList() {
   return (
     <Stack spacing={1.5}>
       {/* Only show search if there are exercises */}
-      {items.length > 0 && (
-        <Input placeholder="Search" onChange={handleSearch} size="small" />
-      )}
-      
+      {items.length > 0 && <Input placeholder="Search" onChange={handleSearch} size="small" />}
+
       {items.length === 0 ? (
         <Box
           sx={{
@@ -78,9 +76,7 @@ export default function ExercisesList() {
           <Typography variant="h6" gutterBottom>
             No Exercises Found
           </Typography>
-          <Typography variant="body2">
-            No exercises match your search criteria.
-          </Typography>
+          <Typography variant="body2">No exercises match your search criteria.</Typography>
         </Box>
       ) : (
         <List sx={{ width: '100%', bgcolor: 'background.paper' }}>

@@ -8,6 +8,7 @@ import { useConfirm } from '@/providers/confirmProvider';
 import { Routes } from '@/router/routes';
 import type { Workout, WorkoutExercise } from '@/types/workouts';
 import type { WorkoutSet } from '@/types/workouts';
+import { analyzeWorkoutPerformance } from '@/utils/workoutAnalysis';
 
 import { WorkoutExerciseContent } from './index';
 
@@ -117,8 +118,16 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           duration: finalDurationMinutes,
           exercises: workoutWithResults.exercises,
         });
-        navigate(Routes.WORKOUTS);
 
+        const { shouldUpdatePlannedValues, exercisesToUpdate } =
+          analyzeWorkoutPerformance(workoutWithResults);
+
+        console.log(shouldUpdatePlannedValues, exercisesToUpdate);
+
+        if (shouldUpdatePlannedValues) {
+          await updatePlannedValues(exercisesToUpdate);
+        }
+        navigate(Routes.WORKOUTS);
       } catch (error) {
         console.error('Failed to finish workout:', error);
         // Error is already handled by the controller

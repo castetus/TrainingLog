@@ -1,10 +1,10 @@
-import { ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import { useCallback, type MouseEventHandler } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { RowActions } from '@/components/Common';
 import { Routes } from '@/router/routes';
-import type { Exercise } from '@/types/exercises';
+import { ExerciseType, type Exercise } from '@/types/exercises';
 
 interface ExercisesListItemProps {
   exercise: Exercise;
@@ -46,6 +46,15 @@ export default function ExercisesListItem({ exercise, onDelete }: ExercisesListI
     >
       <ListItemButton onClick={handleView} sx={{ px: 0 }}>
         <ListItemText primary={exercise.name} secondary={exercise.description} />
+        {exercise.type === ExerciseType.WEIGHT && exercise.lastSetWeightKg && (
+          <Typography variant="body2">{exercise.lastSetWeightKg} kg</Typography>
+        )}
+        {exercise.type === ExerciseType.TIME && exercise.lastSetSeconds && (
+          <Typography variant="body2">{exercise.lastSetSeconds} s</Typography>
+        )}
+        {exercise.type === ExerciseType.REPS_ONLY && exercise.lastSetReps && (
+          <Typography variant="body2">{exercise.lastSetReps} reps</Typography>
+        )}
       </ListItemButton>
     </ListItem>
   );
