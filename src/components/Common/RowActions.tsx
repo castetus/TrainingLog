@@ -14,6 +14,7 @@ export const RowActions = ({
       <IconButton
         edge="end"
         aria-label="edit"
+        color="primary"
         onClick={(e) => {
           e.stopPropagation();
           onEdit?.(e);
@@ -26,6 +27,7 @@ export const RowActions = ({
       <IconButton
         edge="end"
         aria-label="delete"
+        color="error"
         onClick={(e) => {
           e.stopPropagation();
           onDelete?.(e);

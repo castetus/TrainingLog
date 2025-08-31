@@ -1,17 +1,12 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import {
-  ListItem,
-  ListItemText,
-  ListItemButton,
-  Stack,
-  Typography,
-  IconButton,
-} from '@mui/material';
+import { ListItem, ListItemText, ListItemButton, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { Routes } from '@/router/routes';
 import type { Training } from '@/types/trainings';
+
+import { RowActions } from '../Common';
 
 interface TrainingListItemProps {
   training: Training;
@@ -43,6 +38,12 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
           bgcolor: 'action.hover',
         },
       }}
+      secondaryAction={
+        <RowActions
+          onEdit={handleEdit}
+          onDelete={() => onDelete?.({ id: training.id, name: training.name })}
+        />
+      }
       disableGutters
     >
       <ListItemButton sx={{ px: 0 }} onClick={handleView}>
@@ -61,12 +62,7 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
               </Typography>
 
               {training.notes && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ fontStyle: 'italic' }}
-
-                >
+                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                   "{training.notes}"
                 </Typography>
               )}
@@ -74,19 +70,6 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
           }
         />
       </ListItemButton>
-
-      <Stack direction="row" spacing={1}>
-        <IconButton size="small" onClick={handleEdit} sx={{ color: 'primary.main' }}>
-          <EditIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          onClick={() => onDelete?.({ id: training.id, name: training.name })}
-          sx={{ color: 'error.main' }}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </Stack>
     </ListItem>
   );
 }
