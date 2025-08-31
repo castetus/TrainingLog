@@ -49,7 +49,7 @@ export default function UpdatePlannedValuesModal({
             Suggested Updates:
           </Typography>
 
-          {analysis.exercisesToUpdate.map(({ exercise, suggestedWeight, suggestedReps }) => (
+                      {analysis.exercisesToUpdate.map(({ exercise, suggestedWeight, suggestedTime, suggestedReps }) => (
             <Box
               key={exercise.exercise.id}
               sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}
@@ -58,35 +58,49 @@ export default function UpdatePlannedValuesModal({
                 {exercise.exercise.name}
               </Typography>
 
-              <Stack direction="row" spacing={2} alignItems="center">
-                {suggestedWeight && (
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography variant="body2" color="text.secondary">
-                      Weight:
-                    </Typography>
-                    <Chip
-                      label={`${exercise.plannedWeight}kg → ${suggestedWeight}kg`}
-                      color="success"
-                      size="small"
-                      variant="outlined"
-                    />
-                  </Stack>
-                )}
+                              <Stack direction="row" spacing={2} alignItems="center">
+                  {suggestedWeight && (
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Typography variant="body2" color="text.secondary">
+                        Weight:
+                      </Typography>
+                      <Chip
+                        label={`${exercise.plannedWeight}kg → ${suggestedWeight}kg`}
+                        color="success"
+                        size="small"
+                        variant="outlined"
+                      />
+                    </Stack>
+                  )}
 
-                {suggestedReps && (
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Typography variant="body2" color="text.secondary">
-                      Reps:
-                    </Typography>
-                    <Chip
-                      label={`${exercise.plannedReps} → ${suggestedReps}`}
-                      color="success"
-                      size="small"
-                      variant="outlined"
-                    />
-                  </Stack>
-                )}
-              </Stack>
+                  {suggestedTime && (
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Typography variant="body2" color="text.secondary">
+                        Time:
+                      </Typography>
+                      <Chip
+                        label={`${exercise.plannedDuration}s → ${suggestedTime}s`}
+                        color="success"
+                        size="small"
+                        variant="outlined"
+                      />
+                    </Stack>
+                  )}
+
+                  {suggestedReps && (
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Typography variant="body2" color="text.secondary">
+                        Reps:
+                      </Typography>
+                      <Chip
+                        label={`${exercise.plannedReps} → ${suggestedReps}`}
+                        color="success"
+                        size="small"
+                        variant="outlined"
+                      />
+                    </Stack>
+                  )}
+                </Stack>
             </Box>
           ))}
 

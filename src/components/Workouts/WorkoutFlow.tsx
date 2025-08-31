@@ -11,6 +11,7 @@ import type { WorkoutSet } from '@/types/workouts';
 import { analyzeWorkoutPerformance } from '@/utils/workoutAnalysis';
 
 import { WorkoutExerciseContent } from './index';
+import UpdatePlannedValuesModal from './UpdatePlannedValuesModal';
 
 interface WorkoutFlowProps {
   workout: Workout;
@@ -24,6 +25,10 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   // Track workout duration
   const [startTime] = useState<Date>(new Date());
   const [currentDuration, setCurrentDuration] = useState<number>(0);
+  
+  // State for performance analysis modal
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [performanceAnalysis, setPerformanceAnalysis] = useState<ReturnType<typeof analyzeWorkoutPerformance> | null>(null);
 
   // Track actual sets for all exercises - initialize with existing data
   const [actualSetsByExercise, setActualSetsByExercise] = useState<Record<number, WorkoutSet[]>>(
@@ -119,14 +124,15 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           exercises: workoutWithResults.exercises,
         });
 
-        const { shouldUpdatePlannedValues, exercisesToUpdate } =
-          analyzeWorkoutPerformance(workoutWithResults);
+        const analysis = analyzeWorkoutPerformance(workoutWithResults);
 
-        console.log(shouldUpdatePlannedValues, exercisesToUpdate);
-
-        if (shouldUpdatePlannedValues) {
-          await updatePlannedValues(exercisesToUpdate);
+        if (analysis.shouldUpdatePlannedValues) {
+          // Show modal to confirm updating planned values
+          setPerformanceAnalysis(analysis);
+          setShowUpdateModal(true);
+          return; // Don't finish workout yet, wait for user decision
         }
+        
         navigate(Routes.WORKOUTS);
       } catch (error) {
         console.error('Failed to finish workout:', error);
@@ -212,6 +218,26 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           </Button>
         </Box>
       </Stack>
+      
+      {/* Performance Analysis Modal */}
+      {performanceAnalysis && (
+        <UpdatePlannedValuesModal
+          open={showUpdateModal}
+          onClose={() => {
+            setShowUpdateModal(false);
+            setPerformanceAnalysis(null);
+            navigate(Routes.WORKOUTS);
+          }}
+          onConfirm={() => {
+            // TODO: Implement the actual update logic for training plan
+            console.log('Updating planned values:', performanceAnalysis);
+            setShowUpdateModal(false);
+            setPerformanceAnalysis(null);
+            navigate(Routes.WORKOUTS);
+          }}
+          analysis={performanceAnalysis}
+        />
+      )}
     </Box>
   );
 }
