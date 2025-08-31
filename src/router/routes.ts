@@ -1,5 +1,4 @@
 export enum Routes {
-  HOME = '/',
   WORKOUTS = '/workouts',
   WORKOUT_NEW = '/workouts/new',
   WORKOUT_FLOW = '/workouts/:id/flow',
@@ -13,4 +12,5 @@ export enum Routes {
   EXERCISE_NEW = '/exercises/new',
   EXERCISE_DETAIL = '/exercises/:id',
   EXERCISE_EDIT = '/exercises/:id/edit',
-};
+  STATISTICS = '/statistics',
+}

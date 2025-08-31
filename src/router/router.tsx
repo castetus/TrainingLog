@@ -1,11 +1,11 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import ExerciseForm from '@/components/Exercises/ExerciseForm';
 import TrainingForm from '@/components/Trainings/TrainingForm';
 import MainLayout from '@/layouts/MainLayout';
 import ExercisesPage from '@/pages/ExercisesPage';
-import HomePage from '@/pages/HomePage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import StatisticsPage from '@/pages/StatisticsPage';
 import TrainingsPage from '@/pages/TrainingsPage';
 import WorkoutsPage from '@/pages/WorkoutsPage';
 
@@ -15,7 +15,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: <MainLayout />,
     children: [
-      { index: true, element: <HomePage /> },
+      { index: true, element: <Navigate to="/workouts" replace /> },
       {
         path: 'workouts',
         element: <WorkoutsPage />,
@@ -43,6 +43,10 @@ export const router = createBrowserRouter([
           { path: ':id', element: <ExerciseForm /> },
           { path: ':id/edit', element: <ExerciseForm /> },
         ],
+      },
+      {
+        path: 'statistics',
+        element: <StatisticsPage />,
       },
       { path: '*', element: <NotFoundPage /> },
     ],

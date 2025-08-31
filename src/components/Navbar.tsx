@@ -1,7 +1,7 @@
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import HistoryIcon from '@mui/icons-material/History';
-import HomeIcon from '@mui/icons-material/Home';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -16,15 +16,16 @@ export default function Navbar() {
     const pathname = location.pathname;
 
     // Check exact matches first, then check if path starts with route
-    if (pathname === Routes.HOME) return Routes.HOME;
     if (pathname === Routes.WORKOUTS || pathname.startsWith(Routes.WORKOUTS + '/'))
       return Routes.WORKOUTS;
     if (pathname === Routes.TRAININGS || pathname.startsWith(Routes.TRAININGS + '/'))
       return Routes.TRAININGS;
     if (pathname === Routes.EXERCISES || pathname.startsWith(Routes.EXERCISES + '/'))
       return Routes.EXERCISES;
+    if (pathname === Routes.STATISTICS || pathname.startsWith(Routes.STATISTICS + '/'))
+      return Routes.STATISTICS;
 
-    return Routes.HOME; // Default fallback
+    return Routes.WORKOUTS; // Default fallback to Workouts
   };
 
   const changeRoute = (event: React.SyntheticEvent, newValue: Routes) => {
@@ -46,7 +47,6 @@ export default function Navbar() {
           },
         }}
       >
-        <BottomNavigationAction label="Home" icon={<HomeIcon />} value={Routes.HOME} />
         <BottomNavigationAction label="Workouts" icon={<HistoryIcon />} value={Routes.WORKOUTS} />
         <BottomNavigationAction
           label="Trainings"
@@ -57,6 +57,11 @@ export default function Navbar() {
           label="Exercises"
           icon={<MenuBookIcon />}
           value={Routes.EXERCISES}
+        />
+        <BottomNavigationAction
+          label="Statistics"
+          icon={<BarChartIcon />}
+          value={Routes.STATISTICS}
         />
       </BottomNavigation>
     </Paper>
