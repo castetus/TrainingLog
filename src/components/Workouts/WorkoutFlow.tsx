@@ -1,5 +1,6 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Accordion, AccordionSummary, Typography, Stack, Chip, Button } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { Box, Accordion, AccordionSummary, Typography, Stack, Chip, Button, IconButton } from '@mui/material';
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -78,8 +79,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
 
   // Helper function to check if an exercise is completed
   const isExerciseCompleted = (workoutExercise: WorkoutExercise): boolean => {
-    // if (!workoutExercise.actualSets.length) return false;
-    console.log(workoutExercise);
+
     return workoutExercise.actualSets.every((set) => {
       // Reps are always required
       if (set.actualReps <= 0) return false;
@@ -219,9 +219,25 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           <Accordion key={index} defaultExpanded={index === 0}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    flexGrow: 1,
+                    color: isExerciseCompleted(workoutExercise) ? 'success.main' : 'inherit'
+                  }}
+                >
                   {workoutExercise.exercise.name}
                 </Typography>
+                {workoutExercise.exercise.videoUrl && (
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={() => window.open(workoutExercise.exercise.videoUrl, '_blank')}
+                    sx={{ ml: 1 }}
+                  >
+                    <PlayArrowIcon />
+                  </IconButton>
+                )}
                 <Stack direction="row" alignItems="start" width="100%" spacing={2}>
                   {isExerciseCompleted(workoutExercise) && (
                     <Chip

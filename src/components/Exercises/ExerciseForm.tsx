@@ -36,10 +36,12 @@ export default function ExerciseForm() {
     name: string;
     description: string;
     type: ExerciseType | undefined;
+    videoUrl: string;
   }>({
     name: '',
     description: '',
     type: ExerciseType.WEIGHT,
+    videoUrl: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -58,16 +60,18 @@ export default function ExerciseForm() {
               name: exerciseFromStore.name,
               description: exerciseFromStore.description || '',
               type: exerciseFromStore.type,
+              videoUrl: exerciseFromStore.videoUrl || '',
             });
           } else {
             // If not in store, try to load from database
             const exerciseFromDb = await findById(id);
             if (exerciseFromDb) {
-              setFormData({
-                name: exerciseFromDb.name,
-                description: exerciseFromDb.description || '',
-                type: exerciseFromDb.type,
-              });
+                          setFormData({
+              name: exerciseFromDb.name,
+              description: exerciseFromDb.description || '',
+              type: exerciseFromDb.type,
+              videoUrl: exerciseFromDb.videoUrl || '',
+            });
             }
           }
         } catch (error) {
@@ -169,6 +173,16 @@ export default function ExerciseForm() {
               rows={2}
               fullWidth
               size="small"
+            />
+
+            <TextField
+              label="Video URL (optional)"
+              value={formData.videoUrl || ''}
+              onChange={(e) => handleInputChange('videoUrl', e.target.value)}
+              placeholder="https://youtube.com/watch?v=..."
+              fullWidth
+              size="small"
+              helperText="Link to tutorial or demonstration video"
             />
 
             <FormControl fullWidth size="small">
