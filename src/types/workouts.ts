@@ -41,6 +41,8 @@ export interface Workout {
   exercises: WorkoutExercise[];
   /** Overall workout notes */
   notes?: string;
+  /** ID of the training plan this workout was based on */
+  trainingId?: string;
   /** When the workout was created */
   createdAt: string;
   /** When the workout was last updated */
@@ -55,6 +57,7 @@ export interface CreateWorkoutData {
   date: string;
   duration?: number;
   exercises: WorkoutExercise[];
+  trainingId?: string;
 }
 
 export interface UpdateWorkoutData extends Partial<CreateWorkoutData> {

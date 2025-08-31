@@ -3,12 +3,15 @@ import { Box, Accordion, AccordionSummary, Typography, Stack, Chip, Button } fro
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useExercisesController } from '@/controllers/exercisesController';
+import { useTrainingsController } from '@/controllers/trainingsController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import { useConfirm } from '@/providers/confirmProvider';
 import { Routes } from '@/router/routes';
 import type { Workout, WorkoutExercise } from '@/types/workouts';
 import type { WorkoutSet } from '@/types/workouts';
 import { analyzeWorkoutPerformance } from '@/utils/workoutAnalysis';
+import { updateTrainingFromWorkout } from '@/utils/updateTrainingFromWorkout';
 
 import { WorkoutExerciseContent } from './index';
 import UpdatePlannedValuesModal from './UpdatePlannedValuesModal';
@@ -20,6 +23,8 @@ interface WorkoutFlowProps {
 export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   const confirm = useConfirm();
   const { finishWorkout, update } = useWorkoutsController();
+  const { findById: findTrainingById, update: updateTraining } = useTrainingsController();
+  const { update: updateExercise } = useExercisesController();
   const navigate = useNavigate();
 
   // Track workout duration
@@ -124,6 +129,9 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           exercises: workoutWithResults.exercises,
         });
 
+        // Update exercise lastSet values with actual performance
+        await updateExerciseLastSetValues(workoutWithResults.exercises);
+
         const analysis = analyzeWorkoutPerformance(workoutWithResults);
 
         if (analysis.shouldUpdatePlannedValues) {
@@ -138,6 +146,43 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
         console.error('Failed to finish workout:', error);
         // Error is already handled by the controller
       }
+    }
+  };
+
+  const updateExerciseLastSetValues = async (exercises: WorkoutExercise[]) => {
+    const exercisesToUpdate: any[] = [];
+
+    exercises.forEach((workoutExercise) => {
+      if (!workoutExercise.actualSets || workoutExercise.actualSets.length === 0) {
+        return; // Skip exercises with no actual sets
+      }
+
+      // Get the last actual set
+      const lastSet = workoutExercise.actualSets[workoutExercise.actualSets.length - 1];
+      if (!lastSet) {
+        return;
+      }
+
+      // Create updated exercise with lastSet values
+      const exercise = workoutExercise.exercise;
+      const updatedExercise = { ...exercise };
+
+      // Update lastSet values based on exercise type
+      if (exercise.type === 'weight' && lastSet.actualWeight) {
+        (updatedExercise as any).lastSetWeightKg = lastSet.actualWeight;
+        exercisesToUpdate.push(updatedExercise);
+      } else if (exercise.type === 'time' && lastSet.actualDuration) {
+        (updatedExercise as any).lastSetSeconds = lastSet.actualDuration;
+        exercisesToUpdate.push(updatedExercise);
+      } else if (exercise.type === 'reps_only' && lastSet.actualReps) {
+        (updatedExercise as any).lastSetReps = lastSet.actualReps;
+        exercisesToUpdate.push(updatedExercise);
+      }
+    });
+
+    // Update exercises in database
+    for (const exercise of exercisesToUpdate) {
+      await updateExercise(exercise);
     }
   };
 
@@ -228,12 +273,54 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
             setPerformanceAnalysis(null);
             navigate(Routes.WORKOUTS);
           }}
-          onConfirm={() => {
-            // TODO: Implement the actual update logic for training plan
-            console.log('Updating planned values:', performanceAnalysis);
-            setShowUpdateModal(false);
-            setPerformanceAnalysis(null);
-            navigate(Routes.WORKOUTS);
+          onConfirm={async () => {
+            try {
+              if (!workout.trainingId || !performanceAnalysis) {
+                setShowUpdateModal(false);
+                setPerformanceAnalysis(null);
+                navigate(Routes.WORKOUTS);
+                return;
+              }
+
+              // Find the original training
+              const originalTraining = await findTrainingById(workout.trainingId);
+              if (!originalTraining) {
+                console.error('Training not found:', workout.trainingId);
+                setShowUpdateModal(false);
+                setPerformanceAnalysis(null);
+                navigate(Routes.WORKOUTS);
+                return;
+              }
+
+              // Update the training with suggested improvements
+              const updateResult = updateTrainingFromWorkout(originalTraining, performanceAnalysis);
+              if (!updateResult.success || !updateResult.updatedTraining) {
+                console.error('Failed to update training:', updateResult.error);
+                setShowUpdateModal(false);
+                setPerformanceAnalysis(null);
+                navigate(Routes.WORKOUTS);
+                return;
+              }
+
+              // Save the updated training to database
+              await updateTraining(originalTraining.id, updateResult.updatedTraining);
+              
+              // Also update exercises in the database and store if any were updated
+              if (updateResult.updatedExercises && updateResult.updatedExercises.length > 0) {
+                // Update each exercise in the database
+                for (const exercise of updateResult.updatedExercises) {
+                  await updateExercise(exercise);
+                }
+              }
+              
+              console.log('Training and exercises updated successfully with new planned values');
+            } catch (error) {
+              console.error('Failed to update training:', error);
+            } finally {
+              setShowUpdateModal(false);
+              setPerformanceAnalysis(null);
+              navigate(Routes.WORKOUTS);
+            }
           }}
           analysis={performanceAnalysis}
         />

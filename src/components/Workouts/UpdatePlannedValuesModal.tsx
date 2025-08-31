@@ -49,16 +49,17 @@ export default function UpdatePlannedValuesModal({
             Suggested Updates:
           </Typography>
 
-                      {analysis.exercisesToUpdate.map(({ exercise, suggestedWeight, suggestedTime, suggestedReps }) => (
-            <Box
-              key={exercise.exercise.id}
-              sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}
-            >
-              <Typography variant="subtitle2" fontWeight="medium" gutterBottom>
-                {exercise.exercise.name}
-              </Typography>
+          {analysis.exercisesToUpdate.map(
+            ({ exercise, suggestedWeight, suggestedTime, suggestedReps }) => (
+              <Box
+                key={exercise.exercise.id}
+                sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}
+              >
+                <Typography variant="subtitle2" fontWeight="medium" gutterBottom>
+                  {exercise.exercise.name}
+                </Typography>
 
-                              <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} alignItems="center">
                   {suggestedWeight && (
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <Typography variant="body2" color="text.secondary">
@@ -101,8 +102,9 @@ export default function UpdatePlannedValuesModal({
                     </Stack>
                   )}
                 </Stack>
-            </Box>
-          ))}
+              </Box>
+            ),
+          )}
 
           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
             This will update the planned values in your training plan to help you continue

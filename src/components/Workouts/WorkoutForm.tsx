@@ -94,14 +94,15 @@ export default function WorkoutForm() {
           ...prev,
           name: workoutName,
           description: training.description || '',
-                      exercises: training.exercises.map((ex) => ({
-              exercise: ex.exercise,
-              plannedSets: ex.plannedSets,
-              plannedReps: ex.plannedReps || 10, // Use planned rep value
-              plannedWeight: ex.plannedWeightKg, // Use planned weight value
-              plannedDuration: ex.plannedSeconds, // Use planned duration value
-              actualSets: [], // Initialize with empty actual sets
-            })),
+          trainingId: trainingId,
+          exercises: training.exercises.map((ex) => ({
+            exercise: ex.exercise,
+            plannedSets: ex.plannedSets,
+            plannedReps: ex.plannedReps || 10, // Use planned rep value
+            plannedWeight: ex.plannedWeightKg, // Use planned weight value
+            plannedDuration: ex.plannedSeconds, // Use planned duration value
+            actualSets: [], // Initialize with empty actual sets
+          })),
         }));
       }
     }
