@@ -48,7 +48,7 @@ export default function AddExerciseSubform({
           </Typography>
           <Autocomplete
             value={newExerciseData.exercise}
-            onChange={(event, newValue) => {
+            onChange={(_event, newValue) => {
               if (newValue) {
                 onExerciseChange(newValue);
               }
@@ -128,7 +128,10 @@ export default function AddExerciseSubform({
               />
             </Stack>
             <Typography variant="caption" color="text.secondary" sx={{ ml: 10 }}>
-              Last set: {newExerciseData.exercise?.lastSetWeightKg ? `${newExerciseData.exercise.lastSetWeightKg}kg` : '—'}
+              Last set:{' '}
+              {newExerciseData.exercise?.lastSetWeightKg
+                ? `${newExerciseData.exercise.lastSetWeightKg}kg`
+                : '—'}
             </Typography>
           </Stack>
         )}
@@ -161,7 +164,10 @@ export default function AddExerciseSubform({
               />
             </Stack>
             <Typography variant="caption" color="text.secondary" sx={{ ml: 10 }}>
-              Last set: {newExerciseData.exercise?.lastSetSeconds ? `${newExerciseData.exercise.lastSetSeconds}s` : '—'}
+              Last set:{' '}
+              {newExerciseData.exercise?.lastSetSeconds
+                ? `${newExerciseData.exercise.lastSetSeconds}s`
+                : '—'}
             </Typography>
           </Stack>
         )}
@@ -194,7 +200,11 @@ export default function AddExerciseSubform({
               />
             </Stack>
             <Typography variant="caption" color="text.secondary" sx={{ ml: 10 }}>
-              Last set: {newExerciseData.exercise?.type === ExerciseType.REPS_ONLY && newExerciseData.exercise?.lastSetReps ? `${newExerciseData.exercise.lastSetReps} reps` : '—'}
+              Last set:{' '}
+              {newExerciseData.exercise?.type === ExerciseType.REPS_ONLY &&
+              newExerciseData.exercise?.lastSetReps
+                ? `${newExerciseData.exercise.lastSetReps} reps`
+                : '—'}
             </Typography>
           </Stack>
         )}

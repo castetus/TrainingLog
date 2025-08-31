@@ -1,7 +1,7 @@
+import BarChartIcon from '@mui/icons-material/BarChart';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import HistoryIcon from '@mui/icons-material/History';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import BarChartIcon from '@mui/icons-material/BarChart';
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ export default function Navbar() {
     return Routes.WORKOUTS; // Default fallback to Workouts
   };
 
-  const changeRoute = (event: React.SyntheticEvent, newValue: Routes) => {
+  const changeRoute = (_event: React.SyntheticEvent, newValue: Routes) => {
     navigate(newValue);
   };
 
