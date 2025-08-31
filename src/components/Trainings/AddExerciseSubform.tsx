@@ -101,86 +101,101 @@ export default function AddExerciseSubform({
 
         {/* Weight-based exercise fields */}
         {newExerciseData.exercise?.type === ExerciseType.WEIGHT && (
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography variant="body2" sx={{ minWidth: 80 }}>
-              Weight (kg):
-            </Typography>
-            <TextField
-              type="number"
-              value={newExerciseData.plannedWeight}
-              onChange={(e) => {
-                const value = e.target.value;
+          <Stack spacing={1}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography variant="body2" sx={{ minWidth: 80 }}>
+                Weight (kg):
+              </Typography>
+              <TextField
+                type="number"
+                value={newExerciseData.plannedWeight}
+                onChange={(e) => {
+                  const value = e.target.value;
 
-                if (value === '') {
-                  // Don't call onWeightChange - let it stay empty temporarily
-                  return;
-                } else {
-                  const parsed = parseFloat(value);
-                  if (!isNaN(parsed)) {
-                    onWeightChange(parsed);
+                  if (value === '') {
+                    // Don't call onWeightChange - let it stay empty temporarily
+                    return;
+                  } else {
+                    const parsed = parseFloat(value);
+                    if (!isNaN(parsed)) {
+                      onWeightChange(parsed);
+                    }
                   }
-                }
-              }}
-              disabled={!newExerciseData.exercise}
-              size="small"
-              sx={{ width: 100 }}
-            />
+                }}
+                disabled={!newExerciseData.exercise}
+                size="small"
+                sx={{ width: 100 }}
+              />
+            </Stack>
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 10 }}>
+              Last set: {newExerciseData.exercise?.lastSetWeightKg ? `${newExerciseData.exercise.lastSetWeightKg}kg` : '—'}
+            </Typography>
           </Stack>
         )}
 
         {/* Time-based exercise fields */}
         {newExerciseData.exercise?.type === ExerciseType.TIME && (
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography variant="body2" sx={{ minWidth: 80 }}>
-              Duration (sec):
-            </Typography>
-            <TextField
-              type="number"
-              value={newExerciseData.plannedDuration}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '') {
-                  // Don't call onDurationChange - let it stay empty temporarily
-                  return;
-                } else {
-                  const parsed = parseInt(value);
-                  if (!isNaN(parsed)) {
-                    onDurationChange(parsed);
+          <Stack spacing={1}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography variant="body2" sx={{ minWidth: 80 }}>
+                Duration (sec):
+              </Typography>
+              <TextField
+                type="number"
+                value={newExerciseData.plannedDuration}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    // Don't call onDurationChange - let it stay empty temporarily
+                    return;
+                  } else {
+                    const parsed = parseInt(value);
+                    if (!isNaN(parsed)) {
+                      onDurationChange(parsed);
+                    }
                   }
-                }
-              }}
-              disabled={!newExerciseData.exercise}
-              size="small"
-              sx={{ width: 100 }}
-            />
+                }}
+                disabled={!newExerciseData.exercise}
+                size="small"
+                sx={{ width: 100 }}
+              />
+            </Stack>
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 10 }}>
+              Last set: {newExerciseData.exercise?.lastSetSeconds ? `${newExerciseData.exercise.lastSetSeconds}s` : '—'}
+            </Typography>
           </Stack>
         )}
 
         {/* Reps field - hidden for time-based exercises */}
         {newExerciseData.exercise?.type !== ExerciseType.TIME && (
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography variant="body2" sx={{ minWidth: 80 }}>
-              Reps:
+          <Stack spacing={1}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography variant="body2" sx={{ minWidth: 80 }}>
+                Reps:
+              </Typography>
+              <TextField
+                type="number"
+                value={newExerciseData.plannedReps}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    // Don't call onRepsChange - let it stay empty temporarily
+                    return;
+                  } else {
+                    const parsed = parseInt(value);
+                    if (!isNaN(parsed)) {
+                      onRepsChange(parsed);
+                    }
+                  }
+                }}
+                disabled={!newExerciseData.exercise}
+                size="small"
+                sx={{ width: 100 }}
+              />
+            </Stack>
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 10 }}>
+              Last set: {newExerciseData.exercise?.type === ExerciseType.REPS_ONLY && newExerciseData.exercise?.lastSetReps ? `${newExerciseData.exercise.lastSetReps} reps` : '—'}
             </Typography>
-          <TextField
-            type="number"
-            value={newExerciseData.plannedReps}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === '') {
-                // Don't call onRepsChange - let it stay empty temporarily
-                return;
-              } else {
-                const parsed = parseInt(value);
-                if (!isNaN(parsed)) {
-                  onRepsChange(parsed);
-                }
-              }
-            }}
-            disabled={!newExerciseData.exercise}
-            size="small"
-            sx={{ width: 100 }}
-          />
           </Stack>
         )}
 
