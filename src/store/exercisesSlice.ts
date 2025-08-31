@@ -18,7 +18,7 @@ export const createExercisesSlice: StateCreator<ExercisesSlice, [], [], Exercise
   exerciseIds: [],
   setExercises: (items) => {
     // Replace all exercises with new data
-    set((state) => {
+    set(() => {
 
       const byId: Record<string, Exercise> = {};
       for (const ex of items) byId[ex.id] = ex;

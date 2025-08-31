@@ -1,4 +1,4 @@
-export type ID = string;
+import type { ID } from './common';
 
 export enum ExerciseType {
   WEIGHT = 'weight',

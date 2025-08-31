@@ -1,6 +1,5 @@
+import type { ID } from './common';
 import type { Exercise } from './exercises';
-
-export type ID = string;
 
 export interface WorkoutSet {
   /** Actual reps completed in this set */

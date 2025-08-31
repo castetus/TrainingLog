@@ -19,7 +19,7 @@ export const createTrainingsSlice: StateCreator<TrainingsSlice, [], [], Training
 
   setTrainings: (trainings) => {
     // Replace all trainings with new data
-    set((state) => {
+    set(() => {
 
       const byId: Record<string, Training> = {};
       for (const training of trainings) byId[training.id] = training;
