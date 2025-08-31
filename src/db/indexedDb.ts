@@ -55,8 +55,6 @@ class IndexedDbTable<T> implements Table<T> {
         const store = transaction.objectStore(this.tableName);
         const request = store.put(item);
 
-        console.log(`Putting ${this.tableName}:`, item);
-
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(item);
       });
@@ -105,32 +103,23 @@ class IndexedDbManager {
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         this.db = request.result;
-        console.log(
-          'Database opened successfully. Available object stores:',
-          this.db.objectStoreNames,
-        );
+
         resolve(request.result);
       };
 
       request.onupgradeneeded = (event) => {
-        console.log('Database upgrade needed, creating object stores...');
         const db = (event.target as IDBOpenDBRequest).result;
 
         // Create all required object stores
         if (!db.objectStoreNames.contains('exercises')) {
-          console.log('Creating exercises object store...');
           db.createObjectStore('exercises', { keyPath: 'id' });
         }
         if (!db.objectStoreNames.contains('trainings')) {
-          console.log('Creating trainings object store...');
           db.createObjectStore('trainings', { keyPath: 'id' });
         }
         if (!db.objectStoreNames.contains('workouts')) {
-          console.log('Creating workouts object store...');
           db.createObjectStore('workouts', { keyPath: 'id' });
         }
-
-        console.log('Database upgrade completed. Object stores:', db.objectStoreNames);
       };
     });
   }
@@ -157,7 +146,6 @@ class IndexedDbManager {
 
       deleteRequest.onerror = () => reject(deleteRequest.error);
       deleteRequest.onsuccess = () => {
-        console.log('Database deleted successfully, will recreate on next access');
         resolve();
       };
     });

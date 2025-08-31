@@ -11,17 +11,13 @@ export function DataProvider({ children }: DataProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const {
-    setExercises,
-    setTrainings,
-    setWorkouts,
-  } = useAppStore();
+  const { setExercises, setTrainings, setWorkouts } = useAppStore();
 
   useEffect(() => {
     const initializeData = async () => {
       try {
         console.log('Initializing data from database...');
-        
+
         // Load all data in parallel
         const [exercises, trainings, workouts] = await Promise.all([
           db.exercises.list(),
@@ -29,7 +25,9 @@ export function DataProvider({ children }: DataProviderProps) {
           db.workouts.list(),
         ]);
 
-        console.log(`Loaded ${exercises.length} exercises, ${trainings.length} trainings, ${workouts.length} workouts`);
+        console.log(
+          `Loaded ${exercises.length} exercises, ${trainings.length} trainings, ${workouts.length} workouts`,
+        );
 
         // Update store with loaded data
         setExercises(exercises);
@@ -56,14 +54,16 @@ export function DataProvider({ children }: DataProviderProps) {
   // Show loading state while initializing
   if (!isInitialized) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '16px',
-        color: '#666'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          fontSize: '16px',
+          color: '#666',
+        }}
+      >
         Loading application data...
       </div>
     );

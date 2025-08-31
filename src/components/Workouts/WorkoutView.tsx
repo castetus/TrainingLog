@@ -24,7 +24,7 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
   const formatDate = (dateString: string) => {
     return formatLongDate(dateString);
   };
-  console.log('Workout:', workout);
+
   return (
     <Stack spacing={3}>
       {/* Header Info */}

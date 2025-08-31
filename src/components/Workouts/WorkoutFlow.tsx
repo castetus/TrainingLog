@@ -118,13 +118,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           exercises: workoutWithResults.exercises,
         });
         navigate(Routes.WORKOUTS);
-        console.log(
-          'Workout finished successfully:',
-          workout.id,
-          'Duration:',
-          finalDurationMinutes,
-          'minutes',
-        );
+
       } catch (error) {
         console.error('Failed to finish workout:', error);
         // Error is already handled by the controller

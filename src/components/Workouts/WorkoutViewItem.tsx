@@ -18,7 +18,6 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
     actualDuration: exercise.actualSets[exercise.actualSets.length - 1].actualDuration,
   };
 
-  console.log(exerciseViewData);
   return (
     <TableRow>
       <TableCell>

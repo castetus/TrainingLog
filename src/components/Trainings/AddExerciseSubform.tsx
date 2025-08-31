@@ -110,7 +110,7 @@ export default function AddExerciseSubform({
               value={newExerciseData.plannedWeight}
               onChange={(e) => {
                 const value = e.target.value;
-                console.log('value', value, typeof value);
+
                 if (value === '') {
                   // Don't call onWeightChange - let it stay empty temporarily
                   return;

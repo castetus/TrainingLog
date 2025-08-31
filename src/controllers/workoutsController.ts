@@ -36,7 +36,7 @@ export const useWorkoutsController = () => {
       try {
         // First check store
         const workout = workoutsById[id];
-        console.log('Workout:', workout);
+
         if (workout) {
           return workout;
         }
@@ -93,7 +93,7 @@ export const useWorkoutsController = () => {
 
   const update = useCallback(
     async (data: UpdateWorkoutData): Promise<Workout> => {
-      console.log('Updating workout:', data);
+
       try {
         setLoading(true);
         clearError();
