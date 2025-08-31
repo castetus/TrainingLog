@@ -1,9 +1,17 @@
 import AddIcon from '@mui/icons-material/Add';
+import NavigationIcon from '@mui/icons-material/Navigation';
 import { Box, Container, Typography, Fab } from '@mui/material';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import Navbar from '@/components/Navbar';
 import { Routes } from '@/router/routes';
+
+type AddButtonVariant = 'circular' | 'extended';
+interface AddButtonConfig {
+  to: Routes;
+  label: string;
+  variant: AddButtonVariant;
+}
 
 const MainLayout = () => {
   const { pathname } = useLocation();
@@ -21,25 +29,28 @@ const MainLayout = () => {
     : null;
 
   // Determine which add button to show based on current route
-  const getAddButtonConfig = () => {
+  const getAddButtonConfig = (): AddButtonConfig | null => {
     if (isNestedRoute) return null;
 
     if (pathname === Routes.EXERCISES) {
       return {
         to: Routes.EXERCISE_NEW,
         label: 'Add Exercise',
+        variant: 'circular',
       };
     }
     if (pathname === Routes.TRAININGS) {
       return {
         to: Routes.TRAINING_NEW,
         label: 'Add Training',
+        variant: 'circular',
       };
     }
     if (pathname === Routes.WORKOUTS) {
       return {
         to: Routes.WORKOUT_NEW,
-        label: 'Add Workout',
+        label: 'Start Workout',
+        variant: 'extended',
       };
     }
 
@@ -50,7 +61,7 @@ const MainLayout = () => {
 
   return (
     <Box sx={{ pb: 8 }}>
-      <Container maxWidth="xl" sx={{ py: 1 }} className="main-container" >
+      <Container maxWidth="xl" sx={{ py: 1 }} className="main-container">
         {pageTitle && (
           <Typography variant="h4" gutterBottom>
             {pageTitle}
@@ -65,6 +76,7 @@ const MainLayout = () => {
           color="primary"
           aria-label={addButtonConfig.label}
           className="fab-button"
+          variant={addButtonConfig.variant}
           onClick={() => (window.location.href = addButtonConfig.to)}
           sx={{
             position: 'fixed',
@@ -73,7 +85,9 @@ const MainLayout = () => {
             zIndex: 1000,
           }}
         >
-          <AddIcon />
+          {addButtonConfig.variant === 'circular' && <AddIcon />}
+          {addButtonConfig.variant === 'extended' && <NavigationIcon />}
+          {addButtonConfig.label}
         </Fab>
       )}
 
