@@ -17,18 +17,22 @@ import { useState, useMemo, useEffect } from 'react';
 
 import { ExerciseType } from '@/types';
 import type { WorkoutExercise, WorkoutSet } from '@/types/workouts';
+import { useWorkoutsController } from '@/controllers/workoutsController';
 
 interface WorkoutExerciseContentProps {
   workoutExercise: WorkoutExercise;
   exerciseIndex: number;
+  workoutId: string;
   onActualSetsUpdate: (exerciseIndex: number, actualSets: WorkoutSet[]) => void;
 }
 
 export default function WorkoutExerciseContent({
   workoutExercise,
   exerciseIndex,
+  workoutId,
   onActualSetsUpdate,
 }: WorkoutExerciseContentProps) {
+  const { update } = useWorkoutsController();
   const [actualSets, setActualSets] = useState<WorkoutSet[]>(() => {
     // Initialize with existing data if available, otherwise create empty sets
     if (workoutExercise.actualSets && workoutExercise.actualSets.length > 0) {
@@ -51,7 +55,7 @@ export default function WorkoutExerciseContent({
     }
   }, [workoutExercise.actualSets]);
 
-  const handleSetChange = (setIndex: number, field: keyof WorkoutSet, value: any) => {
+  const handleSetChange = async (setIndex: number, field: keyof WorkoutSet, value: any) => {
     setActualSets((prev) => {
       const newActualSets = prev.map((set, index) =>
         index === setIndex ? { ...set, [field]: value } : set,
@@ -59,6 +63,15 @@ export default function WorkoutExerciseContent({
 
       // Notify parent component of the change
       onActualSetsUpdate(exerciseIndex, newActualSets);
+
+      // Update workout in store
+      update({
+        id: workoutId,
+        exercises: [{
+          ...workoutExercise,
+          actualSets: newActualSets
+        }]
+      });
 
       return newActualSets;
     });

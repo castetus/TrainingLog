@@ -10,8 +10,8 @@ import { useConfirm } from '@/providers/confirmProvider';
 import { Routes } from '@/router/routes';
 import type { Workout, WorkoutExercise } from '@/types/workouts';
 import type { WorkoutSet } from '@/types/workouts';
-import { analyzeWorkoutPerformance } from '@/utils/workoutAnalysis';
 import { updateTrainingFromWorkout } from '@/utils/updateTrainingFromWorkout';
+import { analyzeWorkoutPerformance } from '@/utils/workoutAnalysis';
 
 import { WorkoutExerciseContent } from './index';
 import UpdatePlannedValuesModal from './UpdatePlannedValuesModal';
@@ -30,10 +30,12 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   // Track workout duration
   const [startTime] = useState<Date>(new Date());
   const [currentDuration, setCurrentDuration] = useState<number>(0);
-  
+
   // State for performance analysis modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [performanceAnalysis, setPerformanceAnalysis] = useState<ReturnType<typeof analyzeWorkoutPerformance> | null>(null);
+  const [performanceAnalysis, setPerformanceAnalysis] = useState<ReturnType<
+    typeof analyzeWorkoutPerformance
+  > | null>(null);
 
   // Track actual sets for all exercises - initialize with existing data
   const [actualSetsByExercise, setActualSetsByExercise] = useState<Record<number, WorkoutSet[]>>(
@@ -76,6 +78,8 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
 
   // Helper function to check if an exercise is completed
   const isExerciseCompleted = (workoutExercise: WorkoutExercise): boolean => {
+    // if (!workoutExercise.actualSets.length) return false;
+    console.log(workoutExercise);
     return workoutExercise.actualSets.every((set) => {
       // Reps are always required
       if (set.actualReps <= 0) return false;
@@ -140,7 +144,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           setShowUpdateModal(true);
           return; // Don't finish workout yet, wait for user decision
         }
-        
+
         navigate(Routes.WORKOUTS);
       } catch (error) {
         console.error('Failed to finish workout:', error);
@@ -214,37 +218,45 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
         {workout.exercises.map((workoutExercise, index) => (
           <Accordion key={index} defaultExpanded={index === 0}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
+              <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
                 <Typography variant="h6" sx={{ flexGrow: 1 }}>
                   {workoutExercise.exercise.name}
                 </Typography>
-                <Chip
-                  label={`${workoutExercise.plannedSets} × ${workoutExercise.plannedReps}`}
-                  color="primary"
-                  size="small"
-                />
-                {workoutExercise.plannedWeight && (
+                <Stack direction="row" alignItems="start" width="100%" spacing={2}>
+                  {isExerciseCompleted(workoutExercise) && (
+                    <Chip
+                      label="✓"
+                      color="success"
+                      size="small"
+                      sx={{ minWidth: 24, height: 24 }}
+                    />
+                  )}
                   <Chip
-                    label={`${workoutExercise.plannedWeight}kg`}
-                    color="secondary"
+                    label={`${workoutExercise.plannedSets} × ${workoutExercise.plannedReps}`}
+                    color="primary"
                     size="small"
                   />
-                )}
-                {workoutExercise.plannedDuration && (
-                  <Chip
-                    label={`${workoutExercise.plannedDuration}s`}
-                    color="secondary"
-                    size="small"
-                  />
-                )}
-                {isExerciseCompleted(workoutExercise) && (
-                  <Chip label="✓" color="success" size="small" sx={{ minWidth: 24, height: 24 }} />
-                )}
+                  {workoutExercise.plannedWeight && (
+                    <Chip
+                      label={`${workoutExercise.plannedWeight}kg`}
+                      color="secondary"
+                      size="small"
+                    />
+                  )}
+                  {workoutExercise.plannedDuration && (
+                    <Chip
+                      label={`${workoutExercise.plannedDuration}s`}
+                      color="secondary"
+                      size="small"
+                    />
+                  )}
+                </Stack>
               </Stack>
             </AccordionSummary>
             <WorkoutExerciseContent
               workoutExercise={workoutExercise}
               exerciseIndex={index}
+              workoutId={workout.id}
               onActualSetsUpdate={handleActualSetsUpdate}
             />
           </Accordion>
@@ -263,7 +275,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           </Button>
         </Box>
       </Stack>
-      
+
       {/* Performance Analysis Modal */}
       {performanceAnalysis && (
         <UpdatePlannedValuesModal
@@ -304,7 +316,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
 
               // Save the updated training to database
               await updateTraining(originalTraining.id, updateResult.updatedTraining);
-              
+
               // Also update exercises in the database and store if any were updated
               if (updateResult.updatedExercises && updateResult.updatedExercises.length > 0) {
                 // Update each exercise in the database
@@ -312,7 +324,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                   await updateExercise(exercise);
                 }
               }
-              
+
               console.log('Training and exercises updated successfully with new planned values');
             } catch (error) {
               console.error('Failed to update training:', error);
