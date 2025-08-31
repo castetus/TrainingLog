@@ -8,11 +8,17 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
     name: exercise.exercise.name,
     description: exercise.exercise.description,
     type: exercise.exercise.type,
-    sets: exercise.actualSets.length,
-    reps: exercise.actualSets[exercise.actualSets.length - 1].actualReps,
-    weight: exercise.actualSets[exercise.actualSets.length - 1].actualWeight,
-    duration: exercise.actualSets[exercise.actualSets.length - 1].actualDuration,
+    plannedSets: exercise.plannedSets,
+    plannedReps: exercise.plannedReps,
+    plannedWeight: exercise.plannedWeight,
+    plannedDuration: exercise.plannedDuration,
+    actualSets: exercise.actualSets.length,
+    actualReps: exercise.actualSets[exercise.actualSets.length - 1].actualReps,
+    actualWeight: exercise.actualSets[exercise.actualSets.length - 1].actualWeight,
+    actualDuration: exercise.actualSets[exercise.actualSets.length - 1].actualDuration,
   };
+
+  console.log(exerciseViewData);
   return (
     <TableRow>
       <TableCell>
@@ -26,19 +32,22 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
         </Stack>
       </TableCell>
       <TableCell align="center">
-        <Typography variant="body2">{exerciseViewData.sets}</Typography>
+        <Typography variant="body2">{exerciseViewData.plannedSets}</Typography>
       </TableCell>
       <TableCell align="center">
         <Typography variant="body2">
-          {exerciseViewData.reps} × {exerciseViewData.weight && exerciseViewData.weight}kg
-          {exerciseViewData.duration && formatTime(exerciseViewData.duration)}
+          {exerciseViewData.plannedReps} ×{' '}
+          {exerciseViewData.plannedWeight && exerciseViewData.plannedWeight}kg
+          {exerciseViewData.plannedDuration && formatTime(exerciseViewData.plannedDuration)}
         </Typography>
       </TableCell>
       <TableCell align="center">
         <Stack spacing={0.5}>
           <Typography variant="body2">
-            {exerciseViewData.weight && ` x ${exerciseViewData.weight}kg`}
-            {exerciseViewData.duration && ` x ${formatTime(exerciseViewData.duration)}`}
+            {exerciseViewData.actualReps && `${exerciseViewData.actualReps}`}
+            {exerciseViewData.actualReps && ` x ${exerciseViewData.actualWeight}kg`}
+            {exerciseViewData.plannedDuration &&
+              ` x ${formatTime(exerciseViewData.plannedDuration)}`}
           </Typography>
         </Stack>
       </TableCell>

@@ -11,7 +11,9 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
+import { Routes } from '@/router/routes';
 import type { Training } from '@/types/trainings';
 import { formatTime } from '@/utils';
 
@@ -20,10 +22,16 @@ interface TrainingViewProps {
 }
 
 export default function TrainingView({ training }: TrainingViewProps) {
+  const navigate = useNavigate();
+
   const getDayOfWeek = (day?: number) => {
     if (day === undefined) return null;
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[day];
+  };
+
+  const handleExerciseClick = (exerciseId: string) => {
+    navigate(Routes.EXERCISE_DETAIL.replace(':id', exerciseId));
   };
 
   return (
@@ -57,7 +65,7 @@ export default function TrainingView({ training }: TrainingViewProps) {
               <TableRow>
                 <TableCell>Exercise</TableCell>
                 <TableCell align="center">Sets</TableCell>
-                <TableCell align="center">Planned Details</TableCell>
+                <TableCell align="center">Details</TableCell>
                 <TableCell>Notes</TableCell>
               </TableRow>
             </TableHead>
@@ -66,7 +74,18 @@ export default function TrainingView({ training }: TrainingViewProps) {
                 <TableRow key={index}>
                   <TableCell>
                     <Stack>
-                      <Typography variant="subtitle2" fontWeight="medium">
+                      <Typography 
+                        variant="subtitle2" 
+                        fontWeight="medium"
+                        sx={{ 
+                          cursor: 'pointer',
+                          color: 'primary.main',
+                          '&:hover': {
+                            textDecoration: 'underline',
+                          }
+                        }}
+                        onClick={() => handleExerciseClick(trainingExercise.exercise.id)}
+                      >
                         {trainingExercise.exercise.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -81,20 +100,11 @@ export default function TrainingView({ training }: TrainingViewProps) {
                     <Stack spacing={0.5}>
                       {trainingExercise.plannedSets > 0 && (
                         <Typography variant="body2">
-                          {trainingExercise.plannedReps.map((reps, setIndex) => (
-                            <Box key={setIndex}>
-                              Set {setIndex + 1}: {reps} reps
-                              {trainingExercise.plannedWeightKg?.[setIndex] && (
-                                <span> @ {trainingExercise.plannedWeightKg[setIndex]}kg</span>
-                              )}
-                              {trainingExercise.plannedSeconds?.[setIndex] && (
-                                <span>
-                                  {' '}
-                                  @ {formatTime(trainingExercise.plannedSeconds[setIndex])}
-                                </span>
-                              )}
-                            </Box>
-                          ))}
+                          {trainingExercise.plannedReps} reps
+                          {trainingExercise.plannedWeightKg &&
+                            ` x ${trainingExercise.plannedWeightKg}kg`}
+                          {trainingExercise.plannedSeconds &&
+                            ` x ${formatTime(trainingExercise.plannedSeconds)}`}
                         </Typography>
                       )}
                     </Stack>

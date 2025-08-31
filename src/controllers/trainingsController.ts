@@ -31,25 +31,22 @@ export const useTrainingsController = () => {
     }
   }, []);
 
-  const create = useCallback(
-    async (trainingData: TrainingFormData): Promise<Training> => {
-      try {
-        // Generate a unique ID for the new training
-        const newTraining: Training = {
-          ...trainingData,
-          id: crypto.randomUUID(),
-        };
-        
-        const savedTraining = await db.trainings.put(newTraining);
-        store.upsertTrainings([savedTraining]);
-        return savedTraining;
-      } catch (error) {
-        console.error('Error creating training:', error);
-        throw error;
-      }
-    },
-    [],
-  );
+  const create = useCallback(async (trainingData: TrainingFormData): Promise<Training> => {
+    try {
+      // Generate a unique ID for the new training
+      const newTraining: Training = {
+        ...trainingData,
+        id: crypto.randomUUID(),
+      };
+
+      const savedTraining = await db.trainings.put(newTraining);
+      store.upsertTrainings([savedTraining]);
+      return savedTraining;
+    } catch (error) {
+      console.error('Error creating training:', error);
+      throw error;
+    }
+  }, []);
 
   const update = useCallback(
     async (id: string, trainingData: Partial<TrainingFormData>): Promise<Training> => {
@@ -65,18 +62,15 @@ export const useTrainingsController = () => {
     [],
   );
 
-  const remove = useCallback(
-    async (id: string): Promise<void> => {
-      try {
-        await db.trainings.remove(id);
-        store.removeTraining(id);
-      } catch (error) {
-        console.error('Error removing training:', error);
-        throw error;
-      }
-    },
-    [],
-  );
+  const remove = useCallback(async (id: string): Promise<void> => {
+    try {
+      await db.trainings.remove(id);
+      store.removeTraining(id);
+    } catch (error) {
+      console.error('Error removing training:', error);
+      throw error;
+    }
+  }, []);
 
   const clear = useCallback(() => {
     store.clearTrainings();

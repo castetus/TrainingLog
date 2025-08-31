@@ -43,6 +43,8 @@ export default function WorkoutForm() {
     loadAll();
   }, [loadAll]);
 
+
+
   // Auto-select training based on day of the week
   useEffect(() => {
     if (Object.keys(trainingsById).length > 0 && !selectedTrainingId) {
@@ -87,18 +89,19 @@ export default function WorkoutForm() {
       if (training) {
         // Auto-generate workout name
         const workoutName = generateWorkoutName(trainingId, formData.date);
+
         setFormData((prev) => ({
           ...prev,
           name: workoutName,
           description: training.description || '',
-          exercises: training.exercises.map((ex) => ({
-            exercise: ex.exercise,
-            plannedSets: ex.plannedSets,
-            plannedReps: ex.plannedReps[0] || 10, // Use first planned rep value
-            plannedWeight: ex.plannedWeightKg?.[0], // Use first planned weight value
-            plannedDuration: ex.plannedSeconds?.[0], // Use first planned duration value
-            actualSets: [], // Initialize with empty actual sets
-          })),
+                      exercises: training.exercises.map((ex) => ({
+              exercise: ex.exercise,
+              plannedSets: ex.plannedSets,
+              plannedReps: ex.plannedReps || 10, // Use planned rep value
+              plannedWeight: ex.plannedWeightKg, // Use planned weight value
+              plannedDuration: ex.plannedSeconds, // Use planned duration value
+              actualSets: [], // Initialize with empty actual sets
+            })),
         }));
       }
     }
@@ -137,7 +140,7 @@ export default function WorkoutForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleStartWorkout = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -161,7 +164,7 @@ export default function WorkoutForm() {
       title="Start Workout"
       subtitle="Begin a new workout session based on a training plan"
     >
-      <Box component="form" onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleStartWorkout}>
         <Stack spacing={2}>
           {/* Training Selection */}
           <Stack spacing={1.5}>

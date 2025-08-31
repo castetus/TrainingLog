@@ -25,7 +25,6 @@ import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
 import { useAppStore } from '@/store';
 import type { Exercise } from '@/types/exercises';
-import { ExerciseType } from '@/types/exercises';
 import type { TrainingFormData, TrainingExercise } from '@/types/trainings';
 
 import AddExerciseSubform from './AddExerciseSubform';
@@ -89,27 +88,27 @@ export default function TrainingForm() {
     setNewExerciseData((prev) => ({
       ...prev,
       exercise,
-      plannedSets: '',
-      plannedReps: '',
-      plannedWeight: '',
-      plannedDuration: '',
+      plannedSets: 0,
+      plannedReps: 0,
+      plannedWeight: 0,
+      plannedDuration: 0,
     }));
   }, []);
 
   const [showAddExerciseForm, setShowAddExerciseForm] = useState(false);
   const [newExerciseData, setNewExerciseData] = useState<{
     exercise: Exercise | null;
-    plannedSets: string;
-    plannedReps: string;
-    plannedWeight: string;
-    plannedDuration: string;
+    plannedSets: number;
+    plannedReps: number;
+    plannedWeight: number;
+    plannedDuration: number;
     notes: string;
   }>({
     exercise: null,
-    plannedSets: '',
-    plannedReps: '',
-    plannedWeight: '',
-    plannedDuration: '',
+    plannedSets: 0,
+    plannedReps: 0,
+    plannedWeight: 0,
+    plannedDuration: 0,
     notes: '',
   });
 
@@ -125,21 +124,24 @@ export default function TrainingForm() {
     const newExercise: TrainingExercise = {
       exercise: newExerciseData.exercise,
       plannedSets: newExerciseData.plannedSets,
-      plannedReps: [newExerciseData.plannedReps],
+      plannedReps: newExerciseData.plannedReps,
+      plannedWeightKg: newExerciseData.plannedWeight > 0 ? newExerciseData.plannedWeight : undefined,
+      plannedSeconds: newExerciseData.plannedDuration > 0 ? newExerciseData.plannedDuration : undefined,
       notes: newExerciseData.notes,
     };
     setFormData((prev) => ({
       ...prev,
       exercises: [...prev.exercises, newExercise],
     }));
+
     setShowAddExerciseForm(false);
     // Reset form data
     setNewExerciseData({
       exercise: null,
-      plannedSets: '',
-      plannedReps: '',
-      plannedWeight: '',
-      plannedDuration: '',
+      plannedSets: 0,
+      plannedReps: 0,
+      plannedWeight: 0,
+      plannedDuration: 0,
       notes: '',
     });
   };
@@ -148,10 +150,10 @@ export default function TrainingForm() {
     setShowAddExerciseForm(false);
     setNewExerciseData({
       exercise: null,
-      plannedSets: '',
-      plannedReps: '',
-      plannedWeight: '',
-      plannedDuration: '',
+      plannedSets: 0,
+      plannedReps: 0,
+      plannedWeight: 0,
+      plannedDuration: 0,
       notes: '',
     });
   };
@@ -182,11 +184,7 @@ export default function TrainingForm() {
       if (exercise.plannedSets < 1) {
         newErrors[`exercise${index}Sets`] = 'Sets must be at least 1';
       }
-      if (
-        !exercise.plannedReps ||
-        exercise.plannedReps.length === 0 ||
-        exercise.plannedReps[0] < 1
-      ) {
+      if (!exercise.plannedReps || exercise.plannedReps < 1) {
         newErrors[`exercise${index}Reps`] = 'Reps must be at least 1';
       }
     });
@@ -363,7 +361,7 @@ export default function TrainingForm() {
                           <Typography variant="body2">{exercise.plannedSets}</Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Typography variant="body2">{exercise.plannedReps[0] || 10}</Typography>
+                          <Typography variant="body2">{exercise.plannedReps || 10}</Typography>
                         </TableCell>
                         <TableCell align="center">
                           <IconButton

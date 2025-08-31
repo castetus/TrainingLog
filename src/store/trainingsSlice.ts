@@ -20,7 +20,7 @@ export const createTrainingsSlice: StateCreator<TrainingsSlice, [], [], Training
   setTrainings: (trainings) => {
     // Replace all trainings with new data
     set((state) => {
-      console.log('setTrainings', trainings);
+
       const byId: Record<string, Training> = {};
       for (const training of trainings) byId[training.id] = training;
       const ids = trainings.map((x) => x.id);
@@ -31,7 +31,7 @@ export const createTrainingsSlice: StateCreator<TrainingsSlice, [], [], Training
   upsertTrainings: (trainings) => {
     // Only update local state - database operations should be handled by controllers
     set((state) => {
-      console.log('upsertTrainings', trainings);
+
       const byId = { ...state.trainingsById };
       for (const training of trainings) byId[training.id] = training;
       const ids = Array.from(new Set([...state.trainingIds, ...trainings.map((x) => x.id)]));
@@ -42,7 +42,7 @@ export const createTrainingsSlice: StateCreator<TrainingsSlice, [], [], Training
   removeTraining: (id) => {
     // Only update local state - database operations should be handled by controllers
     set((state) => {
-      console.log('removeTraining', id);
+
       if (!state.trainingsById[id]) return state;
       const newTrainingsById = { ...state.trainingsById };
       delete newTrainingsById[id];
