@@ -53,6 +53,7 @@ export interface CreateWorkoutData {
   name: string;
   description?: string;
   date: string;
+  duration?: number;
   exercises: WorkoutExercise[];
 }
 

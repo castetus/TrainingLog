@@ -7,6 +7,7 @@ export enum Routes {
   WORKOUT_EDIT = '/workouts/:id/edit',
   TRAININGS = '/trainings',
   TRAINING_NEW = '/trainings/new',
+  TRAINING_DETAIL = '/trainings/:id',
   TRAINING_EDIT = '/trainings/:id/edit',
   EXERCISES = '/exercises',
   EXERCISE_NEW = '/exercises/new',

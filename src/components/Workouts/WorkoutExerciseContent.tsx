@@ -1,14 +1,16 @@
 import { AccordionDetails, Typography, Stack, TextField, Divider, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import { ExerciseType } from '@/types';
 import type { WorkoutExercise, WorkoutSet } from '@/types/workouts';
 
 interface WorkoutExerciseContentProps {
   workoutExercise: WorkoutExercise;
+  exerciseIndex: number;
+  onActualSetsUpdate: (exerciseIndex: number, actualSets: WorkoutSet[]) => void;
 }
 
-export default function WorkoutExerciseContent({ workoutExercise }: WorkoutExerciseContentProps) {
+export default function WorkoutExerciseContent({ workoutExercise, exerciseIndex, onActualSetsUpdate }: WorkoutExerciseContentProps) {
   const [actualSets, setActualSets] = useState<WorkoutSet[]>(
     Array(workoutExercise.plannedSets)
       .fill(null)
@@ -19,10 +21,24 @@ export default function WorkoutExerciseContent({ workoutExercise }: WorkoutExerc
       })),
   );
 
+  // Initialize actual sets with existing data if available
+  useEffect(() => {
+    if (workoutExercise.actualSets && workoutExercise.actualSets.length > 0) {
+      setActualSets(workoutExercise.actualSets);
+    }
+  }, [workoutExercise.actualSets]);
+
   const handleSetChange = (setIndex: number, field: keyof WorkoutSet, value: any) => {
-    setActualSets((prev) =>
-      prev.map((set, index) => (index === setIndex ? { ...set, [field]: value } : set)),
-    );
+    setActualSets((prev) => {
+      const newActualSets = prev.map((set, index) => 
+        index === setIndex ? { ...set, [field]: value } : set
+      );
+      
+      // Notify parent component of the change
+      onActualSetsUpdate(exerciseIndex, newActualSets);
+      
+      return newActualSets;
+    });
   };
 
   // Check if exercise is completed (all sets have required fields filled)

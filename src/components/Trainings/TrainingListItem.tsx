@@ -21,6 +21,10 @@ interface TrainingListItemProps {
 export default function TrainingListItem({ training, onDelete }: TrainingListItemProps) {
   const navigate = useNavigate();
 
+  const handleView = () => {
+    navigate(Routes.TRAINING_DETAIL.replace(':id', training.id));
+  };
+
   const handleEdit = () => {
     navigate(Routes.TRAINING_EDIT.replace(':id', training.id));
   };
@@ -41,7 +45,7 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
       }}
       disableGutters
     >
-      <ListItemButton sx={{ px: 0 }} onClick={handleEdit}>
+      <ListItemButton sx={{ px: 0 }} onClick={handleView}>
         <ListItemText
           primary={training.name}
           secondary={

@@ -31,6 +31,7 @@ export const router = createBrowserRouter([
         element: <TrainingsPage />,
         children: [
           { path: 'new', element: <TrainingForm /> },
+          { path: ':id', element: <TrainingsPage /> },
           { path: ':id/edit', element: <TrainingForm /> },
         ],
       },
