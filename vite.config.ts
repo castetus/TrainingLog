@@ -1,45 +1,37 @@
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import { defineConfig } from 'vite';
-import { VitePWA } from 'vite-plugin-pwa';
+// vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/TrainingLog/',
+  base: '/TrainingLog/',                     // <— GH Pages subpath
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate', // service worker auto-updates
-      includeAssets: ['favicon.svg'], // extra static assets (optional)
+      registerType: 'autoUpdate',
+      strategies: 'generateSW',
+      // IMPORTANT: no leading slash here for GH Pages
+      workbox: {
+        navigateFallback: 'index.html',
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+      },
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: 'TrainingLog',
+        name: 'Training Log',
         short_name: 'TrainingLog',
-        description: 'Track your fitness progress and workouts',
-        start_url: '/TrainingLog/',
-        scope: '/TrainingLog/',
+        description: 'Workout tracker PWA',
+        start_url: '/TrainingLog/',          // <— align with base
+        scope: '/TrainingLog/',              // <— align with base
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#1976d2',
+        theme_color: '#0ea5e9',
+        // TIP: keep icon srcs RELATIVE (no leading /) so they resolve under /TrainingLog/
         icons: [
-          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          {
-            src: '/maskable-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'pwa-512x512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable any' }
         ],
       },
-      workbox: {
-        navigateFallback: '/index.html',
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
-      }
     }),
   ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-});
+})
