@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: '/',
+  base: '/TrainingLog/',
   plugins: [
     react(),
     VitePWA({
@@ -14,8 +14,8 @@ export default defineConfig({
         name: 'TrainingLog',
         short_name: 'TrainingLog',
         description: 'Track your fitness progress and workouts',
-        start_url: '/',
-        scope: '/',
+        start_url: '/TrainingLog/',
+        scope: '/TrainingLog/',
         display: 'standalone',
         background_color: '#ffffff',
         theme_color: '#1976d2',
