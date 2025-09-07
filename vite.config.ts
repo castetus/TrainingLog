@@ -31,24 +31,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // sensible defaults; add runtime caching rules if needed
-        navigateFallback: '/TrainingLog/index.html',
-        runtimeCaching: [
-          {
-            urlPattern: ({ request }) => request.destination === 'image',
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images',
-              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/api\.example\.com\/.*/i,
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'api' },
-          },
-        ],
-      },
+        navigateFallback: '/index.html',
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+      }
     }),
   ],
   resolve: {
