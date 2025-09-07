@@ -11,6 +11,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { useNavigate } from 'react-router-dom';
 
 import { Routes } from '@/router/routes';
@@ -74,20 +75,31 @@ export default function TrainingView({ training }: TrainingViewProps) {
                 <TableRow key={index}>
                   <TableCell>
                     <Stack>
-                      <Typography 
-                        variant="subtitle2" 
-                        fontWeight="medium"
-                        sx={{ 
-                          cursor: 'pointer',
-                          color: 'primary.main',
-                          '&:hover': {
-                            textDecoration: 'underline',
-                          }
-                        }}
-                        onClick={() => handleExerciseClick(trainingExercise.exercise.id)}
-                      >
-                        {trainingExercise.exercise.name}
-                      </Typography>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Typography 
+                          variant="subtitle2" 
+                          fontWeight="medium"
+                          sx={{ 
+                            cursor: 'pointer',
+                            color: 'primary.main',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            }
+                          }}
+                          onClick={() => handleExerciseClick(trainingExercise.exercise.id)}
+                        >
+                          {trainingExercise.exercise.name}
+                        </Typography>
+                        {trainingExercise.shouldUpdatePlannedValues && (
+                          <Chip
+                            icon={<TrendingUpIcon />}
+                            label="Ready for increase"
+                            color="warning"
+                            size="small"
+                            variant="outlined"
+                          />
+                        )}
+                      </Stack>
                       <Typography variant="caption" color="text.secondary">
                         {trainingExercise.exercise.description}
                       </Typography>

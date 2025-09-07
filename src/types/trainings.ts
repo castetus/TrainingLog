@@ -15,6 +15,8 @@ export interface TrainingExercise {
   plannedSeconds?: number;
   /** Notes specific to this exercise in this training session */
   notes?: string;
+  /** Whether to update the planned values for this exercise */
+  shouldUpdatePlannedValues?: boolean;
 }
 
 export interface Training {

@@ -1,5 +1,6 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {
   Box,
   Accordion,
@@ -16,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useExercisesController } from '@/controllers/exercisesController';
 import { useTrainingsController } from '@/controllers/trainingsController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
+import { useNavigationBlocker } from '@/hooks/useNavigationBlocker';
 import { useConfirm } from '@/providers/confirmProvider';
 import { Routes } from '@/router/routes';
 import type { Workout, WorkoutExercise } from '@/types/workouts';
@@ -46,6 +48,35 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   const [performanceAnalysis, setPerformanceAnalysis] = useState<ReturnType<
     typeof analyzeWorkoutPerformance
   > | null>(null);
+
+  // Track if workout has been finished to disable navigation blocking
+  const [isWorkoutFinished, setIsWorkoutFinished] = useState(false);
+
+  // Navigation blocker for preventing accidental exits
+  const confirmExit = useCallback(async () => {
+    return await confirm({
+      title: 'Leave Workout Session?',
+      message:
+        'You have an active workout session. Are you sure you want to leave? Your progress will be lost.',
+      confirmText: 'Leave',
+      cancelText: 'Stay',
+      danger: true,
+    });
+  }, [confirm]);
+
+  const shouldBlockNavigation = !isWorkoutFinished && !showUpdateModal;
+
+  useNavigationBlocker({
+    when: shouldBlockNavigation, // Block navigation when workout is active and not in update modal
+    onConfirmExit: () => {
+      setIsWorkoutFinished(true);
+      navigate(Routes.WORKOUTS);
+    },
+    onCancelExit: () => {
+      // Stay on current page - no action needed
+    },
+    confirmExit,
+  });
 
   // Track actual sets for all exercises - initialize with existing data
   const [actualSetsByExercise, setActualSetsByExercise] = useState<Record<number, WorkoutSet[]>>(
@@ -154,6 +185,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           return; // Don't finish workout yet, wait for user decision
         }
 
+        setIsWorkoutFinished(true);
         navigate(Routes.WORKOUTS);
       } catch (error) {
         console.error('Failed to finish workout:', error);
@@ -228,15 +260,16 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           <Accordion key={index} defaultExpanded={index === 0}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    flexGrow: 1,
-                    color: isExerciseCompleted(workoutExercise) ? 'success.main' : 'inherit',
-                  }}
-                >
-                  {workoutExercise.exercise.name}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ flexGrow: 1 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: isExerciseCompleted(workoutExercise) ? 'success.main' : 'inherit',
+                    }}
+                  >
+                    {workoutExercise.exercise.name}
+                  </Typography>
+                </Stack>
                 {workoutExercise.exercise.videoUrl && (
                   <IconButton
                     size="small"
@@ -254,6 +287,15 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                       color="success"
                       size="small"
                       sx={{ minWidth: 24, height: 24 }}
+                    />
+                  )}
+                  {workoutExercise.shouldUpdatePlannedValues && (
+                    <Chip
+                      icon={<TrendingUpIcon />}
+                      label="Ready for increase"
+                      color="warning"
+                      size="small"
+                      variant="outlined"
                     />
                   )}
                   <Chip
@@ -308,6 +350,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           onClose={() => {
             setShowUpdateModal(false);
             setPerformanceAnalysis(null);
+            setIsWorkoutFinished(true);
             navigate(Routes.WORKOUTS);
           }}
           onConfirm={async () => {
@@ -315,6 +358,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
               if (!workout.trainingId || !performanceAnalysis) {
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
+                setIsWorkoutFinished(true);
                 navigate(Routes.WORKOUTS);
                 return;
               }
@@ -325,6 +369,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 console.error('Training not found:', workout.trainingId);
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
+                setIsWorkoutFinished(true);
                 navigate(Routes.WORKOUTS);
                 return;
               }
@@ -335,6 +380,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 console.error('Failed to update training:', updateResult.error);
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
+                setIsWorkoutFinished(true);
                 navigate(Routes.WORKOUTS);
                 return;
               }
@@ -356,6 +402,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
             } finally {
               setShowUpdateModal(false);
               setPerformanceAnalysis(null);
+              setIsWorkoutFinished(true);
               navigate(Routes.WORKOUTS);
             }
           }}

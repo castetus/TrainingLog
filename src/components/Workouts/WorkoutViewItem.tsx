@@ -1,9 +1,14 @@
-import { Stack, TableCell, TableRow, Typography } from '@mui/material';
+import { Stack, TableCell, TableRow, Typography, Chip } from '@mui/material';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 import type { WorkoutExercise } from '@/types/workouts';
 import { formatTime } from '@/utils';
 
 export default function WorkoutViewItem(exercise: WorkoutExercise) {
+  const lastSet = exercise.actualSets && exercise.actualSets.length > 0 
+    ? exercise.actualSets[exercise.actualSets.length - 1] 
+    : null;
+
   const exerciseViewData = {
     name: exercise.exercise.name,
     description: exercise.exercise.description,
@@ -12,19 +17,30 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
     plannedReps: exercise.plannedReps,
     plannedWeight: exercise.plannedWeight,
     plannedDuration: exercise.plannedDuration,
-    actualSets: exercise.actualSets.length,
-    actualReps: exercise.actualSets[exercise.actualSets.length - 1].actualReps,
-    actualWeight: exercise.actualSets[exercise.actualSets.length - 1].actualWeight,
-    actualDuration: exercise.actualSets[exercise.actualSets.length - 1].actualDuration,
+    actualSets: exercise.actualSets?.length || 0,
+    actualReps: lastSet?.actualReps,
+    actualWeight: lastSet?.actualWeight,
+    actualDuration: lastSet?.actualDuration,
   };
 
   return (
     <TableRow>
       <TableCell>
         <Stack>
-          <Typography variant="subtitle2" fontWeight="medium">
-            {exerciseViewData.name}
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="subtitle2" fontWeight="medium">
+              {exerciseViewData.name}
+            </Typography>
+            {exercise.shouldUpdatePlannedValues && (
+              <Chip
+                icon={<TrendingUpIcon />}
+                label="Ready for increase"
+                color="warning"
+                size="small"
+                variant="outlined"
+              />
+            )}
+          </Stack>
           <Typography variant="caption" color="text.secondary">
             {exerciseViewData.description}
           </Typography>
@@ -43,10 +59,17 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
       <TableCell align="center">
         <Stack spacing={0.5}>
           <Typography variant="body2">
-            {exerciseViewData.actualReps && `${exerciseViewData.actualReps}`}
-            {exerciseViewData.actualReps && ` x ${exerciseViewData.actualWeight}kg`}
-            {exerciseViewData.plannedDuration &&
-              ` x ${formatTime(exerciseViewData.plannedDuration)}`}
+            {lastSet ? (
+              <>
+                {exerciseViewData.actualReps && `${exerciseViewData.actualReps}`}
+                {exerciseViewData.actualReps && exerciseViewData.actualWeight && ` x ${exerciseViewData.actualWeight}kg`}
+                {exerciseViewData.actualReps && exerciseViewData.actualDuration && ` x ${formatTime(exerciseViewData.actualDuration)}`}
+              </>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No data
+              </Typography>
+            )}
           </Typography>
         </Stack>
       </TableCell>

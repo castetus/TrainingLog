@@ -24,6 +24,8 @@ export interface WorkoutExercise {
   actualSets: WorkoutSet[];
   /** Notes for this exercise in the workout */
   notes?: string;
+  /** Whether to update the planned values for this exercise */
+  shouldUpdatePlannedValues?: boolean;
 }
 
 export interface Workout {

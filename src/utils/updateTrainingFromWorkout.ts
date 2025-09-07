@@ -61,6 +61,9 @@ export const updateTrainingFromWorkout = (
           updatedExercise.plannedReps = lastSet.actualReps;
         }
 
+        // Set the flag to indicate this exercise exceeded planned values
+        updatedExercise.shouldUpdatePlannedValues = true;
+
         // Replace the exercise in the training
         updatedTraining.exercises[exerciseIndex] = updatedExercise;
 

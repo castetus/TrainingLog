@@ -1,4 +1,5 @@
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {
   Box,
   Typography,
@@ -11,6 +12,13 @@ import {
   Select,
   MenuItem,
   Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -42,8 +50,6 @@ export default function WorkoutForm() {
   useEffect(() => {
     loadAll();
   }, [loadAll]);
-
-
 
   // Auto-select training based on day of the week
   useEffect(() => {
@@ -102,6 +108,7 @@ export default function WorkoutForm() {
             plannedWeight: ex.plannedWeightKg, // Use planned weight value
             plannedDuration: ex.plannedSeconds, // Use planned duration value
             actualSets: [], // Initialize with empty actual sets
+            shouldUpdatePlannedValues: ex.shouldUpdatePlannedValues, // Pass the flag
           })),
         }));
       }
@@ -276,6 +283,62 @@ export default function WorkoutForm() {
               InputLabelProps={{ shrink: true }}
             />
           </Stack>
+
+          {/* Exercises Preview */}
+          {formData.exercises.length > 0 && (
+            <Stack spacing={1.5}>
+              <Typography variant="h6">Exercises Preview</Typography>
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Exercise</TableCell>
+                      <TableCell align="center">Sets</TableCell>
+                      <TableCell align="center">Planned</TableCell>
+                      <TableCell align="center">Status</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {formData.exercises.map((exercise, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Stack>
+                            <Typography variant="subtitle2" fontWeight="medium">
+                              {exercise.exercise.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {exercise.exercise.description}
+                            </Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography variant="body2">{exercise.plannedSets}</Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography variant="body2">
+                            {exercise.plannedReps} reps
+                            {exercise.plannedWeight && ` @ ${exercise.plannedWeight}kg`}
+                            {exercise.plannedDuration && ` @ ${exercise.plannedDuration}s`}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          {exercise.shouldUpdatePlannedValues && (
+                            <Chip
+                              icon={<TrendingUpIcon />}
+                              label="Ready for increase"
+                              color="warning"
+                              size="small"
+                              variant="outlined"
+                            />
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Stack>
+          )}
 
           {/* Error Messages */}
           {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
