@@ -46,11 +46,11 @@ export default function UpdatePlannedValuesModal({
           <Divider />
 
           <Typography variant="subtitle1" fontWeight="medium">
-            Suggested Updates:
+            Exercises Ready for Increase:
           </Typography>
 
           {analysis.exercisesToUpdate.map(
-            ({ exercise, suggestedWeight, suggestedTime, suggestedReps }) => (
+            ({ exercise, shouldIncreaseWeight, shouldIncreaseTime, shouldIncreaseReps }) => (
               <Box
                 key={exercise.exercise.id}
                 sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}
@@ -60,46 +60,31 @@ export default function UpdatePlannedValuesModal({
                 </Typography>
 
                 <Stack direction="row" spacing={2} alignItems="center">
-                  {suggestedWeight && (
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <Typography variant="body2" color="text.secondary">
-                        Weight:
-                      </Typography>
-                      <Chip
-                        label={`${exercise.plannedWeight}kg → ${suggestedWeight}kg`}
-                        color="success"
-                        size="small"
-                        variant="outlined"
-                      />
-                    </Stack>
+                  {shouldIncreaseWeight && (
+                    <Chip
+                      label="Weight increase needed"
+                      color="success"
+                      size="small"
+                      variant="outlined"
+                    />
                   )}
 
-                  {suggestedTime && (
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <Typography variant="body2" color="text.secondary">
-                        Time:
-                      </Typography>
-                      <Chip
-                        label={`${exercise.plannedDuration}s → ${suggestedTime}s`}
-                        color="success"
-                        size="small"
-                        variant="outlined"
-                      />
-                    </Stack>
+                  {shouldIncreaseTime && (
+                    <Chip
+                      label="Time increase needed"
+                      color="success"
+                      size="small"
+                      variant="outlined"
+                    />
                   )}
 
-                  {suggestedReps && (
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <Typography variant="body2" color="text.secondary">
-                        Reps:
-                      </Typography>
-                      <Chip
-                        label={`${exercise.plannedReps} → ${suggestedReps}`}
-                        color="success"
-                        size="small"
-                        variant="outlined"
-                      />
-                    </Stack>
+                  {shouldIncreaseReps && (
+                    <Chip
+                      label="Reps increase needed"
+                      color="success"
+                      size="small"
+                      variant="outlined"
+                    />
                   )}
                 </Stack>
               </Box>
@@ -107,8 +92,8 @@ export default function UpdatePlannedValuesModal({
           )}
 
           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-            This will update the planned values in your training plan to help you continue
-            progressing.
+            This will update the planned values in your training plan with your actual performance
+            to help you continue progressing.
           </Typography>
         </Stack>
       </DialogContent>

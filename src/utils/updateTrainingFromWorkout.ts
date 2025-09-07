@@ -25,26 +25,40 @@ export const updateTrainingFromWorkout = (
 
     // Update each exercise that has suggested improvements
     analysis.exercisesToUpdate.forEach(
-      ({ exerciseIndex, suggestedWeight, suggestedTime, suggestedReps }) => {
+      ({ exerciseIndex, shouldIncreaseWeight, shouldIncreaseTime, shouldIncreaseReps }) => {
         const trainingExercise = updatedTraining.exercises[exerciseIndex];
 
         if (!trainingExercise) {
           return; // Skip if exercise not found
         }
 
-        // Update the training exercise with suggested values
+        // Get the actual values from the last set of the workout exercise
+        const workoutExercise = analysis.exercisesToUpdate.find(
+          (item) => item.exerciseIndex === exerciseIndex
+        )?.exercise;
+
+        if (!workoutExercise || !workoutExercise.actualSets || workoutExercise.actualSets.length === 0) {
+          return; // Skip if no actual sets
+        }
+
+        const lastSet = workoutExercise.actualSets[workoutExercise.actualSets.length - 1];
+        if (!lastSet) {
+          return;
+        }
+
+        // Update the training exercise with actual values
         const updatedExercise = { ...trainingExercise };
 
-        if (suggestedWeight !== undefined) {
-          updatedExercise.plannedWeightKg = suggestedWeight;
+        if (shouldIncreaseWeight && lastSet.actualWeight) {
+          updatedExercise.plannedWeightKg = lastSet.actualWeight;
         }
 
-        if (suggestedTime !== undefined) {
-          updatedExercise.plannedSeconds = suggestedTime;
+        if (shouldIncreaseTime && lastSet.actualDuration) {
+          updatedExercise.plannedSeconds = lastSet.actualDuration;
         }
 
-        if (suggestedReps !== undefined) {
-          updatedExercise.plannedReps = suggestedReps;
+        if (shouldIncreaseReps && lastSet.actualReps) {
+          updatedExercise.plannedReps = lastSet.actualReps;
         }
 
         // Replace the exercise in the training
@@ -54,16 +68,16 @@ export const updateTrainingFromWorkout = (
         const exercise = trainingExercise.exercise;
         const updatedExerciseDict = { ...exercise };
 
-        if (suggestedWeight !== undefined && exercise.type === 'weight') {
-          (updatedExerciseDict as any).lastSetWeightKg = suggestedWeight;
+        if (shouldIncreaseWeight && lastSet.actualWeight && exercise.type === 'weight') {
+          (updatedExerciseDict as any).lastSetWeightKg = lastSet.actualWeight;
         }
 
-        if (suggestedTime !== undefined && exercise.type === 'time') {
-          (updatedExerciseDict as any).lastSetSeconds = suggestedTime;
+        if (shouldIncreaseTime && lastSet.actualDuration && exercise.type === 'time') {
+          (updatedExerciseDict as any).lastSetSeconds = lastSet.actualDuration;
         }
 
-        if (suggestedReps !== undefined && exercise.type === 'reps_only') {
-          (updatedExerciseDict as any).lastSetReps = suggestedReps;
+        if (shouldIncreaseReps && lastSet.actualReps && exercise.type === 'reps_only') {
+          (updatedExerciseDict as any).lastSetReps = lastSet.actualReps;
         }
 
         updatedExercises.push(updatedExerciseDict);

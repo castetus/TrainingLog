@@ -15,9 +15,9 @@ import {
 } from '@mui/material';
 import { useState, useMemo, useEffect } from 'react';
 
+import { useWorkoutsController } from '@/controllers/workoutsController';
 import { ExerciseType } from '@/types';
 import type { WorkoutExercise, WorkoutSet } from '@/types/workouts';
-import { useWorkoutsController } from '@/controllers/workoutsController';
 
 interface WorkoutExerciseContentProps {
   workoutExercise: WorkoutExercise;
@@ -56,24 +56,24 @@ export default function WorkoutExerciseContent({
   }, [workoutExercise.actualSets]);
 
   const handleSetChange = async (setIndex: number, field: keyof WorkoutSet, value: any) => {
-    setActualSets((prev) => {
-      const newActualSets = prev.map((set, index) =>
-        index === setIndex ? { ...set, [field]: value } : set,
-      );
+    const newActualSets = actualSets.map((set, index) =>
+      index === setIndex ? { ...set, [field]: value } : set,
+    );
 
-      // Notify parent component of the change
-      onActualSetsUpdate(exerciseIndex, newActualSets);
+    setActualSets(newActualSets);
 
-      // Update workout in store
-      update({
-        id: workoutId,
-        exercises: [{
+    // Notify parent component of the change
+    onActualSetsUpdate(exerciseIndex, newActualSets);
+
+    // Update workout in store
+    update({
+      id: workoutId,
+      exercises: [
+        {
           ...workoutExercise,
-          actualSets: newActualSets
-        }]
-      });
-
-      return newActualSets;
+          actualSets: newActualSets,
+        },
+      ],
     });
   };
 

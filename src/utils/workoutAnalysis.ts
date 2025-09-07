@@ -6,9 +6,9 @@ export interface PerformanceAnalysis {
   exercisesToUpdate: Array<{
     exerciseIndex: number;
     exercise: WorkoutExercise;
-    suggestedWeight?: number;
-    suggestedTime?: number;
-    suggestedReps?: number;
+    shouldIncreaseWeight?: boolean;
+    shouldIncreaseTime?: boolean;
+    shouldIncreaseReps?: boolean;
   }>;
 }
 
@@ -17,60 +17,56 @@ export const analyzeWorkoutPerformance = (workout: {
 }): PerformanceAnalysis => {
   const exercisesToUpdate: PerformanceAnalysis['exercisesToUpdate'] = [];
 
-  const suggestWeightIncrease = (exercise: WorkoutExercise): number | undefined => {
+  const shouldIncreaseWeight = (exercise: WorkoutExercise): boolean => {
     if (!exercise.plannedWeight || !exercise.actualSets || exercise.actualSets.length === 0) {
-      return undefined;
+      return false;
     }
 
     const lastSet = exercise.actualSets[exercise.actualSets.length - 1];
 
     if (!lastSet) {
-      return undefined;
+      return false;
     }
 
-    const shouldIncrease =
+    return !!(
       lastSet.actualWeight &&
       lastSet.actualWeight >= exercise.plannedWeight &&
       lastSet.actualReps &&
-      lastSet.actualReps >= exercise.plannedReps;
-
-    if (shouldIncrease) {
-      return Math.round(exercise.plannedWeight + Math.max(exercise.plannedWeight * 0.05, 2.5));
-    }
-    return undefined;
+      lastSet.actualReps >= exercise.plannedReps
+    );
   };
 
-  const suggestTimeIncrease = (exercise: WorkoutExercise): number | undefined => {
+  const shouldIncreaseTime = (exercise: WorkoutExercise): boolean => {
     if (!exercise.plannedDuration || !exercise.actualSets || exercise.actualSets.length === 0) {
-      return undefined;
+      return false;
     }
 
     const lastSet = exercise.actualSets[exercise.actualSets.length - 1];
 
-    const shouldIncrease =
+    if (!lastSet) {
+      return false;
+    }
+
+    return !!(
       lastSet.actualDuration &&
       lastSet.actualDuration >= exercise.plannedDuration &&
       lastSet.actualReps &&
-      lastSet.actualReps >= exercise.plannedReps;
-
-    if (shouldIncrease) {
-      return Math.round(exercise.plannedDuration + Math.max(exercise.plannedDuration * 0.05, 2.5));
-    }
-    return undefined;
+      lastSet.actualReps >= exercise.plannedReps
+    );
   };
 
-  const suggestRepsIncrease = (exercise: WorkoutExercise): number | undefined => {
+  const shouldIncreaseReps = (exercise: WorkoutExercise): boolean => {
     if (!exercise.plannedReps || !exercise.actualSets || exercise.actualSets.length === 0) {
-      return undefined;
+      return false;
     }
 
     const lastSet = exercise.actualSets[exercise.actualSets.length - 1];
 
     if (!lastSet || !lastSet.actualReps || lastSet.actualReps < exercise.plannedReps) {
-      return undefined;
+      return false;
     }
 
-    return exercise.plannedReps + Math.max(Math.round(exercise.plannedReps * 0.1), 1);
+    return lastSet.actualReps >= exercise.plannedReps;
   };
 
   workout.exercises.forEach((exercise, exerciseIndex) => {
@@ -86,20 +82,20 @@ export const analyzeWorkoutPerformance = (workout: {
     }
 
     let shouldUpdateThisExercise = false;
-    const suggestedUpdates: { weight?: number; reps?: number; time?: number } = {};
+    const increaseFlags: { weight?: boolean; reps?: boolean; time?: boolean } = {};
 
     switch (exercise.exercise.type) {
       case ExerciseType.WEIGHT:
-        suggestedUpdates.weight = suggestWeightIncrease(exercise);
-        if (suggestedUpdates.weight) shouldUpdateThisExercise = true;
+        increaseFlags.weight = shouldIncreaseWeight(exercise);
+        if (increaseFlags.weight) shouldUpdateThisExercise = true;
         break;
       case ExerciseType.TIME:
-        suggestedUpdates.time = suggestTimeIncrease(exercise);
-        if (suggestedUpdates.time) shouldUpdateThisExercise = true;
+        increaseFlags.time = shouldIncreaseTime(exercise);
+        if (increaseFlags.time) shouldUpdateThisExercise = true;
         break;
       case ExerciseType.REPS_ONLY:
-        suggestedUpdates.reps = suggestRepsIncrease(exercise);
-        if (suggestedUpdates.reps) shouldUpdateThisExercise = true;
+        increaseFlags.reps = shouldIncreaseReps(exercise);
+        if (increaseFlags.reps) shouldUpdateThisExercise = true;
         break;
     }
 
@@ -107,9 +103,9 @@ export const analyzeWorkoutPerformance = (workout: {
       exercisesToUpdate.push({
         exerciseIndex,
         exercise,
-        suggestedWeight: suggestedUpdates.weight,
-        suggestedTime: suggestedUpdates.time,
-        suggestedReps: suggestedUpdates.reps,
+        shouldIncreaseWeight: increaseFlags.weight,
+        shouldIncreaseTime: increaseFlags.time,
+        shouldIncreaseReps: increaseFlags.reps,
       });
     }
   });

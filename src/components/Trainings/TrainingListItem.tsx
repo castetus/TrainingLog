@@ -55,9 +55,7 @@ export default function TrainingListItem({ training, onDelete }: TrainingListIte
                 </Typography>
               )}
 
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                {getExerciseSummary(training.exercises)}
-              </Typography>
+              {getExerciseSummary(training.exercises)}
 
               {training.notes && (
                 <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>

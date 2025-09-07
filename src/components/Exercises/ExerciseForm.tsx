@@ -66,12 +66,12 @@ export default function ExerciseForm() {
             // If not in store, try to load from database
             const exerciseFromDb = await findById(id);
             if (exerciseFromDb) {
-                          setFormData({
-              name: exerciseFromDb.name,
-              description: exerciseFromDb.description || '',
-              type: exerciseFromDb.type,
-              videoUrl: exerciseFromDb.videoUrl || '',
-            });
+              setFormData({
+                name: exerciseFromDb.name,
+                description: exerciseFromDb.description || '',
+                type: exerciseFromDb.type,
+                videoUrl: exerciseFromDb.videoUrl || '',
+              });
             }
           }
         } catch (error) {

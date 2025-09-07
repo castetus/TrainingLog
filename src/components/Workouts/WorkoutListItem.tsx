@@ -50,9 +50,7 @@ export default function WorkoutListItem({ workout }: WorkoutListItemProps) {
                   {workout.description}
                 </Typography>
               )}
-              <Typography variant="body2" color="text.secondary">
                 {workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}
-              </Typography>
             </>
           }
         />
