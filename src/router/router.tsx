@@ -9,6 +9,8 @@ import StatisticsPage from '@/pages/StatisticsPage';
 import TrainingsPage from '@/pages/TrainingsPage';
 import WorkoutsPage from '@/pages/WorkoutsPage';
 
+const BASENAME = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 export const router = createBrowserRouter(
   [
     {
@@ -52,5 +54,5 @@ export const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: '/TrainingLog' },
+  { basename: BASENAME },
 );
