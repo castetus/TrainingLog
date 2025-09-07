@@ -16,7 +16,13 @@ export default function WorkoutsPage() {
   const [workout, setWorkout] = useState<Workout | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isNestedRoute = location.pathname !== Routes.WORKOUTS;
+  // Simple check: if we have an id parameter or specific workout paths, show nested content
+  const isNestedRoute =
+    !!id ||
+    location.pathname.includes('/new') ||
+    location.pathname.includes('/edit') ||
+    location.pathname.includes('/flow');
+
   const isDetailRoute =
     id &&
     !location.pathname.includes('/edit') &&
@@ -24,6 +30,17 @@ export default function WorkoutsPage() {
     !location.pathname.includes('/flow');
   const isNewRoute = location.pathname.includes('/new');
   const isFlowRoute = location.pathname.includes('/flow');
+
+  // Debug logging
+  console.log('WorkoutsPage Debug:', {
+    pathname: location.pathname,
+    Routes_HOME: Routes.HOME,
+    isNestedRoute,
+    isDetailRoute,
+    isNewRoute,
+    isFlowRoute,
+    id,
+  });
 
   useEffect(() => {
     if ((isDetailRoute || isFlowRoute) && id) {
@@ -56,7 +73,6 @@ export default function WorkoutsPage() {
       <NestedPageLayout title={workout.name} subtitle="Workout Details">
         <Stack spacing={3}>
           <WorkoutView workout={workout} />
-
         </Stack>
       </NestedPageLayout>
     );
@@ -69,6 +85,12 @@ export default function WorkoutsPage() {
       </Box>
     );
   }
+
+  console.log('WorkoutsPage Final Return:', {
+    isNestedRoute,
+    willShowOutlet: isNestedRoute,
+    willShowWorkoutsList: !isNestedRoute,
+  });
 
   return <Stack spacing={1}>{isNestedRoute ? <Outlet /> : <WorkoutsList />}</Stack>;
 }

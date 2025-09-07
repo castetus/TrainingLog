@@ -16,16 +16,18 @@ interface AddButtonConfig {
 const MainLayout = () => {
   const { pathname } = useLocation();
 
-  // Check if we're on a nested route (has more than 2 segments)
+  // Check if we're on a nested route (has more than 2 segments, or is home with nested content)
   const isNestedRoute = pathname.split('/').length > 2;
 
   // Only show title for main routes, not nested ones
   const pageTitle = !isNestedRoute
-    ? pathname
-        .split('/')
-        .pop()
-        ?.replace(/-/g, ' ')
-        .replace(/\b\w/g, (char) => char.toUpperCase())
+    ? pathname === '/'
+      ? 'Workouts'
+      : pathname
+          .split('/')
+          .pop()
+          ?.replace(/-/g, ' ')
+          .replace(/\b\w/g, (char) => char.toUpperCase())
     : null;
 
   // Determine which add button to show based on current route
@@ -46,7 +48,7 @@ const MainLayout = () => {
         variant: 'circular',
       };
     }
-    if (pathname === Routes.WORKOUTS) {
+    if (pathname === Routes.HOME) {
       return {
         to: Routes.WORKOUT_NEW,
         label: 'Start Workout',

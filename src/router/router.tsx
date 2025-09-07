@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 
 import ExerciseForm from '@/components/Exercises/ExerciseForm';
 import TrainingForm from '@/components/Trainings/TrainingForm';
@@ -17,7 +17,7 @@ export const router = createBrowserRouter(
       path: '/',
       element: <MainLayout />,
       children: [
-        { index: true, element: <Navigate to="/workouts" replace /> },
+        { index: true, element: <WorkoutsPage /> },
         {
           path: 'workouts',
           element: <WorkoutsPage />,

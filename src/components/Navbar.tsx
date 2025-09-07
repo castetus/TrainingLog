@@ -16,8 +16,8 @@ export default function Navbar() {
     const pathname = location.pathname;
 
     // Check exact matches first, then check if path starts with route
-    if (pathname === Routes.WORKOUTS || pathname.startsWith(Routes.WORKOUTS + '/'))
-      return Routes.WORKOUTS;
+    if (pathname === Routes.HOME || pathname.startsWith(`${Routes.HOME}workouts`))
+      return Routes.HOME;
     if (pathname === Routes.TRAININGS || pathname.startsWith(Routes.TRAININGS + '/'))
       return Routes.TRAININGS;
     if (pathname === Routes.EXERCISES || pathname.startsWith(Routes.EXERCISES + '/'))
@@ -25,7 +25,7 @@ export default function Navbar() {
     if (pathname === Routes.STATISTICS || pathname.startsWith(Routes.STATISTICS + '/'))
       return Routes.STATISTICS;
 
-    return Routes.WORKOUTS; // Default fallback to Workouts
+    return Routes.HOME; // Default fallback to Home
   };
 
   const changeRoute = (_event: React.SyntheticEvent, newValue: Routes) => {
@@ -47,7 +47,7 @@ export default function Navbar() {
           },
         }}
       >
-        <BottomNavigationAction label="Workouts" icon={<HistoryIcon />} value={Routes.WORKOUTS} />
+        <BottomNavigationAction label="Workouts" icon={<HistoryIcon />} value={Routes.HOME} />
         <BottomNavigationAction
           label="Trainings"
           icon={<FitnessCenterIcon />}

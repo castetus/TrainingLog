@@ -70,7 +70,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     when: shouldBlockNavigation, // Block navigation when workout is active and not in update modal
     onConfirmExit: () => {
       setIsWorkoutFinished(true);
-      navigate(Routes.WORKOUTS);
+      navigate(Routes.HOME);
     },
     onCancelExit: () => {
       // Stay on current page - no action needed
@@ -186,7 +186,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
         }
 
         setIsWorkoutFinished(true);
-        navigate(Routes.WORKOUTS);
+        navigate(Routes.HOME);
       } catch (error) {
         console.error('Failed to finish workout:', error);
         // Error is already handled by the controller
@@ -351,7 +351,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
             setShowUpdateModal(false);
             setPerformanceAnalysis(null);
             setIsWorkoutFinished(true);
-            navigate(Routes.WORKOUTS);
+            navigate(Routes.HOME);
           }}
           onConfirm={async () => {
             try {
@@ -359,7 +359,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
                 setIsWorkoutFinished(true);
-                navigate(Routes.WORKOUTS);
+                navigate(Routes.HOME);
                 return;
               }
 
@@ -370,7 +370,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
                 setIsWorkoutFinished(true);
-                navigate(Routes.WORKOUTS);
+                navigate(Routes.HOME);
                 return;
               }
 
@@ -381,7 +381,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
                 setIsWorkoutFinished(true);
-                navigate(Routes.WORKOUTS);
+                navigate(Routes.HOME);
                 return;
               }
 
@@ -403,7 +403,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
               setShowUpdateModal(false);
               setPerformanceAnalysis(null);
               setIsWorkoutFinished(true);
-              navigate(Routes.WORKOUTS);
+              navigate(Routes.HOME);
             }
           }}
           analysis={performanceAnalysis}
