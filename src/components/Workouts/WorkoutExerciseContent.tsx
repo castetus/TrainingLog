@@ -84,10 +84,10 @@ export default function WorkoutExerciseContent({
       if (set.actualReps <= 0) return false;
 
       // Weight is required for weight-based exercises
-      if (workoutExercise.exercise.type === 'weight' && !set.actualWeight) return false;
+      if (workoutExercise.exercise.type === ExerciseType.WEIGHT && !set.actualWeight) return false;
 
       // Duration is required for time-based exercises
-      if (workoutExercise.exercise.type === 'time' && !set.actualDuration) return false;
+      if (workoutExercise.exercise.type === ExerciseType.TIME && !set.actualDuration) return false;
 
       return true;
     });
@@ -154,7 +154,6 @@ export default function WorkoutExerciseContent({
                     set.actualReps > 0 &&
                     (workoutExercise.exercise.type !== ExerciseType.WEIGHT || set.actualWeight) &&
                     (workoutExercise.exercise.type !== ExerciseType.TIME || set.actualDuration);
-
                   return (
                     <TableRow key={setIndex}>
                       <TableCell align="center">

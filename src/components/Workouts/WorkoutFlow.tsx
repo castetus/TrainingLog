@@ -1,6 +1,15 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { Box, Accordion, AccordionSummary, Typography, Stack, Chip, Button, IconButton } from '@mui/material';
+import {
+  Box,
+  Accordion,
+  AccordionSummary,
+  Typography,
+  Stack,
+  Chip,
+  Button,
+  IconButton,
+} from '@mui/material';
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -79,7 +88,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
 
   // Helper function to check if an exercise is completed
   const isExerciseCompleted = (workoutExercise: WorkoutExercise): boolean => {
-
+    if (!workoutExercise.actualSets || workoutExercise.actualSets.length === 0) return false;
     return workoutExercise.actualSets.every((set) => {
       // Reps are always required
       if (set.actualReps <= 0) return false;
@@ -219,11 +228,11 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           <Accordion key={index} defaultExpanded={index === 0}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
+                <Typography
+                  variant="h6"
+                  sx={{
                     flexGrow: 1,
-                    color: isExerciseCompleted(workoutExercise) ? 'success.main' : 'inherit'
+                    color: isExerciseCompleted(workoutExercise) ? 'success.main' : 'inherit',
                   }}
                 >
                   {workoutExercise.exercise.name}
