@@ -9,46 +9,48 @@ import StatisticsPage from '@/pages/StatisticsPage';
 import TrainingsPage from '@/pages/TrainingsPage';
 import WorkoutsPage from '@/pages/WorkoutsPage';
 
-
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <MainLayout />,
-    children: [
-      { index: true, element: <Navigate to="/workouts" replace /> },
-      {
-        path: 'workouts',
-        element: <WorkoutsPage />,
-        children: [
-          { path: 'new', element: <WorkoutsPage /> },
-          { path: ':id', element: <WorkoutsPage /> },
-          { path: ':id/edit', element: <WorkoutsPage /> },
-          { path: ':id/flow', element: <WorkoutsPage /> },
-        ],
-      },
-      {
-        path: 'trainings',
-        element: <TrainingsPage />,
-        children: [
-          { path: 'new', element: <TrainingForm /> },
-          { path: ':id', element: <TrainingsPage /> },
-          { path: ':id/edit', element: <TrainingForm /> },
-        ],
-      },
-      {
-        path: 'exercises',
-        element: <ExercisesPage />,
-        children: [
-          { path: 'new', element: <ExerciseForm /> },
-          { path: ':id', element: <ExerciseForm /> },
-          { path: ':id/edit', element: <ExerciseForm /> },
-        ],
-      },
-      {
-        path: 'statistics',
-        element: <StatisticsPage />,
-      },
-      { path: '*', element: <NotFoundPage /> },
-    ],
-  },
-]);
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <MainLayout />,
+      children: [
+        { index: true, element: <Navigate to="/workouts" replace /> },
+        {
+          path: 'workouts',
+          element: <WorkoutsPage />,
+          children: [
+            { path: 'new', element: <WorkoutsPage /> },
+            { path: ':id', element: <WorkoutsPage /> },
+            { path: ':id/edit', element: <WorkoutsPage /> },
+            { path: ':id/flow', element: <WorkoutsPage /> },
+          ],
+        },
+        {
+          path: 'trainings',
+          element: <TrainingsPage />,
+          children: [
+            { path: 'new', element: <TrainingForm /> },
+            { path: ':id', element: <TrainingsPage /> },
+            { path: ':id/edit', element: <TrainingForm /> },
+          ],
+        },
+        {
+          path: 'exercises',
+          element: <ExercisesPage />,
+          children: [
+            { path: 'new', element: <ExerciseForm /> },
+            { path: ':id', element: <ExerciseForm /> },
+            { path: ':id/edit', element: <ExerciseForm /> },
+          ],
+        },
+        {
+          path: 'statistics',
+          element: <StatisticsPage />,
+        },
+        { path: '*', element: <NotFoundPage /> },
+      ],
+    },
+  ],
+  { basename: '/TrainingLog' },
+);
