@@ -15,4 +15,5 @@ export enum Routes {
   EXERCISE_DETAIL = `/exercises/:id`,
   EXERCISE_EDIT = `/exercises/:id/edit`,
   STATISTICS = `/statistics`,
+  SETTINGS = `/settings`,
 }

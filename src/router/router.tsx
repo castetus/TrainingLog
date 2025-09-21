@@ -5,6 +5,7 @@ import TrainingForm from '@/components/Trainings/TrainingForm';
 import MainLayout from '@/layouts/MainLayout';
 import ExercisesPage from '@/pages/ExercisesPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import SettingsPage from '@/pages/SettingsPage';
 import StatisticsPage from '@/pages/StatisticsPage';
 import TrainingsPage from '@/pages/TrainingsPage';
 import WorkoutsPage from '@/pages/WorkoutsPage';
@@ -49,6 +50,10 @@ export const router = createBrowserRouter(
         {
           path: 'statistics',
           element: <StatisticsPage />,
+        },
+        {
+          path: 'settings',
+          element: <SettingsPage />,
         },
         { path: '*', element: <NotFoundPage /> },
       ],

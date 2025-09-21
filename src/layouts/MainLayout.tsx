@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import NavigationIcon from '@mui/icons-material/Navigation';
-import { Box, Container, Typography, Fab } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Box, Container, Typography, Fab, AppBar, Toolbar, IconButton } from '@mui/material';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Navbar from '@/components/Navbar';
@@ -64,6 +65,22 @@ const MainLayout = () => {
 
   return (
     <Box sx={{ pb: 8 }}>
+      {/* Header with Settings */}
+      <AppBar position="static" color="default" elevation={1}>
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Training Log
+          </Typography>
+          <IconButton
+            color="inherit"
+            onClick={() => navigate(Routes.SETTINGS)}
+            aria-label="Settings"
+          >
+            <SettingsIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
       <Container maxWidth="xl" sx={{ py: 1 }} className="main-container">
         {pageTitle && (
           <Typography variant="h4" gutterBottom>
