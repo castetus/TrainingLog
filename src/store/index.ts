@@ -1,18 +1,10 @@
 import { create } from 'zustand';
 
-import type { ExercisesSlice } from './exercisesSlice';
-import { createExercisesSlice } from './exercisesSlice';
-import type { TrainingsSlice } from './trainingsSlice';
-import { createTrainingsSlice } from './trainingsSlice';
-import type { WorkoutsSlice } from './workoutsSlice';
-import { createWorkoutsSlice } from './workoutsSlice';
-// import other slices as you add them
+// Minimal Zustand store setup for future use
+// Currently, components use controllers directly for data management
 
-export type AppStore = ExercisesSlice & TrainingsSlice & WorkoutsSlice; /* & SessionsSlice */
+export interface AppStore {
+  // Add future global state here
+}
 
-export const useAppStore = create<AppStore>()((...a) => ({
-  ...createExercisesSlice(...a),
-  ...createTrainingsSlice(...a),
-  ...createWorkoutsSlice(...a),
-  // ...createSessionsSlice(...a),
-}));
+export const useAppStore = create<AppStore>()(() => ({}));

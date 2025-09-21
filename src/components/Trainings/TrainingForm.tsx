@@ -20,10 +20,10 @@ import {
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import { useExercisesController } from '@/controllers/exercisesController';
 import { useTrainingsController } from '@/controllers/trainingsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
-import { useAppStore } from '@/store';
 import type { Exercise } from '@/types/exercises';
 import type { TrainingFormData, TrainingExercise } from '@/types/trainings';
 
@@ -33,7 +33,7 @@ export default function TrainingForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { findById, create, update } = useTrainingsController();
-  const exercisesById = useAppStore((s) => s.exercisesById);
+  const { list: exercises } = useExercisesController();
 
   const isEditing = !!id;
   const title = isEditing ? 'Edit Training' : 'New Training';
@@ -305,7 +305,7 @@ export default function TrainingForm() {
                   onClick={addExercise}
                   variant="outlined"
                   size="small"
-                  disabled={Object.keys(exercisesById).length === 0}
+                  disabled={exercises.length === 0}
                 >
                   Add Exercise
                 </Button>
@@ -349,7 +349,7 @@ export default function TrainingForm() {
                 setNewExerciseData((prev) => ({ ...prev, plannedDuration: duration }))
               }
               onNotesChange={(notes) => setNewExerciseData((prev) => ({ ...prev, notes }))}
-              mockExercises={Object.values(exercisesById)}
+              mockExercises={exercises}
               errors={{
                 exercise: errors.newExercise,
                 sets: errors.newSets,

@@ -1,18 +1,27 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import { db } from '@/db'; // uses the current DB implementation
-import { useAppStore } from '@/store';
 import type { Exercise } from '@/types/exercises';
 
 export const useExercisesController = () => {
-  const upsertExercises = useAppStore((s) => s.upsertExercises);
-  const removeExercise = useAppStore((s) => s.removeExercise);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadAll = useCallback(async () => {
-    const items = await db.exercises.list();
-    upsertExercises(items);
-    return items;
-  }, [upsertExercises]);
+    setIsLoading(true);
+    try {
+      const items = await db.exercises.list();
+      setExercises(items);
+      return items;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Load exercises on mount
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   const findById = useCallback(async (id: string) => {
     return db.exercises.get(id);
@@ -22,28 +31,36 @@ export const useExercisesController = () => {
     async (draft: Exercise) => {
       const withId = draft.id ? draft : { ...draft, id: crypto.randomUUID() };
       const saved = await db.exercises.put(withId);
-      upsertExercises([saved]);
+      setExercises(prev => [...prev.filter(e => e.id !== saved.id), saved]);
       return saved;
     },
-    [upsertExercises],
+    [],
   );
 
   const update = useCallback(
     async (draft: Exercise) => {
       const saved = await db.exercises.put(draft);
-      upsertExercises([saved]);
+      setExercises(prev => prev.map(e => e.id === saved.id ? saved : e));
       return saved;
     },
-    [upsertExercises],
+    [],
   );
 
   const remove = useCallback(
     async (id: string) => {
       await db.exercises.remove(id);
-      removeExercise(id);
+      setExercises(prev => prev.filter(e => e.id !== id));
     },
-    [removeExercise],
+    [],
   );
 
-  return { loadAll, findById, create, update, remove };
+  return { 
+    list: exercises, 
+    isLoading, 
+    loadAll, 
+    findById, 
+    create, 
+    update, 
+    remove 
+  };
 };

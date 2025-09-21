@@ -1,20 +1,12 @@
 import { List, Box, Divider, Typography } from '@mui/material';
-import { useEffect } from 'react';
 
 import { useTrainingsController } from '@/controllers/trainingsController';
 import { useConfirm } from '@/providers/confirmProvider';
-import { useAppStore } from '@/store';
 import TrainingListItem from './TrainingListItem';
 
 export default function TrainingsList() {
-  const { remove: removeTraining, loadAll } = useTrainingsController();
-  const trainingsById = useAppStore((s) => s.trainingsById);
+  const { remove: removeTraining, list: trainings } = useTrainingsController();
   const confirm = useConfirm();
-
-  // Load trainings from database when component mounts
-  useEffect(() => {
-    loadAll();
-  }, [loadAll]);
 
   const handleDelete = async ({ id, name }: { id: string; name?: string }) => {
     const ok = await confirm({
@@ -26,7 +18,6 @@ export default function TrainingsList() {
     }
   };
 
-  const trainings = Object.values(trainingsById);
 
   return (
     <>

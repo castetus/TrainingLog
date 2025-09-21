@@ -3,7 +3,6 @@ import { useState, useMemo, useEffect } from 'react';
 
 import { useExercisesController } from '@/controllers/exercisesController';
 import { useConfirm } from '@/providers/confirmProvider';
-import { useAppStore } from '@/store';
 
 import ExercisesListItem from './ExercisesListItem';
 
@@ -14,20 +13,11 @@ export default function ExercisesList() {
     setSearch(event.target.value);
   };
 
-  const { remove: removeExercise, loadAll } = useExercisesController();
-
-  // Load exercises from database when component mounts
-  useEffect(() => {
-    loadAll();
-  }, [loadAll]);
-
-  const exercisesById = useAppStore((s) => s.exercisesById);
+  const { remove: removeExercise, list: exercises } = useExercisesController();
 
   const items = useMemo(() => {
-    const exercises = Object.values(exercisesById);
-
     return exercises;
-  }, [exercisesById]);
+  }, [exercises]);
 
   const filteredExercises = useMemo(() => {
     return items.filter((exercise) => exercise.name.toLowerCase().includes(search.toLowerCase()));

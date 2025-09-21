@@ -2,19 +2,11 @@ import { List, Typography, Box, CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
 
 import { useWorkoutsController } from '@/controllers/workoutsController';
-import { useAppStore } from '@/store';
 
 import WorkoutListItem from './WorkoutListItem';
 
 export default function WorkoutsList() {
-  const { workoutsById, loadAll } = useWorkoutsController();
-  const isLoading = useAppStore((s) => s.isLoading);
-
-  useEffect(() => {
-    loadAll();
-  }, [loadAll]);
-
-  const workouts = Object.values(workoutsById);
+  const { list: workouts, isLoading } = useWorkoutsController();
 
   if (isLoading && workouts.length === 0) {
     return (

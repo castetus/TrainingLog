@@ -1,25 +1,17 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import { db } from '@/db';
-import { useAppStore } from '@/store';
 import type { Workout, CreateWorkoutData, UpdateWorkoutData } from '@/types/workouts';
 
 export const useWorkoutsController = () => {
-  const {
-    workoutsById,
-    setWorkouts,
-    addWorkout,
-    updateWorkout,
-    removeWorkout,
-    setLoading,
-    setError,
-    clearError,
-  } = useAppStore();
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const loadAll = useCallback(async () => {
     try {
-      setLoading(true);
-      clearError();
+      setIsLoading(true);
+      setError(null);
 
       const workouts = await db.workouts.list();
       setWorkouts(workouts);
@@ -27,16 +19,20 @@ export const useWorkoutsController = () => {
       setError('Failed to load workouts');
       console.error('Error loading workouts:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [setWorkouts, setLoading, setError, clearError]);
+  }, []);
+
+  // Load workouts on mount
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   const findById = useCallback(
     async (id: string): Promise<Workout | null> => {
       try {
-        // First check store
-        const workout = workoutsById[id];
-
+        // First check local state
+        const workout = workouts.find(w => w.id === id);
         if (workout) {
           return workout;
         }
@@ -44,7 +40,7 @@ export const useWorkoutsController = () => {
         // Try to find in database
         const dbWorkout = await db.workouts.get(id);
         if (dbWorkout) {
-          addWorkout(dbWorkout);
+          setWorkouts(prev => [...prev.filter(w => w.id !== dbWorkout.id), dbWorkout]);
           return dbWorkout;
         }
         return null;
@@ -54,14 +50,14 @@ export const useWorkoutsController = () => {
         return null;
       }
     },
-    [workoutsById, addWorkout, setError],
+    [workouts],
   );
 
   const create = useCallback(
     async (data: CreateWorkoutData): Promise<Workout> => {
       try {
-        setLoading(true);
-        clearError();
+        setIsLoading(true);
+        setError(null);
 
         const newWorkout: Workout = {
           ...data,
@@ -77,28 +73,27 @@ export const useWorkoutsController = () => {
         // Save to database first
         const savedWorkout = await db.workouts.put(newWorkout);
 
-        // Then update local store
-        addWorkout(savedWorkout);
+        // Then update local state
+        setWorkouts(prev => [...prev.filter(w => w.id !== savedWorkout.id), savedWorkout]);
         return savedWorkout;
       } catch (error) {
         setError('Failed to create workout');
         console.error('Error creating workout:', error);
         throw error;
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
-    [addWorkout, setLoading, setError, clearError],
+    [],
   );
 
   const update = useCallback(
     async (data: UpdateWorkoutData): Promise<Workout> => {
-
       try {
-        setLoading(true);
-        clearError();
+        setIsLoading(true);
+        setError(null);
 
-        const existingWorkout = workoutsById[data.id];
+        const existingWorkout = workouts.find(w => w.id === data.id);
         if (!existingWorkout) {
           throw new Error('Workout not found');
         }
@@ -112,49 +107,49 @@ export const useWorkoutsController = () => {
         // Save to database first
         const savedWorkout = await db.workouts.put(updatedWorkout);
 
-        // Then update local store
-        updateWorkout(savedWorkout);
+        // Then update local state
+        setWorkouts(prev => prev.map(w => w.id === savedWorkout.id ? savedWorkout : w));
         return savedWorkout;
       } catch (error) {
         setError('Failed to update workout');
         console.error('Error updating workout:', error);
         throw error;
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
-    [workoutsById, updateWorkout, setLoading, setError, clearError],
+    [workouts],
   );
 
   const remove = useCallback(
     async (id: string): Promise<void> => {
       try {
-        setLoading(true);
-        clearError();
+        setIsLoading(true);
+        setError(null);
 
         // Remove from database first
         await db.workouts.remove(id);
 
-        // Then remove from local store
-        removeWorkout(id);
+        // Then remove from local state
+        setWorkouts(prev => prev.filter(w => w.id !== id));
       } catch (error) {
         setError('Failed to delete workout');
         console.error('Error deleting workout:', error);
         throw error;
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
-    [removeWorkout, setLoading, setError, clearError],
+    [],
   );
 
   const finishWorkout = useCallback(
     async (data: UpdateWorkoutData): Promise<Workout> => {
       try {
-        setLoading(true);
-        clearError();
+        setIsLoading(true);
+        setError(null);
 
-        const existingWorkout = workoutsById[data.id];
+        const existingWorkout = workouts.find(w => w.id === data.id);
         if (!existingWorkout) {
           throw new Error('Workout not found');
         }
@@ -170,22 +165,24 @@ export const useWorkoutsController = () => {
         // Save to database first
         const savedWorkout = await db.workouts.put(finishedWorkout);
 
-        // Then update local store
-        updateWorkout(savedWorkout);
+        // Then update local state
+        setWorkouts(prev => prev.map(w => w.id === savedWorkout.id ? savedWorkout : w));
         return savedWorkout;
       } catch (error) {
         setError('Failed to finish workout');
         console.error('Error finishing workout:', error);
         throw error;
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
-    [workoutsById, updateWorkout, setLoading, setError, clearError],
+    [workouts],
   );
 
   return {
-    workoutsById,
+    list: workouts,
+    isLoading,
+    error,
     loadAll,
     findById,
     create,

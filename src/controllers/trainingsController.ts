@@ -1,23 +1,30 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import { db } from '@/db';
-import { useAppStore } from '@/store';
 import type { Training, TrainingFormData } from '@/types/trainings';
 
 export const useTrainingsController = () => {
-  // Get store functions directly to avoid re-creation
-  const store = useAppStore.getState();
+  const [trainings, setTrainings] = useState<Training[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadAll = useCallback(async () => {
+    setIsLoading(true);
     try {
       const trainings = await db.trainings.list();
-      store.upsertTrainings(trainings);
+      setTrainings(trainings);
       return trainings;
     } catch (error) {
       console.error('Error loading trainings:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
+
+  // Load trainings on mount
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   const findById = useCallback(async (id: string): Promise<Training | null> => {
     try {
@@ -40,7 +47,7 @@ export const useTrainingsController = () => {
       };
 
       const savedTraining = await db.trainings.put(newTraining);
-      store.upsertTrainings([savedTraining]);
+      setTrainings(prev => [...prev.filter(t => t.id !== savedTraining.id), savedTraining]);
       return savedTraining;
     } catch (error) {
       console.error('Error creating training:', error);
@@ -52,7 +59,7 @@ export const useTrainingsController = () => {
     async (id: string, trainingData: Partial<TrainingFormData>): Promise<Training> => {
       try {
         const updatedTraining = await db.trainings.put({ ...trainingData, id } as Training);
-        store.upsertTrainings([updatedTraining]);
+        setTrainings(prev => prev.map(t => t.id === id ? updatedTraining : t));
         return updatedTraining;
       } catch (error) {
         console.error('Error updating training:', error);
@@ -65,23 +72,20 @@ export const useTrainingsController = () => {
   const remove = useCallback(async (id: string): Promise<void> => {
     try {
       await db.trainings.remove(id);
-      store.removeTraining(id);
+      setTrainings(prev => prev.filter(t => t.id !== id));
     } catch (error) {
       console.error('Error removing training:', error);
       throw error;
     }
   }, []);
 
-  const clear = useCallback(() => {
-    store.clearTrainings();
-  }, []);
-
   return {
+    list: trainings,
+    isLoading,
     loadAll,
     findById,
     create,
     update,
     remove,
-    clear,
   };
 };

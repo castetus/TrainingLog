@@ -16,14 +16,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useExercisesController } from '@/controllers/exercisesController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
-import { useAppStore } from '@/store';
 import { ExerciseType } from '@/types/exercises';
 
 export default function ExerciseForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { findById, create, update } = useExercisesController();
-  const exercisesById = useAppStore((s) => s.exercisesById);
 
   const isEditing = !!id;
   const title = isEditing ? 'Edit Exercise' : 'New Exercise';
@@ -53,26 +51,15 @@ export default function ExerciseForm() {
       if (isEditing && id) {
         setIsLoading(true);
         try {
-          // First try to get from store
-          const exerciseFromStore = exercisesById[id];
-          if (exerciseFromStore) {
+          // Load exercise data from controller
+          const exercise = await findById(id);
+          if (exercise) {
             setFormData({
-              name: exerciseFromStore.name,
-              description: exerciseFromStore.description || '',
-              type: exerciseFromStore.type,
-              videoUrl: exerciseFromStore.videoUrl || '',
+              name: exercise.name,
+              description: exercise.description || '',
+              type: exercise.type,
+              videoUrl: exercise.videoUrl || '',
             });
-          } else {
-            // If not in store, try to load from database
-            const exerciseFromDb = await findById(id);
-            if (exerciseFromDb) {
-              setFormData({
-                name: exerciseFromDb.name,
-                description: exerciseFromDb.description || '',
-                type: exerciseFromDb.type,
-                videoUrl: exerciseFromDb.videoUrl || '',
-              });
-            }
           }
         } catch (error) {
           console.error('Error loading exercise:', error);
@@ -84,7 +71,7 @@ export default function ExerciseForm() {
     };
 
     loadExercise();
-  }, [isEditing, id, exercisesById, findById]);
+  }, [isEditing, id, findById]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

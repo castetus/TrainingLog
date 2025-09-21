@@ -27,15 +27,13 @@ import { useTrainingsController } from '@/controllers/trainingsController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
-import { useAppStore } from '@/store';
 import type { CreateWorkoutData } from '@/types/workouts';
 import { formatShortDate } from '@/utils';
 
 export default function WorkoutForm() {
   const navigate = useNavigate();
   const { create } = useWorkoutsController();
-  const { loadAll } = useTrainingsController();
-  const trainingsById = useAppStore((s) => s.trainingsById);
+  const { list: trainings } = useTrainingsController();
 
   const [formData, setFormData] = useState<CreateWorkoutData>({
     name: '',
@@ -46,26 +44,19 @@ export default function WorkoutForm() {
 
   const [selectedTrainingId, setSelectedTrainingId] = useState<string>('');
 
-  // Load trainings on component mount
-  useEffect(() => {
-    loadAll();
-  }, [loadAll]);
-
   // Auto-select training based on day of the week
   useEffect(() => {
-    if (Object.keys(trainingsById).length > 0 && !selectedTrainingId) {
+    if (trainings.length > 0 && !selectedTrainingId) {
       const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
 
       // Find training that matches today's day of the week
-      const matchingTraining = Object.values(trainingsById).find(
-        (training) => training.dayOfTheWeek === today,
-      );
+      const matchingTraining = trainings.find((training) => training.dayOfTheWeek === today);
 
       if (matchingTraining) {
         handleTrainingChange(matchingTraining.id);
       }
     }
-  }, [trainingsById, selectedTrainingId]);
+  }, [trainings, selectedTrainingId]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +70,7 @@ export default function WorkoutForm() {
   const generateWorkoutName = (trainingId: string, date: string) => {
     if (!trainingId || !date) return '';
 
-    const training = trainingsById[trainingId];
+    const training = trainings.find((t) => t.id === trainingId);
     if (!training) return '';
 
     const formattedDate = formatShortDate(date);
@@ -91,7 +82,7 @@ export default function WorkoutForm() {
     setSelectedTrainingId(trainingId);
 
     if (trainingId) {
-      const training = trainingsById[trainingId];
+      const training = trainings.find((t) => t.id === trainingId);
       if (training) {
         // Auto-generate workout name
         const workoutName = generateWorkoutName(trainingId, formData.date);
@@ -178,7 +169,7 @@ export default function WorkoutForm() {
           <Stack spacing={1.5}>
             <Typography variant="h6">Select Training Plan</Typography>
 
-            {Object.keys(trainingsById).length === 0 ? (
+            {trainings.length === 0 ? (
               <Box
                 sx={{
                   textAlign: 'center',
@@ -211,7 +202,7 @@ export default function WorkoutForm() {
                   <MenuItem value="">
                     <em>Choose a training plan...</em>
                   </MenuItem>
-                  {Object.values(trainingsById).map((training) => {
+                  {trainings.map((training) => {
                     const today = new Date().getDay();
                     const isToday = training.dayOfTheWeek === today;
 
@@ -348,7 +339,7 @@ export default function WorkoutForm() {
             <Button
               type="submit"
               variant="contained"
-              disabled={isLoading || Object.keys(trainingsById).length === 0 || !selectedTrainingId}
+              disabled={isLoading || trainings.length === 0 || !selectedTrainingId}
               startIcon={<PlayArrowIcon />}
             >
               {isLoading ? 'Starting...' : 'Start Workout'}

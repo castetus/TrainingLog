@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import { Box, Container, Typography, Fab } from '@mui/material';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Navbar from '@/components/Navbar';
 import { Routes } from '@/router/routes';
@@ -15,6 +15,7 @@ interface AddButtonConfig {
 
 const MainLayout = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   // Check if we're on a nested route (has more than 2 segments, or is home with nested content)
   const isNestedRoute = pathname.split('/').length > 2;
@@ -79,7 +80,7 @@ const MainLayout = () => {
           aria-label={addButtonConfig.label}
           className="fab-button"
           variant={addButtonConfig.variant}
-          onClick={() => (window.location.href = addButtonConfig.to)}
+          onClick={() => navigate(addButtonConfig.to)}
           sx={{
             position: 'fixed',
             bottom: 80, // Above the navbar
