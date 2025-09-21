@@ -47,7 +47,7 @@ export const useTrainingsController = () => {
       };
 
       const savedTraining = await db.trainings.put(newTraining);
-      setTrainings(prev => [...prev.filter(t => t.id !== savedTraining.id), savedTraining]);
+      setTrainings((prev) => [...prev.filter((t) => t.id !== savedTraining.id), savedTraining]);
       return savedTraining;
     } catch (error) {
       console.error('Error creating training:', error);
@@ -59,7 +59,7 @@ export const useTrainingsController = () => {
     async (id: string, trainingData: Partial<TrainingFormData>): Promise<Training> => {
       try {
         const updatedTraining = await db.trainings.put({ ...trainingData, id } as Training);
-        setTrainings(prev => prev.map(t => t.id === id ? updatedTraining : t));
+        setTrainings((prev) => prev.map((t) => (t.id === id ? updatedTraining : t)));
         return updatedTraining;
       } catch (error) {
         console.error('Error updating training:', error);
@@ -72,7 +72,7 @@ export const useTrainingsController = () => {
   const remove = useCallback(async (id: string): Promise<void> => {
     try {
       await db.trainings.remove(id);
-      setTrainings(prev => prev.filter(t => t.id !== id));
+      setTrainings((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
       console.error('Error removing training:', error);
       throw error;

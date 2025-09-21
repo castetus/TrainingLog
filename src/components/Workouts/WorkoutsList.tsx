@@ -1,5 +1,4 @@
 import { List, Typography, Box, CircularProgress } from '@mui/material';
-import { useEffect } from 'react';
 
 import { useWorkoutsController } from '@/controllers/workoutsController';
 

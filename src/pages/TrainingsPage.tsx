@@ -41,7 +41,7 @@ const TrainingsPage = () => {
 
   const handleUpdateTraining = async (updatedTraining: Training) => {
     try {
-      await update(updatedTraining);
+      await update(updatedTraining.id, updatedTraining);
       setTraining(updatedTraining); // Update local state
     } catch (error) {
       console.error('Failed to update training:', error);

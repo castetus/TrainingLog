@@ -1,4 +1,4 @@
-const BASE_URL = '/TrainingLog';
+// const BASE_URL = '/TrainingLog';
 
 export enum Routes {
   HOME = `/`,
