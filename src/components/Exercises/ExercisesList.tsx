@@ -1,5 +1,5 @@
 import { List, Input, Stack, Typography, Box } from '@mui/material';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 
 import { useExercisesController } from '@/controllers/exercisesController';
 import { useConfirm } from '@/providers/confirmProvider';
