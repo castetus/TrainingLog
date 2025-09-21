@@ -1,7 +1,16 @@
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Box, Typography, Stack, Card, CardContent, Paper, IconButton, Collapse } from '@mui/material';
-import { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  Stack,
+  Card,
+  CardContent,
+  Paper,
+  IconButton,
+  Collapse,
+} from '@mui/material';
+import { useState } from 'react';
 
 import {
   UniversalChart,
@@ -19,21 +28,13 @@ import {
 } from '@/utils/statisticsUtils';
 
 export default function StatisticsPage() {
-  const { workoutsById, loadAll } = useWorkoutsController();
+  const { list: workouts } = useWorkoutsController();
   const [selectedDateRange, setSelectedDateRange] = useState<DateRangePreset>('all-time');
   const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>();
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Load workouts on component mount
-  useEffect(() => {
-    loadAll();
-  }, [loadAll]);
-
   // Get current date range
   const currentDateRange = customDateRange || getDateRangeForPreset(selectedDateRange);
-
-  // Generate real data from workouts
-  const workouts = Object.values(workoutsById);
   const workoutFrequencyData = generateWorkoutFrequencyData(workouts, currentDateRange);
   const exerciseProgressData = generateExerciseProgressData(
     workouts,
@@ -47,15 +48,21 @@ export default function StatisticsPage() {
   // Calculate quick stats
   const totalWorkouts = workouts.length;
   const totalLiftedWeight = workouts.reduce((total, workout) => {
-    return total + workout.exercises.reduce((workoutTotal, exercise) => {
-      if (!exercise.actualSets || exercise.actualSets.length === 0) return workoutTotal;
-      return workoutTotal + exercise.actualSets.reduce((setTotal, set) => {
-        if (set.actualWeight && set.actualReps) {
-          return setTotal + (set.actualWeight * set.actualReps);
-        }
-        return setTotal;
-      }, 0);
-    }, 0);
+    return (
+      total +
+      workout.exercises.reduce((workoutTotal, exercise) => {
+        if (!exercise.actualSets || exercise.actualSets.length === 0) return workoutTotal;
+        return (
+          workoutTotal +
+          exercise.actualSets.reduce((setTotal, set) => {
+            if (set.actualWeight && set.actualReps) {
+              return setTotal + set.actualWeight * set.actualReps;
+            }
+            return setTotal;
+          }, 0)
+        );
+      }, 0)
+    );
   }, 0);
 
   const handleDateRangeChange = (preset: DateRangePreset, range?: DateRange) => {
@@ -111,24 +118,24 @@ export default function StatisticsPage() {
         </Card>
         <Card sx={{ flex: 1 }}>
           <CardContent>
-                          <Stack direction="row" alignItems="center" spacing={1}>
-                <BarChartIcon color="secondary" />
-                <Box>
-                  <Typography variant="h6">{Math.round(totalLiftedWeight)} kg</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Total Lifted Weight
-                  </Typography>
-                </Box>
-              </Stack>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <BarChartIcon color="secondary" />
+              <Box>
+                <Typography variant="h6">{Math.round(totalLiftedWeight)} kg</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Total Lifted Weight
+                </Typography>
+              </Box>
+            </Stack>
           </CardContent>
         </Card>
       </Stack>
 
       {/* Workout Frequency Chart */}
       <Paper sx={{ p: 3 }}>
-        <UniversalChart 
-          data={workoutFrequencyData} 
-          title="Workout Frequency" 
+        <UniversalChart
+          data={workoutFrequencyData}
+          title="Workout Frequency"
           type="bar"
           dataKeys={['count']}
           colors={['#8884d8']}

@@ -5,7 +5,6 @@ import { useLocation, useParams, Outlet } from 'react-router-dom';
 import { WorkoutsList, WorkoutView, WorkoutForm, WorkoutFlow } from '@/components/Workouts';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
-import { Routes } from '@/router/routes';
 import type { Workout } from '@/types/workouts';
 
 export default function WorkoutsPage() {
@@ -30,17 +29,6 @@ export default function WorkoutsPage() {
     !location.pathname.includes('/flow');
   const isNewRoute = location.pathname.includes('/new');
   const isFlowRoute = location.pathname.includes('/flow');
-
-  // Debug logging
-  console.log('WorkoutsPage Debug:', {
-    pathname: location.pathname,
-    Routes_HOME: Routes.HOME,
-    isNestedRoute,
-    isDetailRoute,
-    isNewRoute,
-    isFlowRoute,
-    id,
-  });
 
   useEffect(() => {
     if ((isDetailRoute || isFlowRoute) && id) {
@@ -85,12 +73,6 @@ export default function WorkoutsPage() {
       </Box>
     );
   }
-
-  console.log('WorkoutsPage Final Return:', {
-    isNestedRoute,
-    willShowOutlet: isNestedRoute,
-    willShowWorkoutsList: !isNestedRoute,
-  });
 
   return <Stack spacing={1}>{isNestedRoute ? <Outlet /> : <WorkoutsList />}</Stack>;
 }
