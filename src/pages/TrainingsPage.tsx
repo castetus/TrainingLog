@@ -13,7 +13,7 @@ const TrainingsPage = () => {
   const location = useLocation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { findById } = useTrainingsController();
+  const { findById, update } = useTrainingsController();
 
   const [training, setTraining] = useState<Training | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +39,15 @@ const TrainingsPage = () => {
     }
   }, [isDetailRoute, id, findById]);
 
+  const handleUpdateTraining = async (updatedTraining: Training) => {
+    try {
+      await update(updatedTraining);
+      setTraining(updatedTraining); // Update local state
+    } catch (error) {
+      console.error('Failed to update training:', error);
+    }
+  };
+
   if (isNewRoute) {
     return <Outlet />;
   }
@@ -47,7 +56,7 @@ const TrainingsPage = () => {
     return (
       <NestedPageLayout title={training.name} subtitle="Training Details">
         <Stack spacing={3}>
-          <TrainingView training={training} />
+          <TrainingView training={training} onUpdateTraining={handleUpdateTraining} />
 
           {/* Edit button at bottom */}
           <Stack direction="row" justifyContent="flex-end">

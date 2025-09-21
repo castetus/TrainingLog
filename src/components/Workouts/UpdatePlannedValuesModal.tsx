@@ -39,18 +39,18 @@ export default function UpdatePlannedValuesModal({
       <DialogContent>
         <Stack spacing={2}>
           <Typography variant="body1">
-            Great job! You exceeded your planned values in this workout. Would you like to update
-            your training plan with these improved targets?
+            Great job! You achieved your planned parameters in this workout. Would you like to
+            manually increase your training targets for these exercises?
           </Typography>
 
           <Divider />
 
           <Typography variant="subtitle1" fontWeight="medium">
-            Exercises Ready for Increase:
+            Exercises That Achieved Planned Parameters:
           </Typography>
 
-          {analysis.exercisesToUpdate.map(
-            ({ exercise, shouldIncreaseWeight, shouldIncreaseTime, shouldIncreaseReps }) => (
+          {analysis.achievedExercises.map(
+            ({ exercise, achievedWeight, achievedTime, achievedReps }) => (
               <Box
                 key={exercise.exercise.id}
                 sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}
@@ -60,50 +60,76 @@ export default function UpdatePlannedValuesModal({
                 </Typography>
 
                 <Stack direction="row" spacing={2} alignItems="center">
-                  {shouldIncreaseWeight && (
-                    <Chip
-                      label="Weight increase needed"
-                      color="success"
-                      size="small"
-                      variant="outlined"
-                    />
+                  {achievedWeight && (
+                    <Chip label="Weight achieved" color="success" size="small" variant="outlined" />
                   )}
 
-                  {shouldIncreaseTime && (
-                    <Chip
-                      label="Time increase needed"
-                      color="success"
-                      size="small"
-                      variant="outlined"
-                    />
+                  {achievedTime && (
+                    <Chip label="Time achieved" color="success" size="small" variant="outlined" />
                   )}
 
-                  {shouldIncreaseReps && (
-                    <Chip
-                      label="Reps increase needed"
-                      color="success"
-                      size="small"
-                      variant="outlined"
-                    />
+                  {achievedReps && (
+                    <Chip label="Reps achieved" color="success" size="small" variant="outlined" />
                   )}
                 </Stack>
               </Box>
             ),
           )}
 
+          {analysis.hasExceededExercises && (
+            <>
+              <Divider />
+              <Typography variant="subtitle1" fontWeight="medium">
+                Exercises That Exceeded Planned Parameters (will be auto-updated):
+              </Typography>
+
+              {analysis.exceededExercises.map(
+                ({ exercise, exceededWeight, exceededTime, exceededReps }) => (
+                  <Box
+                    key={exercise.exercise.id}
+                    sx={{ p: 2, bgcolor: 'success.light', borderRadius: 1, opacity: 0.1 }}
+                  >
+                    <Typography variant="subtitle2" fontWeight="medium" gutterBottom>
+                      {exercise.exercise.name}
+                    </Typography>
+
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      {exceededWeight && (
+                        <Chip
+                          label="Weight exceeded"
+                          color="success"
+                          size="small"
+                          variant="filled"
+                        />
+                      )}
+
+                      {exceededTime && (
+                        <Chip label="Time exceeded" color="success" size="small" variant="filled" />
+                      )}
+
+                      {exceededReps && (
+                        <Chip label="Reps exceeded" color="success" size="small" variant="filled" />
+                      )}
+                    </Stack>
+                  </Box>
+                ),
+              )}
+            </>
+          )}
+
           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-            This will update the planned values in your training plan with your actual performance
-            to help you continue progressing.
+            This will mark these exercises as achieved and allow you to manually increase the
+            planned values in your training plan to continue progressing.
           </Typography>
         </Stack>
       </DialogContent>
 
       <DialogActions>
         <Button onClick={onClose} color="inherit">
-          Keep Current Plan
+          Skip for Now
         </Button>
         <Button onClick={onConfirm} variant="contained" color="success">
-          Update Training Plan
+          Mark as Achieved
         </Button>
       </DialogActions>
     </Dialog>

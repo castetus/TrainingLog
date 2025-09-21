@@ -31,11 +31,11 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
             <Typography variant="subtitle2" fontWeight="medium">
               {exerciseViewData.name}
             </Typography>
-            {exercise.shouldUpdatePlannedValues && (
+            {exercise.plannedParametersAchieved && (
               <Chip
                 icon={<TrendingUpIcon />}
-                label="Ready for increase"
-                color="warning"
+                label="Achieved"
+                color="success"
                 size="small"
                 variant="outlined"
               />

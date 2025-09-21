@@ -2,116 +2,123 @@ import { ExerciseType } from '@/types';
 import type { WorkoutExercise } from '@/types/workouts';
 
 export interface PerformanceAnalysis {
-  shouldUpdatePlannedValues: boolean;
-  exercisesToUpdate: Array<{
+  hasAchievedExercises: boolean;
+  achievedExercises: Array<{
     exerciseIndex: number;
     exercise: WorkoutExercise;
-    shouldIncreaseWeight?: boolean;
-    shouldIncreaseTime?: boolean;
-    shouldIncreaseReps?: boolean;
+    achievedWeight?: boolean;
+    achievedTime?: boolean;
+    achievedReps?: boolean;
+  }>;
+  hasExceededExercises: boolean;
+  exceededExercises: Array<{
+    exerciseIndex: number;
+    exercise: WorkoutExercise;
+    exceededWeight?: boolean;
+    exceededTime?: boolean;
+    exceededReps?: boolean;
   }>;
 }
 
 export const analyzeWorkoutPerformance = (workout: {
   exercises: WorkoutExercise[];
 }): PerformanceAnalysis => {
-  const exercisesToUpdate: PerformanceAnalysis['exercisesToUpdate'] = [];
+  const achievedExercises: PerformanceAnalysis['achievedExercises'] = [];
+  const exceededExercises: PerformanceAnalysis['exceededExercises'] = [];
 
-  const shouldIncreaseWeight = (exercise: WorkoutExercise): boolean => {
-    if (!exercise.plannedWeight || !exercise.actualSets || exercise.actualSets.length === 0) {
-      return false;
+  const checkAchievement = (exercise: WorkoutExercise): { achieved: boolean; exceeded: boolean } => {
+    if (!exercise.actualSets || exercise.actualSets.length === 0) {
+      return { achieved: false, exceeded: false };
     }
 
     const lastSet = exercise.actualSets[exercise.actualSets.length - 1];
 
     if (!lastSet) {
-      return false;
+      return { achieved: false, exceeded: false };
     }
 
-    return !!(
-      lastSet.actualWeight &&
-      lastSet.actualWeight >= exercise.plannedWeight &&
-      lastSet.actualReps &&
-      lastSet.actualReps >= exercise.plannedReps
+    // Check if planned parameters were met or exceeded
+    const achieved = !!(
+      lastSet.actualReps >= exercise.plannedReps &&
+      (exercise.exercise.type === ExerciseType.REPS_ONLY ||
+        (exercise.exercise.type === ExerciseType.WEIGHT &&
+          lastSet.actualWeight &&
+          exercise.plannedWeight &&
+          lastSet.actualWeight >= exercise.plannedWeight) ||
+        (exercise.exercise.type === ExerciseType.TIME &&
+          lastSet.actualDuration &&
+          exercise.plannedDuration &&
+          lastSet.actualDuration >= exercise.plannedDuration))
     );
-  };
 
-  const shouldIncreaseTime = (exercise: WorkoutExercise): boolean => {
-    if (!exercise.plannedDuration || !exercise.actualSets || exercise.actualSets.length === 0) {
-      return false;
-    }
-
-    const lastSet = exercise.actualSets[exercise.actualSets.length - 1];
-
-    if (!lastSet) {
-      return false;
-    }
-
-    return !!(
-      lastSet.actualDuration &&
-      lastSet.actualDuration >= exercise.plannedDuration &&
-      lastSet.actualReps &&
-      lastSet.actualReps >= exercise.plannedReps
+    // Check if parameters were exceeded (for automatic updates)
+    const exceeded = !!(
+      lastSet.actualReps > exercise.plannedReps ||
+      (exercise.exercise.type === ExerciseType.WEIGHT &&
+        lastSet.actualWeight &&
+        exercise.plannedWeight &&
+        lastSet.actualWeight > exercise.plannedWeight) ||
+      (exercise.exercise.type === ExerciseType.TIME &&
+        lastSet.actualDuration &&
+        exercise.plannedDuration &&
+        lastSet.actualDuration > exercise.plannedDuration)
     );
-  };
 
-  const shouldIncreaseReps = (exercise: WorkoutExercise): boolean => {
-    if (!exercise.plannedReps || !exercise.actualSets || exercise.actualSets.length === 0) {
-      return false;
-    }
-
-    const lastSet = exercise.actualSets[exercise.actualSets.length - 1];
-
-    if (!lastSet || !lastSet.actualReps || lastSet.actualReps < exercise.plannedReps) {
-      return false;
-    }
-
-    return lastSet.actualReps >= exercise.plannedReps;
+    return { achieved, exceeded };
   };
 
   workout.exercises.forEach((exercise, exerciseIndex) => {
-    if (!exercise.actualSets || exercise.actualSets.length === 0) {
-      return; // Skip exercises with no actual sets
-    }
+    const { achieved, exceeded } = checkAchievement(exercise);
 
-    // Get the last actual set (most recent performance)
-    const lastSet = exercise.actualSets[exercise.actualSets.length - 1];
+    if (achieved) {
+      const achievementFlags: { weight?: boolean; time?: boolean; reps?: boolean } = {};
 
-    if (!lastSet) {
-      return;
-    }
+      switch (exercise.exercise.type) {
+        case ExerciseType.WEIGHT:
+          achievementFlags.weight = true;
+          break;
+        case ExerciseType.TIME:
+          achievementFlags.time = true;
+          break;
+        case ExerciseType.REPS_ONLY:
+          achievementFlags.reps = true;
+          break;
+      }
 
-    let shouldUpdateThisExercise = false;
-    const increaseFlags: { weight?: boolean; reps?: boolean; time?: boolean } = {};
-
-    switch (exercise.exercise.type) {
-      case ExerciseType.WEIGHT:
-        increaseFlags.weight = shouldIncreaseWeight(exercise);
-        if (increaseFlags.weight) shouldUpdateThisExercise = true;
-        break;
-      case ExerciseType.TIME:
-        increaseFlags.time = shouldIncreaseTime(exercise);
-        if (increaseFlags.time) shouldUpdateThisExercise = true;
-        break;
-      case ExerciseType.REPS_ONLY:
-        increaseFlags.reps = shouldIncreaseReps(exercise);
-        if (increaseFlags.reps) shouldUpdateThisExercise = true;
-        break;
-    }
-
-    if (shouldUpdateThisExercise) {
-      exercisesToUpdate.push({
+      achievedExercises.push({
         exerciseIndex,
         exercise,
-        shouldIncreaseWeight: increaseFlags.weight,
-        shouldIncreaseTime: increaseFlags.time,
-        shouldIncreaseReps: increaseFlags.reps,
+        achievedWeight: achievementFlags.weight,
+        achievedTime: achievementFlags.time,
+        achievedReps: achievementFlags.reps,
+      });
+    }
+
+    if (exceeded) {
+      const exceededFlags: { weight?: boolean; time?: boolean; reps?: boolean } = {};
+
+      if (exercise.exercise.type === ExerciseType.WEIGHT) {
+        exceededFlags.weight = true;
+      } else if (exercise.exercise.type === ExerciseType.TIME) {
+        exceededFlags.time = true;
+      } else if (exercise.exercise.type === ExerciseType.REPS_ONLY) {
+        exceededFlags.reps = true;
+      }
+
+      exceededExercises.push({
+        exerciseIndex,
+        exercise,
+        exceededWeight: exceededFlags.weight,
+        exceededTime: exceededFlags.time,
+        exceededReps: exceededFlags.reps,
       });
     }
   });
 
   return {
-    shouldUpdatePlannedValues: exercisesToUpdate.length > 0,
-    exercisesToUpdate,
+    hasAchievedExercises: achievedExercises.length > 0,
+    achievedExercises,
+    hasExceededExercises: exceededExercises.length > 0,
+    exceededExercises,
   };
 };

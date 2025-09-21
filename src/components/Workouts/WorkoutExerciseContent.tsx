@@ -1,3 +1,4 @@
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {
   AccordionDetails,
   Typography,
@@ -104,12 +105,23 @@ export default function WorkoutExerciseContent({
             </Typography>
           )}
 
-          <Typography variant="body2">
-            <strong>Planned:</strong> {workoutExercise.plannedSets} sets of{' '}
-            {workoutExercise.plannedReps} reps
-            {workoutExercise.plannedWeight && ` at ${workoutExercise.plannedWeight}kg`}
-            {workoutExercise.plannedDuration && ` for ${workoutExercise.plannedDuration} seconds`}
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography variant="body2">
+              <strong>Planned:</strong> {workoutExercise.plannedSets} sets of{' '}
+              {workoutExercise.plannedReps} reps
+              {workoutExercise.plannedWeight && ` at ${workoutExercise.plannedWeight}kg`}
+              {workoutExercise.plannedDuration && ` for ${workoutExercise.plannedDuration} seconds`}
+            </Typography>
+            {workoutExercise.plannedParametersAchieved && (
+              <Chip
+                icon={<TrendingUpIcon />}
+                label="Achieved"
+                color="success"
+                size="small"
+                variant="outlined"
+              />
+            )}
+          </Stack>
 
           {workoutExercise.notes && (
             <Typography variant="body2" color="text.secondary">

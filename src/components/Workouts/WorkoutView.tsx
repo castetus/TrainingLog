@@ -14,6 +14,7 @@ import {
 
 import type { Workout } from '@/types/workouts';
 import { formatLongDate, formatMediumDate, formatDuration } from '@/utils';
+
 import WorkoutViewItem from './WorkoutViewItem';
 
 interface WorkoutViewProps {
@@ -36,7 +37,9 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
           <Chip label={formatDate(workout.date)} color="primary" />
           {workout.duration ? (
             <Chip label={formatDuration(workout.duration)} color="secondary" />
-          ) : ''}
+          ) : (
+            ''
+          )}
         </Stack>
         {workout.description && (
           <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>

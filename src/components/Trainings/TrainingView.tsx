@@ -10,20 +10,25 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Button,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Routes } from '@/router/routes';
-import type { Training } from '@/types/trainings';
+import type { Training, TrainingExercise } from '@/types/trainings';
 import { formatTime } from '@/utils';
+import IncreasePlannedValuesModal from './IncreasePlannedValuesModal';
 
 interface TrainingViewProps {
   training: Training;
+  onUpdateTraining?: (updatedTraining: Training) => void;
 }
 
-export default function TrainingView({ training }: TrainingViewProps) {
+export default function TrainingView({ training, onUpdateTraining }: TrainingViewProps) {
   const navigate = useNavigate();
+  const [showIncreaseModal, setShowIncreaseModal] = useState(false);
 
   const getDayOfWeek = (day?: number) => {
     if (day === undefined) return null;
@@ -33,6 +38,32 @@ export default function TrainingView({ training }: TrainingViewProps) {
 
   const handleExerciseClick = (exerciseId: string) => {
     navigate(Routes.EXERCISE_DETAIL.replace(':id', exerciseId));
+  };
+
+  const achievedExercises = training.exercises.filter((exercise) => exercise.plannedParametersAchieved);
+
+  const handleIncreaseValues = () => {
+    setShowIncreaseModal(true);
+  };
+
+  const handleIncreaseConfirm = (updatedExercises: TrainingExercise[]) => {
+    if (onUpdateTraining) {
+      const updatedTraining: Training = {
+        ...training,
+        exercises: training.exercises.map((exercise) => {
+          const updatedExercise = updatedExercises.find((ue) => ue.exercise.id === exercise.exercise.id);
+          if (updatedExercise) {
+            return {
+              ...updatedExercise,
+              plannedParametersAchieved: false, // Reset the achieved flag after updating
+            };
+          }
+          return exercise;
+        }),
+      };
+      onUpdateTraining(updatedTraining);
+    }
+    setShowIncreaseModal(false);
   };
 
   return (
@@ -54,6 +85,21 @@ export default function TrainingView({ training }: TrainingViewProps) {
           </Typography>
         )}
       </Box>
+
+      {/* Increase Values Button */}
+      {achievedExercises.length > 0 && (
+        <Box>
+          <Button
+            variant="outlined"
+            color="success"
+            startIcon={<TrendingUpIcon />}
+            onClick={handleIncreaseValues}
+            sx={{ mb: 2 }}
+          >
+            Increase Planned Values ({achievedExercises.length} exercises achieved)
+          </Button>
+        </Box>
+      )}
 
       {/* Exercises Table */}
       <Box>
@@ -90,11 +136,11 @@ export default function TrainingView({ training }: TrainingViewProps) {
                         >
                           {trainingExercise.exercise.name}
                         </Typography>
-                        {trainingExercise.shouldUpdatePlannedValues && (
+                        {trainingExercise.plannedParametersAchieved && (
                           <Chip
                             icon={<TrendingUpIcon />}
-                            label="Ready for increase"
-                            color="warning"
+                            label="Achieved"
+                            color="success"
                             size="small"
                             variant="outlined"
                           />
@@ -144,6 +190,14 @@ export default function TrainingView({ training }: TrainingViewProps) {
           </Typography>
         </Box>
       )}
+
+      {/* Increase Values Modal */}
+      <IncreasePlannedValuesModal
+        open={showIncreaseModal}
+        onClose={() => setShowIncreaseModal(false)}
+        onConfirm={handleIncreaseConfirm}
+        exercises={achievedExercises}
+      />
     </Stack>
   );
 }

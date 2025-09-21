@@ -178,7 +178,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
 
         const analysis = analyzeWorkoutPerformance(workoutWithResults);
 
-        if (analysis.shouldUpdatePlannedValues) {
+        if (analysis.hasAchievedExercises) {
           // Show modal to confirm updating planned values
           setPerformanceAnalysis(analysis);
           setShowUpdateModal(true);
@@ -289,11 +289,11 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                       sx={{ minWidth: 24, height: 24 }}
                     />
                   )}
-                  {workoutExercise.shouldUpdatePlannedValues && (
+                  {workoutExercise.plannedParametersAchieved && (
                     <Chip
                       icon={<TrendingUpIcon />}
-                      label="Ready for increase"
-                      color="warning"
+                      label="Achieved"
+                      color="success"
                       size="small"
                       variant="outlined"
                     />

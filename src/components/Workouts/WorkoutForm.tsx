@@ -100,7 +100,7 @@ export default function WorkoutForm() {
             plannedWeight: ex.plannedWeightKg, // Use planned weight value
             plannedDuration: ex.plannedSeconds, // Use planned duration value
             actualSets: [], // Initialize with empty actual sets
-            shouldUpdatePlannedValues: ex.shouldUpdatePlannedValues, // Pass the flag
+            plannedParametersAchieved: ex.plannedParametersAchieved, // Pass the flag
           })),
         }));
       }
@@ -318,11 +318,11 @@ export default function WorkoutForm() {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          {exercise.shouldUpdatePlannedValues && (
+                          {exercise.plannedParametersAchieved && (
                             <Chip
                               icon={<TrendingUpIcon />}
-                              label="Ready for increase"
-                              color="warning"
+                              label="Achieved"
+                              color="success"
                               size="small"
                               variant="outlined"
                             />
