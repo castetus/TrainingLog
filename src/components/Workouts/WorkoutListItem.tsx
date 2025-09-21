@@ -20,6 +20,12 @@ export default function WorkoutListItem({ workout }: WorkoutListItemProps) {
     return formatShortDate(dateString);
   };
 
+  const shouldShowDuration = () => {
+    if (!workout.duration || workout.duration <= 0) return false;
+    const formatted = formatDuration(workout.duration);
+    return formatted && formatted !== '0' && formatted.trim() !== '';
+  };
+
   return (
     <ListItem alignItems="flex-start" divider disableGutters>
       <ListItemButton onClick={handleView} sx={{ px: 0 }}>
@@ -33,7 +39,7 @@ export default function WorkoutListItem({ workout }: WorkoutListItemProps) {
                 variant="outlined"
                 color="primary"
               />
-              {workout.duration && (
+              {shouldShowDuration() && (
                 <Chip
                   label={formatDuration(workout.duration)}
                   size="small"
