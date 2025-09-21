@@ -77,9 +77,9 @@ export default function AddExerciseSubform({
             size="small"
             sx={{ flexGrow: 1 }}
             renderInput={(params) => (
-              <TextField 
-                {...params} 
-                size="small" 
+              <TextField
+                {...params}
+                size="small"
                 error={!!errors.exercise}
                 helperText={errors.exercise}
               />
@@ -94,7 +94,7 @@ export default function AddExerciseSubform({
           </Typography>
           <TextField
             type="number"
-            value={newExerciseData.plannedSets}
+            value={newExerciseData.plannedSets || ''}
             onChange={(e) => {
               const value = e.target.value;
               if (value === '') {
@@ -124,7 +124,7 @@ export default function AddExerciseSubform({
               </Typography>
               <TextField
                 type="number"
-                value={newExerciseData.plannedWeight}
+                value={newExerciseData.plannedWeight || ''}
                 onChange={(e) => {
                   const value = e.target.value;
 
@@ -161,7 +161,7 @@ export default function AddExerciseSubform({
               </Typography>
               <TextField
                 type="number"
-                value={newExerciseData.plannedDuration}
+                value={newExerciseData.plannedDuration || ''}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value === '') {
@@ -197,7 +197,7 @@ export default function AddExerciseSubform({
               </Typography>
               <TextField
                 type="number"
-                value={newExerciseData.plannedReps}
+                value={newExerciseData.plannedReps || ''}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value === '') {
