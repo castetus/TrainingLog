@@ -1,4 +1,3 @@
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {
   AccordionDetails,
   Typography,
@@ -16,6 +15,7 @@ import {
 } from '@mui/material';
 import { useState, useMemo, useEffect } from 'react';
 
+import { AchievedChip } from '@/components/Common';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import { ExerciseType } from '@/types';
 import type { WorkoutExercise, WorkoutSet } from '@/types/workouts';
@@ -112,15 +112,7 @@ export default function WorkoutExerciseContent({
               {workoutExercise.plannedWeight && ` at ${workoutExercise.plannedWeight}kg`}
               {workoutExercise.plannedDuration && ` for ${workoutExercise.plannedDuration} seconds`}
             </Typography>
-            {workoutExercise.plannedParametersAchieved && (
-              <Chip
-                icon={<TrendingUpIcon />}
-                label="Achieved"
-                color="success"
-                size="small"
-                variant="outlined"
-              />
-            )}
+            <AchievedChip show={workoutExercise.plannedParametersAchieved} />
           </Stack>
 
           {workoutExercise.notes && (

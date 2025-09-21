@@ -1,5 +1,4 @@
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {
   Box,
   Typography,
@@ -23,6 +22,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { AchievedChip } from '@/components/Common';
 import { useTrainingsController } from '@/controllers/trainingsController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
@@ -318,15 +318,7 @@ export default function WorkoutForm() {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          {exercise.plannedParametersAchieved && (
-                            <Chip
-                              icon={<TrendingUpIcon />}
-                              label="Achieved"
-                              color="success"
-                              size="small"
-                              variant="outlined"
-                            />
-                          )}
+                          <AchievedChip show={exercise.plannedParametersAchieved} />
                         </TableCell>
                       </TableRow>
                     ))}

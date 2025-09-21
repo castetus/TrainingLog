@@ -1,6 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import {
   Box,
   Accordion,
@@ -14,6 +13,7 @@ import {
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { AchievedChip } from '@/components/Common';
 import { useExercisesController } from '@/controllers/exercisesController';
 import { useTrainingsController } from '@/controllers/trainingsController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
@@ -289,15 +289,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                       sx={{ minWidth: 24, height: 24 }}
                     />
                   )}
-                  {workoutExercise.plannedParametersAchieved && (
-                    <Chip
-                      icon={<TrendingUpIcon />}
-                      label="Achieved"
-                      color="success"
-                      size="small"
-                      variant="outlined"
-                    />
-                  )}
+                  <AchievedChip show={workoutExercise.plannedParametersAchieved} />
                   <Chip
                     label={`${workoutExercise.plannedSets} × ${workoutExercise.plannedReps}`}
                     color="primary"

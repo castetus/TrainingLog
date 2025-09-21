@@ -1,13 +1,14 @@
-import { Stack, TableCell, TableRow, Typography, Chip } from '@mui/material';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import { Stack, TableCell, TableRow, Typography } from '@mui/material';
 
+import { AchievedChip } from '@/components/Common';
 import type { WorkoutExercise } from '@/types/workouts';
 import { formatTime } from '@/utils';
 
 export default function WorkoutViewItem(exercise: WorkoutExercise) {
-  const lastSet = exercise.actualSets && exercise.actualSets.length > 0 
-    ? exercise.actualSets[exercise.actualSets.length - 1] 
-    : null;
+  const lastSet =
+    exercise.actualSets && exercise.actualSets.length > 0
+      ? exercise.actualSets[exercise.actualSets.length - 1]
+      : null;
 
   const exerciseViewData = {
     name: exercise.exercise.name,
@@ -31,15 +32,7 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
             <Typography variant="subtitle2" fontWeight="medium">
               {exerciseViewData.name}
             </Typography>
-            {exercise.plannedParametersAchieved && (
-              <Chip
-                icon={<TrendingUpIcon />}
-                label="Achieved"
-                color="success"
-                size="small"
-                variant="outlined"
-              />
-            )}
+            <AchievedChip show={exercise.plannedParametersAchieved} />
           </Stack>
           <Typography variant="caption" color="text.secondary">
             {exerciseViewData.description}
@@ -62,8 +55,12 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
             {lastSet ? (
               <>
                 {exerciseViewData.actualReps && `${exerciseViewData.actualReps}`}
-                {exerciseViewData.actualReps && exerciseViewData.actualWeight && ` x ${exerciseViewData.actualWeight}kg`}
-                {exerciseViewData.actualReps && exerciseViewData.actualDuration && ` x ${formatTime(exerciseViewData.actualDuration)}`}
+                {exerciseViewData.actualReps &&
+                  exerciseViewData.actualWeight &&
+                  ` x ${exerciseViewData.actualWeight}kg`}
+                {exerciseViewData.actualReps &&
+                  exerciseViewData.actualDuration &&
+                  ` x ${formatTime(exerciseViewData.actualDuration)}`}
               </>
             ) : (
               <Typography variant="body2" color="text.secondary">

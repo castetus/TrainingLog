@@ -1,7 +1,10 @@
 import AddIcon from '@mui/icons-material/Add';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
 import {
   Box,
   Typography,
@@ -20,6 +23,7 @@ import {
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import { AchievedChip } from '@/components/Common';
 import { useExercisesController } from '@/controllers/exercisesController';
 import { useTrainingsController } from '@/controllers/trainingsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
@@ -50,6 +54,18 @@ export default function TrainingForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [editingExerciseIndex, setEditingExerciseIndex] = useState<number | null>(null);
+  const [editFormData, setEditFormData] = useState<{
+    plannedSets: number;
+    plannedReps: number;
+    plannedWeightKg?: number;
+    plannedSeconds?: number;
+  }>({
+    plannedSets: 0,
+    plannedReps: 0,
+    plannedWeightKg: undefined,
+    plannedSeconds: undefined,
+  });
 
   // Load existing training data if editing
   useEffect(() => {
@@ -205,6 +221,116 @@ export default function TrainingForm() {
       ...prev,
       exercises: prev.exercises.filter((_, i) => i !== index),
     }));
+  };
+
+  const startEditExercise = (index: number) => {
+    const exercise = formData.exercises[index];
+    setEditingExerciseIndex(index);
+    setEditFormData({
+      plannedSets: exercise.plannedSets,
+      plannedReps: exercise.plannedReps,
+      plannedWeightKg: exercise.plannedWeightKg,
+      plannedSeconds: exercise.plannedSeconds,
+    });
+  };
+
+  const cancelEditExercise = () => {
+    setEditingExerciseIndex(null);
+    setEditFormData({
+      plannedSets: 0,
+      plannedReps: 0,
+      plannedWeightKg: undefined,
+      plannedSeconds: undefined,
+    });
+  };
+
+  const validateEditForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (editFormData.plannedSets <= 0) {
+      newErrors.editSets = 'Sets must be greater than 0';
+    }
+
+    if (editFormData.plannedReps <= 0) {
+      newErrors.editReps = 'Reps must be greater than 0';
+    }
+
+    const exercise = formData.exercises[editingExerciseIndex!];
+    if (
+      exercise?.exercise.type === ExerciseType.WEIGHT &&
+      editFormData.plannedWeightKg !== undefined &&
+      editFormData.plannedWeightKg <= 0
+    ) {
+      newErrors.editWeight = 'Weight must be greater than 0';
+    }
+
+    if (
+      exercise?.exercise.type === ExerciseType.TIME &&
+      editFormData.plannedSeconds !== undefined &&
+      editFormData.plannedSeconds <= 0
+    ) {
+      newErrors.editTime = 'Duration must be greater than 0';
+    }
+
+    return newErrors;
+  };
+
+  const saveEditExercise = (index: number) => {
+    const validationErrors = validateEditForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors((prev) => ({ ...prev, ...validationErrors }));
+      return;
+    }
+
+    // Clear any previous edit errors
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.editSets;
+      delete newErrors.editReps;
+      delete newErrors.editWeight;
+      delete newErrors.editTime;
+      return newErrors;
+    });
+
+    const originalExercise = formData.exercises[index];
+
+    // Check if any parameters were increased
+    const parametersIncreased =
+      editFormData.plannedSets > originalExercise.plannedSets ||
+      editFormData.plannedReps > originalExercise.plannedReps ||
+      (editFormData.plannedWeightKg !== undefined &&
+        originalExercise.plannedWeightKg !== undefined &&
+        editFormData.plannedWeightKg > originalExercise.plannedWeightKg) ||
+      (editFormData.plannedSeconds !== undefined &&
+        originalExercise.plannedSeconds !== undefined &&
+        editFormData.plannedSeconds > originalExercise.plannedSeconds);
+
+    const updatedExercises = [...formData.exercises];
+    updatedExercises[index] = {
+      ...updatedExercises[index],
+      plannedSets: editFormData.plannedSets,
+      plannedReps: editFormData.plannedReps,
+      plannedWeightKg: editFormData.plannedWeightKg,
+      plannedSeconds: editFormData.plannedSeconds,
+      // Reset achieved flag if parameters were increased
+      plannedParametersAchieved: parametersIncreased
+        ? false
+        : originalExercise.plannedParametersAchieved,
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      exercises: updatedExercises,
+    }));
+
+    setEditingExerciseIndex(null);
+    setEditFormData({
+      plannedSets: 0,
+      plannedReps: 0,
+      plannedWeightKg: undefined,
+      plannedSeconds: undefined,
+    });
   };
 
   const validateForm = () => {
@@ -380,6 +506,9 @@ export default function TrainingForm() {
                         Weight/Duration
                       </TableCell>
                       <TableCell align="center" sx={{ width: '8%' }}>
+                        Status
+                      </TableCell>
+                      <TableCell align="center" sx={{ width: '8%' }}>
                         Actions
                       </TableCell>
                     </TableRow>
@@ -420,7 +549,30 @@ export default function TrainingForm() {
                         </TableCell>
                         <TableCell align="center">
                           <Stack alignItems="center">
-                            <Typography variant="body2">{exercise.plannedSets}</Typography>
+                            {editingExerciseIndex === index ? (
+                              <Stack alignItems="center">
+                                <TextField
+                                  type="number"
+                                  value={editFormData.plannedSets || ''}
+                                  onChange={(e) =>
+                                    setEditFormData((prev) => ({
+                                      ...prev,
+                                      plannedSets: parseInt(e.target.value) || 0,
+                                    }))
+                                  }
+                                  size="small"
+                                  sx={{ width: 60 }}
+                                  error={!!errors.editSets}
+                                />
+                                {errors.editSets && (
+                                  <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
+                                    {errors.editSets}
+                                  </FormHelperText>
+                                )}
+                              </Stack>
+                            ) : (
+                              <Typography variant="body2">{exercise.plannedSets}</Typography>
+                            )}
                             {errors[`exercise${index}Sets`] && (
                               <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
                                 {errors[`exercise${index}Sets`]}
@@ -430,7 +582,30 @@ export default function TrainingForm() {
                         </TableCell>
                         <TableCell align="center">
                           <Stack alignItems="center">
-                            <Typography variant="body2">{exercise.plannedReps || 10}</Typography>
+                            {editingExerciseIndex === index ? (
+                              <Stack alignItems="center">
+                                <TextField
+                                  type="number"
+                                  value={editFormData.plannedReps || ''}
+                                  onChange={(e) =>
+                                    setEditFormData((prev) => ({
+                                      ...prev,
+                                      plannedReps: parseInt(e.target.value) || 0,
+                                    }))
+                                  }
+                                  size="small"
+                                  sx={{ width: 60 }}
+                                  error={!!errors.editReps}
+                                />
+                                {errors.editReps && (
+                                  <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
+                                    {errors.editReps}
+                                  </FormHelperText>
+                                )}
+                              </Stack>
+                            ) : (
+                              <Typography variant="body2">{exercise.plannedReps || 10}</Typography>
+                            )}
                             {errors[`exercise${index}Reps`] && (
                               <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
                                 {errors[`exercise${index}Reps`]}
@@ -440,25 +615,109 @@ export default function TrainingForm() {
                         </TableCell>
                         <TableCell align="center">
                           <Stack alignItems="center">
-                            <Typography variant="body2">
-                              {exercise.exercise.type === ExerciseType.WEIGHT &&
-                              exercise.plannedWeightKg
-                                ? `${exercise.plannedWeightKg}kg`
-                                : exercise.exercise.type === ExerciseType.TIME &&
-                                    exercise.plannedSeconds
-                                  ? `${exercise.plannedSeconds}s`
-                                  : '—'}
-                            </Typography>
+                            {editingExerciseIndex === index ? (
+                              <Stack alignItems="center">
+                                <Stack direction="row" spacing={1}>
+                                  {exercise.exercise.type === ExerciseType.WEIGHT && (
+                                    <TextField
+                                      type="number"
+                                      value={editFormData.plannedWeightKg || ''}
+                                      onChange={(e) =>
+                                        setEditFormData((prev) => ({
+                                          ...prev,
+                                          plannedWeightKg: parseFloat(e.target.value) || undefined,
+                                        }))
+                                      }
+                                      size="small"
+                                      sx={{ width: 70 }}
+                                      placeholder="kg"
+                                      error={!!errors.editWeight}
+                                    />
+                                  )}
+                                  {exercise.exercise.type === ExerciseType.TIME && (
+                                    <TextField
+                                      type="number"
+                                      value={editFormData.plannedSeconds || ''}
+                                      onChange={(e) =>
+                                        setEditFormData((prev) => ({
+                                          ...prev,
+                                          plannedSeconds: parseInt(e.target.value) || undefined,
+                                        }))
+                                      }
+                                      size="small"
+                                      sx={{ width: 70 }}
+                                      placeholder="s"
+                                      error={!!errors.editTime}
+                                    />
+                                  )}
+                                  {exercise.exercise.type === ExerciseType.REPS_ONLY && (
+                                    <Typography variant="body2">—</Typography>
+                                  )}
+                                </Stack>
+                                {(errors.editWeight || errors.editTime) && (
+                                  <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
+                                    {errors.editWeight || errors.editTime}
+                                  </FormHelperText>
+                                )}
+                              </Stack>
+                            ) : (
+                              <Typography variant="body2">
+                                {exercise.exercise.type === ExerciseType.WEIGHT &&
+                                exercise.plannedWeightKg
+                                  ? `${exercise.plannedWeightKg}kg`
+                                  : exercise.exercise.type === ExerciseType.TIME &&
+                                      exercise.plannedSeconds
+                                    ? `${exercise.plannedSeconds}s`
+                                    : '—'}
+                              </Typography>
+                            )}
                           </Stack>
                         </TableCell>
                         <TableCell align="center">
-                          <IconButton
-                            onClick={() => removeExercise(index)}
-                            color="error"
-                            size="small"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
+                          <AchievedChip show={exercise.plannedParametersAchieved} />
+                        </TableCell>
+                        <TableCell align="center">
+                          <Stack direction="row" spacing={0.5} justifyContent="center">
+                            {editingExerciseIndex === index ? (
+                              <>
+                                <IconButton
+                                  onClick={() => saveEditExercise(index)}
+                                  color="success"
+                                  size="small"
+                                  title="Save changes"
+                                >
+                                  <SaveIcon />
+                                </IconButton>
+                                <IconButton
+                                  onClick={cancelEditExercise}
+                                  color="inherit"
+                                  size="small"
+                                  title="Cancel editing"
+                                >
+                                  <CancelIcon />
+                                </IconButton>
+                              </>
+                            ) : (
+                              <>
+                                <IconButton
+                                  onClick={() => startEditExercise(index)}
+                                  color="primary"
+                                  size="small"
+                                  title="Edit exercise parameters"
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                  onClick={() => removeExercise(index)}
+                                  color="error"
+                                  size="small"
+                                  title="Remove exercise"
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </>
+                            )}
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     ))}

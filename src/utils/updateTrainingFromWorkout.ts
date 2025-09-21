@@ -71,8 +71,8 @@ export const updateTrainingFromWorkout = (
         updatedExercise.plannedReps = lastSet.actualReps;
       }
 
-      // Set achieved flag since they exceeded
-      updatedExercise.plannedParametersAchieved = true;
+      // Reset achieved flag since parameters were increased to new targets
+      updatedExercise.plannedParametersAchieved = false;
 
       // Replace the exercise in the training
       updatedTraining.exercises[exerciseIndex] = updatedExercise;

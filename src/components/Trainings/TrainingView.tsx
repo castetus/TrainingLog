@@ -20,6 +20,7 @@ import { Routes } from '@/router/routes';
 import type { Training, TrainingExercise } from '@/types/trainings';
 import { formatTime } from '@/utils';
 import IncreasePlannedValuesModal from './IncreasePlannedValuesModal';
+import { AchievedChip } from '@/components/Common';
 
 interface TrainingViewProps {
   training: Training;
@@ -136,15 +137,6 @@ export default function TrainingView({ training, onUpdateTraining }: TrainingVie
                         >
                           {trainingExercise.exercise.name}
                         </Typography>
-                        {trainingExercise.plannedParametersAchieved && (
-                          <Chip
-                            icon={<TrendingUpIcon />}
-                            label="Achieved"
-                            color="success"
-                            size="small"
-                            variant="outlined"
-                          />
-                        )}
                       </Stack>
                       <Typography variant="caption" color="text.secondary">
                         {trainingExercise.exercise.description}
@@ -168,9 +160,12 @@ export default function TrainingView({ training, onUpdateTraining }: TrainingVie
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {trainingExercise.notes}
-                    </Typography>
+                    <Stack spacing={1}>
+                      <Typography variant="body2" color="text.secondary">
+                        {trainingExercise.notes}
+                      </Typography>
+                      <AchievedChip show={trainingExercise.plannedParametersAchieved} />
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))}
