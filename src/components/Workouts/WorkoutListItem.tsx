@@ -56,7 +56,7 @@ export default function WorkoutListItem({ workout }: WorkoutListItemProps) {
                   {workout.description}
                 </Typography>
               )}
-                {workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}
+              {workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}
             </>
           }
         />

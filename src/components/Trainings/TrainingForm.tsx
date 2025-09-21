@@ -25,6 +25,7 @@ import { useTrainingsController } from '@/controllers/trainingsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
 import type { Exercise } from '@/types/exercises';
+import { ExerciseType } from '@/types/exercises';
 import type { TrainingFormData, TrainingExercise } from '@/types/trainings';
 
 import AddExerciseSubform from './AddExerciseSubform';
@@ -368,14 +369,17 @@ export default function TrainingForm() {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ width: '35%' }}>Exercise</TableCell>
-                      <TableCell align="center" sx={{ width: '12%' }}>
+                      <TableCell sx={{ width: '30%' }}>Exercise</TableCell>
+                      <TableCell align="center" sx={{ width: '10%' }}>
                         Sets
                       </TableCell>
-                      <TableCell align="center" sx={{ width: '12%' }}>
+                      <TableCell align="center" sx={{ width: '10%' }}>
                         Reps
                       </TableCell>
-                      <TableCell align="center" sx={{ width: '6%' }}>
+                      <TableCell align="center" sx={{ width: '12%' }}>
+                        Weight/Duration
+                      </TableCell>
+                      <TableCell align="center" sx={{ width: '8%' }}>
                         Actions
                       </TableCell>
                     </TableRow>
@@ -432,6 +436,19 @@ export default function TrainingForm() {
                                 {errors[`exercise${index}Reps`]}
                               </FormHelperText>
                             )}
+                          </Stack>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Stack alignItems="center">
+                            <Typography variant="body2">
+                              {exercise.exercise.type === ExerciseType.WEIGHT &&
+                              exercise.plannedWeightKg
+                                ? `${exercise.plannedWeightKg}kg`
+                                : exercise.exercise.type === ExerciseType.TIME &&
+                                    exercise.plannedSeconds
+                                  ? `${exercise.plannedSeconds}s`
+                                  : '—'}
+                            </Typography>
                           </Stack>
                         </TableCell>
                         <TableCell align="center">

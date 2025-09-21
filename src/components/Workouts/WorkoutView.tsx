@@ -36,9 +36,7 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
           <Chip label={formatDate(workout.date)} color="primary" />
           {workout.duration ? (
             <Chip label={formatDuration(workout.duration)} color="secondary" />
-          ) : (
-            <Chip label="Not recorded" color="default" variant="outlined" />
-          )}
+          ) : ''}
         </Stack>
         {workout.description && (
           <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
