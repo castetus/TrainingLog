@@ -52,6 +52,9 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   // Track if workout has been finished to disable navigation blocking
   const [isWorkoutFinished, setIsWorkoutFinished] = useState(false);
 
+  // Track if user is intentionally finishing workout (to avoid navigation blocking)
+  const [isFinishingWorkout, setIsFinishingWorkout] = useState(false);
+
   // Navigation blocker for preventing accidental exits
   const confirmExit = useCallback(async () => {
     return await confirm({
@@ -64,7 +67,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     });
   }, [confirm]);
 
-  const shouldBlockNavigation = !isWorkoutFinished && !showUpdateModal;
+  const shouldBlockNavigation = !isWorkoutFinished && !showUpdateModal && !isFinishingWorkout;
 
   useNavigationBlocker({
     when: shouldBlockNavigation, // Block navigation when workout is active and not in update modal
@@ -135,6 +138,8 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   };
 
   const handleFinishWorkout = async () => {
+    setIsFinishingWorkout(true);
+
     const confirmed = await confirm({
       title: 'Finish Workout',
       message: 'Are you sure you want to finish this workout? This action cannot be undone.',
@@ -191,6 +196,9 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
         console.error('Failed to finish workout:', error);
         // Error is already handled by the controller
       }
+    } else {
+      // User cancelled finishing workout, reset the flag
+      setIsFinishingWorkout(false);
     }
   };
 
@@ -342,6 +350,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           onClose={() => {
             setShowUpdateModal(false);
             setPerformanceAnalysis(null);
+            setIsFinishingWorkout(false); // Reset finishing flag
             setIsWorkoutFinished(true);
             navigate(Routes.HOME);
           }}
@@ -350,6 +359,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
               if (!workout.trainingId || !performanceAnalysis) {
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
+                setIsFinishingWorkout(false); // Reset finishing flag
                 setIsWorkoutFinished(true);
                 navigate(Routes.HOME);
                 return;
@@ -361,6 +371,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 console.error('Training not found:', workout.trainingId);
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
+                setIsFinishingWorkout(false); // Reset finishing flag
                 setIsWorkoutFinished(true);
                 navigate(Routes.HOME);
                 return;
@@ -372,6 +383,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
                 console.error('Failed to update training:', updateResult.error);
                 setShowUpdateModal(false);
                 setPerformanceAnalysis(null);
+                setIsFinishingWorkout(false); // Reset finishing flag
                 setIsWorkoutFinished(true);
                 navigate(Routes.HOME);
                 return;
@@ -394,6 +406,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
             } finally {
               setShowUpdateModal(false);
               setPerformanceAnalysis(null);
+              setIsFinishingWorkout(false); // Reset finishing flag
               setIsWorkoutFinished(true);
               navigate(Routes.HOME);
             }
