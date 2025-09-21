@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useBlocker } from 'react-router-dom';
 
 interface UseNavigationBlockerOptions {
   when: boolean;
@@ -14,9 +14,29 @@ export const useNavigationBlocker = ({
   onCancelExit,
   confirmExit,
 }: UseNavigationBlockerOptions) => {
-  const location = useLocation();
-  const isBlocked = useRef(false);
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      when && currentLocation.pathname !== nextLocation.pathname,
+  );
 
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      const handleConfirm = async () => {
+        const confirmed = await confirmExit();
+        if (confirmed) {
+          onConfirmExit();
+          blocker.proceed();
+        } else {
+          onCancelExit();
+          blocker.reset();
+        }
+      };
+
+      handleConfirm();
+    }
+  }, [blocker, confirmExit, onConfirmExit, onCancelExit]);
+
+  // Also handle browser refresh/close
   useEffect(() => {
     if (!when) return;
 
@@ -26,41 +46,10 @@ export const useNavigationBlocker = ({
       return 'You have an active workout session. Are you sure you want to leave?';
     };
 
-    // Use a more reliable approach for back button detection
-    const handlePopState = async (event: PopStateEvent) => {
-      if (isBlocked.current) return;
-
-      // Prevent the default navigation
-      event.preventDefault();
-      isBlocked.current = true;
-
-      try {
-        const confirmed = await confirmExit();
-
-        if (confirmed) {
-          onConfirmExit();
-        } else {
-          onCancelExit();
-          // Push the current location back to the history stack
-          window.history.pushState(null, '', location.pathname);
-        }
-      } catch (error) {
-        // If confirmation fails, stay on current page
-        onCancelExit();
-        window.history.pushState(null, '', location.pathname);
-      } finally {
-        isBlocked.current = false;
-      }
-    };
-
-    // Add event listeners
     window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('popstate', handlePopState, { capture: true });
 
-    // Cleanup
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('popstate', handlePopState, { capture: true });
     };
-  }, [when, onConfirmExit, onCancelExit, confirmExit, location.pathname]);
+  }, [when]);
 };
