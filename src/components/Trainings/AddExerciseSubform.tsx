@@ -1,4 +1,4 @@
-import { Box, Typography, TextField, Stack, Autocomplete } from '@mui/material';
+import { Box, Typography, TextField, Stack, Autocomplete, FormHelperText } from '@mui/material';
 
 import type { Exercise } from '@/types/exercises';
 import { ExerciseType } from '@/types/exercises';
@@ -20,6 +20,11 @@ interface AddExerciseSubformProps {
   onDurationChange: (duration: number) => void;
   onNotesChange: (notes: string) => void;
   mockExercises: Exercise[];
+  errors?: {
+    exercise?: string;
+    sets?: string;
+    reps?: string;
+  };
 }
 
 export default function AddExerciseSubform({
@@ -32,6 +37,7 @@ export default function AddExerciseSubform({
   onDurationChange,
   onNotesChange,
   mockExercises,
+  errors = {},
 }: AddExerciseSubformProps) {
   if (!showAddExerciseForm) return null;
 
@@ -70,8 +76,16 @@ export default function AddExerciseSubform({
             )}
             size="small"
             sx={{ flexGrow: 1 }}
-            renderInput={(params) => <TextField {...params} size="small" />}
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                size="small" 
+                error={!!errors.exercise}
+                helperText={errors.exercise}
+              />
+            )}
           />
+          {errors.exercise && <FormHelperText error>{errors.exercise}</FormHelperText>}
         </Stack>
 
         <Stack direction="row" spacing={2} alignItems="center">
@@ -96,6 +110,8 @@ export default function AddExerciseSubform({
             disabled={!newExerciseData.exercise}
             size="small"
             sx={{ width: 100 }}
+            error={!!errors.sets}
+            helperText={errors.sets}
           />
         </Stack>
 
@@ -197,6 +213,8 @@ export default function AddExerciseSubform({
                 disabled={!newExerciseData.exercise}
                 size="small"
                 sx={{ width: 100 }}
+                error={!!errors.reps}
+                helperText={errors.reps}
               />
             </Stack>
             <Typography variant="caption" color="text.secondary" sx={{ ml: 10 }}>

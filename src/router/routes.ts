@@ -1,7 +1,7 @@
 const BASE_URL = '/TrainingLog';
 
 export enum Routes {
-  HOME = `${BASE_URL}/`,
+  HOME = `/`,
   WORKOUT_NEW = `${BASE_URL}/workouts/new`,
   WORKOUT_FLOW = `${BASE_URL}/workouts/:id/flow`,
   WORKOUT_DETAIL = `${BASE_URL}/workouts/:id`,

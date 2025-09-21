@@ -84,16 +84,22 @@ export default function TrainingForm() {
     }
   };
 
-  const handleExerciseChange = useCallback((exercise: Exercise) => {
-    setNewExerciseData((prev) => ({
-      ...prev,
-      exercise,
-      plannedSets: 0,
-      plannedReps: 0,
-      plannedWeight: 0,
-      plannedDuration: 0,
-    }));
-  }, []);
+  const handleExerciseChange = useCallback(
+    (exercise: Exercise) => {
+      setNewExerciseData((prev) => ({
+        ...prev,
+        exercise,
+        plannedSets: 0,
+        plannedReps: 0,
+        plannedWeight: 0,
+        plannedDuration: 0,
+      }));
+      if (errors.newExercise) {
+        setErrors((prev) => ({ ...prev, newExercise: '' }));
+      }
+    },
+    [errors.newExercise],
+  );
 
   const [showAddExerciseForm, setShowAddExerciseForm] = useState(false);
   const [newExerciseData, setNewExerciseData] = useState<{
@@ -116,23 +122,58 @@ export default function TrainingForm() {
     setShowAddExerciseForm(true);
   };
 
-  const handleAddExercise = () => {
+  const validateNewExercise = () => {
+    const newErrors: Record<string, string> = {};
+
     if (!newExerciseData.exercise) {
-      return; // Don't add if no exercise is selected
+      newErrors.newExercise = 'Exercise selection is required';
+    }
+    if (newExerciseData.plannedSets < 1) {
+      newErrors.newSets = 'Sets must be at least 1';
+    }
+    if (newExerciseData.plannedReps < 1) {
+      newErrors.newReps = 'Reps must be at least 1';
+    }
+
+    return newErrors;
+  };
+
+  const handleAddExercise = () => {
+    const validationErrors = validateNewExercise();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors((prev) => ({ ...prev, ...validationErrors }));
+      return; // Don't add if validation fails
     }
 
     const newExercise: TrainingExercise = {
-      exercise: newExerciseData.exercise,
+      exercise: newExerciseData.exercise!,
       plannedSets: newExerciseData.plannedSets,
       plannedReps: newExerciseData.plannedReps,
-      plannedWeightKg: newExerciseData.plannedWeight > 0 ? newExerciseData.plannedWeight : undefined,
-      plannedSeconds: newExerciseData.plannedDuration > 0 ? newExerciseData.plannedDuration : undefined,
+      plannedWeightKg:
+        newExerciseData.plannedWeight > 0 ? newExerciseData.plannedWeight : undefined,
+      plannedSeconds:
+        newExerciseData.plannedDuration > 0 ? newExerciseData.plannedDuration : undefined,
       notes: newExerciseData.notes,
     };
     setFormData((prev) => ({
       ...prev,
       exercises: [...prev.exercises, newExercise],
     }));
+
+    // Clear exercises error if it exists
+    if (errors.exercises) {
+      setErrors((prev) => ({ ...prev, exercises: '' }));
+    }
+
+    // Clear any previous validation errors for new exercise
+    setErrors((prev) => {
+      const rest = { ...prev };
+      delete rest.newExercise;
+      delete rest.newSets;
+      delete rest.newReps;
+      return rest;
+    });
 
     setShowAddExerciseForm(false);
     // Reset form data
@@ -289,12 +330,18 @@ export default function TrainingForm() {
               showAddExerciseForm={showAddExerciseForm}
               newExerciseData={newExerciseData}
               onExerciseChange={handleExerciseChange}
-              onSetsChange={(sets) =>
-                setNewExerciseData((prev) => ({ ...prev, plannedSets: sets }))
-              }
-              onRepsChange={(reps) =>
-                setNewExerciseData((prev) => ({ ...prev, plannedReps: reps }))
-              }
+              onSetsChange={(sets) => {
+                setNewExerciseData((prev) => ({ ...prev, plannedSets: sets }));
+                if (errors.newSets) {
+                  setErrors((prev) => ({ ...prev, newSets: '' }));
+                }
+              }}
+              onRepsChange={(reps) => {
+                setNewExerciseData((prev) => ({ ...prev, plannedReps: reps }));
+                if (errors.newReps) {
+                  setErrors((prev) => ({ ...prev, newReps: '' }));
+                }
+              }}
               onWeightChange={(weight) =>
                 setNewExerciseData((prev) => ({ ...prev, plannedWeight: weight }))
               }
@@ -303,6 +350,11 @@ export default function TrainingForm() {
               }
               onNotesChange={(notes) => setNewExerciseData((prev) => ({ ...prev, notes }))}
               mockExercises={Object.values(exercisesById)}
+              errors={{
+                exercise: errors.newExercise,
+                sets: errors.newSets,
+                reps: errors.newReps,
+              }}
             />
 
             {errors.exercises && <FormHelperText error>{errors.exercises}</FormHelperText>}
@@ -355,13 +407,32 @@ export default function TrainingForm() {
                             <Typography variant="body2" color="text.secondary">
                               {exercise.exercise.description}
                             </Typography>
+                            {errors[`exercise${index}Exercise`] && (
+                              <FormHelperText error sx={{ mt: 0.5 }}>
+                                {errors[`exercise${index}Exercise`]}
+                              </FormHelperText>
+                            )}
                           </Stack>
                         </TableCell>
                         <TableCell align="center">
-                          <Typography variant="body2">{exercise.plannedSets}</Typography>
+                          <Stack alignItems="center">
+                            <Typography variant="body2">{exercise.plannedSets}</Typography>
+                            {errors[`exercise${index}Sets`] && (
+                              <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
+                                {errors[`exercise${index}Sets`]}
+                              </FormHelperText>
+                            )}
+                          </Stack>
                         </TableCell>
                         <TableCell align="center">
-                          <Typography variant="body2">{exercise.plannedReps || 10}</Typography>
+                          <Stack alignItems="center">
+                            <Typography variant="body2">{exercise.plannedReps || 10}</Typography>
+                            {errors[`exercise${index}Reps`] && (
+                              <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
+                                {errors[`exercise${index}Reps`]}
+                              </FormHelperText>
+                            )}
+                          </Stack>
                         </TableCell>
                         <TableCell align="center">
                           <IconButton
@@ -404,7 +475,7 @@ export default function TrainingForm() {
             <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
               Cancel
             </Button>
-            <Button type="submit" variant="contained" disabled={isLoading}>
+            <Button type="submit" variant="contained" disabled={isLoading} onClick={handleSubmit}>
               {isLoading
                 ? isEditing
                   ? 'Updating...'
