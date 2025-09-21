@@ -27,6 +27,7 @@ import { useTrainingsController } from '@/controllers/trainingsController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
+import { ExerciseType } from '@/types/exercises';
 import type { CreateWorkoutData } from '@/types/workouts';
 import { formatShortDate } from '@/utils';
 
@@ -308,8 +309,12 @@ export default function WorkoutForm() {
                         <TableCell align="center">
                           <Typography variant="body2">
                             {exercise.plannedReps} reps
-                            {exercise.plannedWeight && ` @ ${exercise.plannedWeight}kg`}
-                            {exercise.plannedDuration && ` @ ${exercise.plannedDuration}s`}
+                            {exercise.exercise.type === ExerciseType.WEIGHT &&
+                              exercise.plannedWeight &&
+                              ` X ${exercise.plannedWeight}kg`}
+                            {exercise.exercise.type === ExerciseType.TIME &&
+                              exercise.plannedDuration &&
+                              ` X ${exercise.plannedDuration}s`}
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
