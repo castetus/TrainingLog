@@ -33,7 +33,7 @@ export default function Navbar() {
   };
 
   return (
-    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9000 }} elevation={3}>
       <BottomNavigation
         showLabels
         value={getCurrentRoute()}

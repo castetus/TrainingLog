@@ -3,7 +3,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
 import PaletteIcon from '@mui/icons-material/Palette';
-import SettingsIcon from '@mui/icons-material/Settings';
+// import SettingsIcon from '@mui/icons-material/Settings';
 import StorageIcon from '@mui/icons-material/Storage';
 import UploadIcon from '@mui/icons-material/Upload';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -46,7 +46,7 @@ export default function SettingsPage() {
   const { create: createExercise, loadAll: loadExercises } = useExercisesController();
   const { mode, toggleMode } = useTheme();
   // const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [autoSave, setAutoSave] = useState(true);
+  // const [autoSave, setAutoSave] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -61,9 +61,9 @@ export default function SettingsPage() {
   //   setNotificationsEnabled(!notificationsEnabled);
   // };
 
-  const handleAutoSaveToggle = () => {
-    setAutoSave(!autoSave);
-  };
+  // const handleAutoSaveToggle = () => {
+  //   setAutoSave(!autoSave);
+  // };
 
   const handleDeleteWorkout = (workoutId: string, workoutName: string) => {
     setWorkoutToDelete({ id: workoutId, name: workoutName });
@@ -246,7 +246,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* General Settings */}
-        <Card>
+        {/* <Card>
           <CardHeader
             avatar={<SettingsIcon color="primary" />}
             title="General Settings"
@@ -265,7 +265,7 @@ export default function SettingsPage() {
               </Typography>
             </Stack>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Appearance Settings */}
         <Card>
@@ -363,7 +363,7 @@ export default function SettingsPage() {
                 />
               </ListItem> */}
               <Divider />
-              <ListItem>
+              <ListItem style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <ListItemText
                   primary="Clear Cache"
                   secondary="Remove temporary cached assets and refresh the app (data is preserved)"
