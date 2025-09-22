@@ -33,12 +33,13 @@ import {
 import { useState } from 'react';
 
 import { useWorkoutsController } from '@/controllers/workoutsController';
+import { useTheme } from '@/providers/themeProvider';
 import { formatShortDate } from '@/utils';
 
 export default function SettingsPage() {
   const { list: workouts, loadAll, remove } = useWorkoutsController();
+  const { mode, toggleMode } = useTheme();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [autoSave, setAutoSave] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<{ id: string; name: string } | null>(null);
@@ -47,10 +48,6 @@ export default function SettingsPage() {
 
   const handleNotificationToggle = () => {
     setNotificationsEnabled(!notificationsEnabled);
-  };
-
-  const handleDarkModeToggle = () => {
-    setDarkMode(!darkMode);
   };
 
   const handleAutoSaveToggle = () => {
@@ -64,7 +61,7 @@ export default function SettingsPage() {
 
   const handleConfirmDelete = async () => {
     if (!workoutToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       await remove(workoutToDelete.id);
@@ -187,9 +184,7 @@ export default function SettingsPage() {
           <CardContent>
             <Stack spacing={2}>
               <FormControlLabel
-                control={
-                  <Switch checked={darkMode} onChange={handleDarkModeToggle} color="primary" />
-                }
+                control={<Switch checked={mode === 'dark'} onChange={toggleMode} color="primary" />}
                 label="Dark mode"
               />
               <Typography variant="body2" color="text.secondary">
@@ -295,7 +290,8 @@ export default function SettingsPage() {
             Are you sure you want to delete "{workoutToDelete?.name}"?
           </Typography>
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            <strong>Warning:</strong> This action cannot be undone. The workout and all its data will be permanently deleted.
+            <strong>Warning:</strong> This action cannot be undone. The workout and all its data
+            will be permanently deleted.
           </Typography>
         </DialogContent>
         <DialogActions>
