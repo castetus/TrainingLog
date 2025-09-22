@@ -50,7 +50,7 @@ export default function WorkoutsPage() {
 
   if (isFlowRoute && workout) {
     return (
-      <NestedPageLayout title={workout.name} subtitle="Workout Session">
+      <NestedPageLayout title={workout.name} subtitle="Workout Session" hideBackButton>
         <WorkoutFlow workout={workout} />
       </NestedPageLayout>
     );

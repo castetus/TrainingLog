@@ -1,3 +1,4 @@
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import {
   Box,
   Typography,
@@ -10,9 +11,12 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Button,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import type { Workout } from '@/types/workouts';
+import { Routes } from '@/router/routes';
 import { formatLongDate, formatMediumDate, formatDuration } from '@/utils';
 
 import WorkoutViewItem from './WorkoutViewItem';
@@ -22,8 +26,16 @@ interface WorkoutViewProps {
 }
 
 export default function WorkoutView({ workout }: WorkoutViewProps) {
+  const navigate = useNavigate();
+
+  console.log('workout', workout);
+  
   const formatDate = (dateString: string) => {
     return formatLongDate(dateString);
+  };
+
+  const handleContinueWorkout = () => {
+    navigate(Routes.WORKOUT_FLOW.replace(':id', workout.id));
   };
 
   return (
@@ -45,6 +57,21 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
           <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
             {workout.description}
           </Typography>
+        )}
+        
+        {/* Continue Workout Button for Incomplete Workouts */}
+        {workout.incompleted && (
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<PlayArrowIcon />}
+              onClick={handleContinueWorkout}
+              size="large"
+            >
+              Continue Workout
+            </Button>
+          </Box>
         )}
       </Box>
 

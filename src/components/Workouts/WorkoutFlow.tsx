@@ -40,9 +40,12 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   const { update: updateExercise } = useExercisesController();
   const navigate = useNavigate();
 
-  // Track workout duration
+  // Track workout duration - start from saved duration if resuming
   const [startTime] = useState<Date>(new Date());
-  const [currentDuration, setCurrentDuration] = useState<number>(0);
+  const [currentDuration, setCurrentDuration] = useState<number>(() => {
+    // If resuming an incomplete workout, start from saved duration
+    return workout.duration ? workout.duration * 60 : 0; // Convert minutes to seconds
+  });
 
   // State for performance analysis modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -76,11 +79,17 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   useNavigationBlocker({
     when: shouldBlockNavigation, // Block navigation when workout is active and not in update modal
     onConfirmExit: async () => {
+      // Disable navigation blocking immediately to prevent double confirmation
+      setIsWorkoutFinished(true);
+      
       try {
-        // Calculate current duration when leaving (in minutes for database)
-        const currentDurationMinutes = Math.floor(
-          (new Date().getTime() - startTime.getTime()) / (1000 * 60),
+        // Calculate total duration when leaving (in minutes for database)
+        const sessionDurationInSeconds = Math.floor(
+          (new Date().getTime() - startTime.getTime()) / 1000,
         );
+        const initialDurationInSeconds = workout.duration ? workout.duration * 60 : 0;
+        const totalDurationInSeconds = initialDurationInSeconds + sessionDurationInSeconds;
+        const currentDurationMinutes = Math.floor(totalDurationInSeconds / 60);
 
         // Prepare workout with current actual sets data
         const workoutWithCurrentResults = {
@@ -97,7 +106,6 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           duration: currentDurationMinutes,
           exercises: workoutWithCurrentResults.exercises,
           incompleted: true,
-          completed: false,
         });
 
         // Update exercise lastSet values with current performance
@@ -106,8 +114,9 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
         console.log('Workout saved with incomplete status');
       } catch (error) {
         console.error('Failed to save workout progress:', error);
+        // Reset the flag if there was an error
+        setIsWorkoutFinished(false);
       } finally {
-        setIsWorkoutFinished(true);
         navigate(Routes.HOME);
       }
     },
@@ -134,12 +143,13 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const durationInSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
-      setCurrentDuration(durationInSeconds);
+      const sessionDurationInSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+      const initialDurationInSeconds = workout.duration ? workout.duration * 60 : 0;
+      setCurrentDuration(initialDurationInSeconds + sessionDurationInSeconds);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startTime]);
+  }, [startTime, workout.duration]);
 
   // Format duration for display
   const formatDuration = (seconds: number): string => {
@@ -187,10 +197,13 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
       setIsWorkoutPaused(true);
       
       try {
-        // Calculate current duration when pausing (in minutes for database)
-        const currentDurationMinutes = Math.floor(
-          (new Date().getTime() - startTime.getTime()) / (1000 * 60),
+        // Calculate total duration when pausing (in minutes for database)
+        const sessionDurationInSeconds = Math.floor(
+          (new Date().getTime() - startTime.getTime()) / 1000,
         );
+        const initialDurationInSeconds = workout.duration ? workout.duration * 60 : 0;
+        const totalDurationInSeconds = initialDurationInSeconds + sessionDurationInSeconds;
+        const currentDurationMinutes = Math.floor(totalDurationInSeconds / 60);
 
         // Prepare workout with current actual sets data
         const workoutWithCurrentResults = {
@@ -236,10 +249,13 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
 
     if (confirmed) {
       try {
-        // Calculate final duration when finishing (in minutes for database)
-        const finalDurationMinutes = Math.floor(
-          (new Date().getTime() - startTime.getTime()) / (1000 * 60),
+        // Calculate total duration when finishing (in minutes for database)
+        const sessionDurationInSeconds = Math.floor(
+          (new Date().getTime() - startTime.getTime()) / 1000,
         );
+        const initialDurationInSeconds = workout.duration ? workout.duration * 60 : 0;
+        const totalDurationInSeconds = initialDurationInSeconds + sessionDurationInSeconds;
+        const finalDurationMinutes = Math.floor(totalDurationInSeconds / 60);
 
         // Prepare workout with actual sets data - ensure we have the latest data
         const workoutWithResults = {

@@ -276,6 +276,18 @@ export default function WorkoutForm() {
             />
           </Stack>
 
+          {/* Form Actions */}
+          <Stack direction="row" justifyContent="center">
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isLoading || trainings.length === 0 || !selectedTrainingId}
+              startIcon={<PlayArrowIcon />}
+            >
+              {isLoading ? 'Starting...' : 'Start Workout'}
+            </Button>
+          </Stack>
+
           {/* Exercises Preview */}
           {formData.exercises.length > 0 && (
             <Stack spacing={1.5}>
@@ -298,7 +310,6 @@ export default function WorkoutForm() {
                             <Typography variant="subtitle2" fontWeight="medium">
                               {exercise.exercise.name}
                             </Typography>
-
                           </Stack>
                         </TableCell>
                         <TableCell align="center">
@@ -328,18 +339,6 @@ export default function WorkoutForm() {
 
           {/* Error Messages */}
           {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
-
-          {/* Form Actions */}
-          <Stack direction="row" justifyContent="flex-end">
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={isLoading || trainings.length === 0 || !selectedTrainingId}
-              startIcon={<PlayArrowIcon />}
-            >
-              {isLoading ? 'Starting...' : 'Start Workout'}
-            </Button>
-          </Stack>
         </Stack>
       </Box>
     </NestedPageLayout>

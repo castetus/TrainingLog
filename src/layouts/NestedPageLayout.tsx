@@ -14,6 +14,8 @@ interface NestedPageLayoutProps {
   children: ReactNode;
   /** Optional custom back button behavior */
   onBack?: () => void;
+  /** Hide the back button */
+  hideBackButton?: boolean;
 }
 
 export default function NestedPageLayout({
@@ -22,13 +24,16 @@ export default function NestedPageLayout({
   subtitle,
   children,
   onBack,
+  hideBackButton = false,
 }: NestedPageLayoutProps) {
   return (
     <Container maxWidth="xl" sx={{ py: 1 }} disableGutters>
       <Stack spacing={2}>
         {/* Header with back button and title */}
         <Stack direction="row" alignItems="flex-start" spacing={1.5}>
-          <BackButton to={backTo} onClick={onBack} sx={{ mt: 0.5 }} />
+          {!hideBackButton && (
+            <BackButton to={backTo} onClick={onBack} sx={{ mt: 0.5 }} />
+          )}
           <Box sx={{ flex: 1 }}>
             <Typography variant="h4" component="h1" gutterBottom>
               {title}
