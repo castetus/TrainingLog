@@ -12,25 +12,19 @@ export interface BaseExercise {
   description?: string;
   /** optional video tutorial URL */
   videoUrl?: string;
-  /** total number of sets (must equal reps.length) */
-  sets: number;
-  /** repeats per set */
-  reps: number[];
 }
 
 /** Weight-based exercise */
 export interface WeightExercise extends BaseExercise {
   type: ExerciseType.WEIGHT;
-  /** weight per set, length must equal sets */
-  weightKg: number[];
+  /** last set weight in kg */
   lastSetWeightKg?: number;
 }
 
 /** Time-based exercise */
 export interface TimeExercise extends BaseExercise {
   type: ExerciseType.TIME;
-  /** duration per set, in seconds */
-  seconds: number[];
+  /** last set duration in seconds */
   lastSetSeconds?: number;
 }
 

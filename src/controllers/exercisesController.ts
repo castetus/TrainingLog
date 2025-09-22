@@ -27,40 +27,31 @@ export const useExercisesController = () => {
     return db.exercises.get(id);
   }, []);
 
-  const create = useCallback(
-    async (draft: Exercise) => {
-      const withId = draft.id ? draft : { ...draft, id: crypto.randomUUID() };
-      const saved = await db.exercises.put(withId);
-      setExercises(prev => [...prev.filter(e => e.id !== saved.id), saved]);
-      return saved;
-    },
-    [],
-  );
+  const create = useCallback(async (draft: Exercise) => {
+    const withId = draft.id ? draft : { ...draft, id: crypto.randomUUID() };
+    const saved = await db.exercises.put(withId);
+    setExercises((prev) => [...prev.filter((e) => e.id !== saved.id), saved]);
+    return saved;
+  }, []);
 
-  const update = useCallback(
-    async (draft: Exercise) => {
-      const saved = await db.exercises.put(draft);
-      setExercises(prev => prev.map(e => e.id === saved.id ? saved : e));
-      return saved;
-    },
-    [],
-  );
+  const update = useCallback(async (draft: Exercise) => {
+    const saved = await db.exercises.put(draft);
+    setExercises((prev) => prev.map((e) => (e.id === saved.id ? saved : e)));
+    return saved;
+  }, []);
 
-  const remove = useCallback(
-    async (id: string) => {
-      await db.exercises.remove(id);
-      setExercises(prev => prev.filter(e => e.id !== id));
-    },
-    [],
-  );
+  const remove = useCallback(async (id: string) => {
+    await db.exercises.remove(id);
+    setExercises((prev) => prev.filter((e) => e.id !== id));
+  }, []);
 
-  return { 
-    list: exercises, 
-    isLoading, 
-    loadAll, 
-    findById, 
-    create, 
-    update, 
-    remove 
+  return {
+    list: exercises,
+    isLoading,
+    loadAll,
+    findById,
+    create,
+    update,
+    remove,
   };
 };

@@ -1,10 +1,11 @@
 import DeleteIcon from '@mui/icons-material/Delete';
+import DownloadIcon from '@mui/icons-material/Download';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import PaletteIcon from '@mui/icons-material/Palette';
 import SettingsIcon from '@mui/icons-material/Settings';
 import StorageIcon from '@mui/icons-material/Storage';
+import UploadIcon from '@mui/icons-material/Upload';
 import WarningIcon from '@mui/icons-material/Warning';
 import {
   Box,
@@ -19,7 +20,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Chip,
   Button,
@@ -32,23 +32,33 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 
+import { useExercisesController } from '@/controllers/exercisesController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
 import { useTheme } from '@/providers/themeProvider';
 import { formatShortDate } from '@/utils';
+import {
+  importExercisesFromFile,
+  createImportTemplate,
+  type ImportResult,
+} from '@/utils/exerciseImport';
 
 export default function SettingsPage() {
   const { list: workouts, loadAll, remove } = useWorkoutsController();
+  const { create: createExercise, loadAll: loadExercises } = useExercisesController();
   const { mode, toggleMode } = useTheme();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  // const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showWorkoutManagement, setShowWorkoutManagement] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
 
-  const handleNotificationToggle = () => {
-    setNotificationsEnabled(!notificationsEnabled);
-  };
+  // const handleNotificationToggle = () => {
+  //   setNotificationsEnabled(!notificationsEnabled);
+  // };
 
   const handleAutoSaveToggle = () => {
     setAutoSave(!autoSave);
@@ -82,6 +92,60 @@ export default function SettingsPage() {
 
   const toggleWorkoutManagement = () => {
     setShowWorkoutManagement(!showWorkoutManagement);
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleImportExercises(file);
+    }
+    // Reset input value to allow selecting the same file again
+    event.target.value = '';
+  };
+
+  const handleImportExercises = async (file: File) => {
+    setIsImporting(true);
+    setImportResult(null);
+
+    try {
+      const result = await importExercisesFromFile(file);
+      setImportResult(result);
+
+      if (result.success && result.exercises.length > 0) {
+        // Save exercises to database
+        for (const exercise of result.exercises) {
+          await createExercise(exercise);
+        }
+        await loadExercises(); // Refresh exercises list
+      }
+    } catch (error) {
+      console.error('Import failed:', error);
+      setImportResult({
+        success: false,
+        importedCount: 0,
+        errors: [`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`],
+        exercises: [],
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const template = createImportTemplate();
+    const dataStr = JSON.stringify(template, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'exercise-template.json';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCloseImportDialog = () => {
+    setShowImportDialog(false);
+    setImportResult(null);
   };
 
   return (
@@ -127,12 +191,8 @@ export default function SettingsPage() {
                 <List>
                   {workouts.map((workout, index) => (
                     <div key={workout.id}>
-                      <ListItem>
-                        <ListItemText
-                          primary={workout.name}
-                          secondary={`${formatShortDate(workout.date)} • ${workout.exercises.length} exercises`}
-                        />
-                        <ListItemSecondaryAction>
+                      <ListItem
+                        secondaryAction={
                           <IconButton
                             edge="end"
                             aria-label="delete workout"
@@ -141,7 +201,12 @@ export default function SettingsPage() {
                           >
                             <DeleteIcon />
                           </IconButton>
-                        </ListItemSecondaryAction>
+                        }
+                      >
+                        <ListItemText
+                          primary={workout.name}
+                          secondary={`${formatShortDate(workout.date)} • ${workout.exercises.length} exercises`}
+                        />
                       </ListItem>
                       {index < workouts.length - 1 && <Divider />}
                     </div>
@@ -195,7 +260,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notifications */}
-        <Card>
+        {/* <Card>
           <CardHeader
             avatar={<NotificationsIcon color="primary" />}
             title="Notifications"
@@ -218,7 +283,7 @@ export default function SettingsPage() {
               </Typography>
             </Stack>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Data Management */}
         <Card>
@@ -227,28 +292,54 @@ export default function SettingsPage() {
             title="Data Management"
             titleTypographyProps={{ variant: 'h6' }}
           />
-          <CardContent>
+          <CardContent style={{ padding: 0 }}>
             <List>
-              <ListItem>
+              <ListItem
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
+              >
+                <ListItemText
+                  primary="Import Exercises"
+                  secondary="Upload exercise data from JSON file"
+                />
+                <Stack direction="row" spacing={1} gap={1}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<DownloadIcon />}
+                    onClick={handleDownloadTemplate}
+                  >
+                    Template
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<UploadIcon />}
+                    onClick={() => setShowImportDialog(true)}
+                    disabled={isImporting}
+                  >
+                    Import
+                  </Button>
+                </Stack>
+              </ListItem>
+              {/* <Divider />
+              <ListItem
+                secondaryAction={
+                  <IconButton edge="end" aria-label="export">
+                    <InfoIcon />
+                  </IconButton>
+                }
+              >
                 <ListItemText
                   primary="Export Data"
                   secondary="Download your workout data as JSON"
                 />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" aria-label="export">
-                    <InfoIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
+              </ListItem> */}
               <Divider />
-              <ListItem>
+              <ListItem secondaryAction={<Chip label="Safe" color="success" size="small" />}>
                 <ListItemText
                   primary="Clear Cache"
                   secondary="Remove temporary data and refresh the app"
                 />
-                <ListItemSecondaryAction>
-                  <Chip label="Safe" color="success" size="small" />
-                </ListItemSecondaryAction>
               </ListItem>
             </List>
           </CardContent>
@@ -306,6 +397,102 @@ export default function SettingsPage() {
             startIcon={isDeleting ? undefined : <DeleteIcon />}
           >
             {isDeleting ? 'Deleting...' : 'Delete Workout'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Import Dialog */}
+      <Dialog open={showImportDialog} onClose={handleCloseImportDialog} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <UploadIcon color="primary" />
+            <Typography variant="h6">Import Exercises</Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            <Typography variant="body1">
+              Upload a JSON file containing exercise data. The file should contain an array of
+              exercises with the following structure:
+            </Typography>
+            <Box
+              sx={{ bgcolor: 'background.paper', p: 2, borderRadius: 1, fontFamily: 'monospace' }}
+            >
+              <pre>{`[
+  {
+    "name": "Bench Press",
+    "type": "weight",
+    "description": "Classic chest exercise"
+  },
+  {
+    "name": "Push-ups",
+    "type": "reps_only",
+    "description": "Bodyweight chest exercise"
+  }
+]`}</pre>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Button
+                variant="outlined"
+                startIcon={<DownloadIcon />}
+                onClick={handleDownloadTemplate}
+              >
+                Download Template
+              </Button>
+              <Typography variant="body2" color="text.secondary">
+                Download a template file to see the correct format
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                style={{ display: 'none' }}
+                id="file-upload"
+                disabled={isImporting}
+              />
+              <label htmlFor="file-upload">
+                <Button
+                  variant="contained"
+                  component="span"
+                  startIcon={<UploadIcon />}
+                  disabled={isImporting}
+                >
+                  {isImporting ? 'Importing...' : 'Choose File'}
+                </Button>
+              </label>
+            </Box>
+
+            {importResult && (
+              <Box sx={{ mt: 2 }}>
+                {importResult.success ? (
+                  <Box sx={{ p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
+                    <Typography variant="body1" color="success.contrastText">
+                      ✅ Successfully imported {importResult.importedCount} exercises!
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Box sx={{ p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
+                    <Typography variant="body1" color="error.contrastText" gutterBottom>
+                      ❌ Import failed
+                    </Typography>
+                    {importResult.errors.map((error, index) => (
+                      <Typography key={index} variant="body2" color="error.contrastText">
+                        • {error}
+                      </Typography>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseImportDialog} disabled={isImporting}>
+            Close
           </Button>
         </DialogActions>
       </Dialog>
