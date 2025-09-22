@@ -35,66 +35,72 @@ export const updateTrainingFromWorkout = (
     });
 
     // 2. Auto-update training for exercises that exceeded planned parameters
-    analysis.exceededExercises.forEach(({ exerciseIndex, exceededWeight, exceededTime, exceededReps }) => {
-      const trainingExercise = updatedTraining.exercises[exerciseIndex];
+    analysis.exceededExercises.forEach(
+      ({ exerciseIndex, exceededWeight, exceededTime, exceededReps }) => {
+        const trainingExercise = updatedTraining.exercises[exerciseIndex];
 
-      if (!trainingExercise) {
-        return; // Skip if exercise not found
-      }
+        if (!trainingExercise) {
+          return; // Skip if exercise not found
+        }
 
-      // Get the actual values from the last set of the workout exercise
-      const workoutExercise = analysis.exceededExercises.find(
-        (item) => item.exerciseIndex === exerciseIndex
-      )?.exercise;
+        // Get the actual values from the last set of the workout exercise
+        const workoutExercise = analysis.exceededExercises.find(
+          (item) => item.exerciseIndex === exerciseIndex,
+        )?.exercise;
 
-      if (!workoutExercise || !workoutExercise.actualSets || workoutExercise.actualSets.length === 0) {
-        return; // Skip if no actual sets
-      }
+        if (
+          !workoutExercise ||
+          !workoutExercise.actualSets ||
+          workoutExercise.actualSets.length === 0
+        ) {
+          return; // Skip if no actual sets
+        }
 
-      const lastSet = workoutExercise.actualSets[workoutExercise.actualSets.length - 1];
-      if (!lastSet) {
-        return;
-      }
+        const lastSet = workoutExercise.actualSets[workoutExercise.actualSets.length - 1];
+        if (!lastSet) {
+          return;
+        }
 
-      // Update the training exercise with actual values (only if exceeded)
-      const updatedExercise = { ...trainingExercise };
+        // Update the training exercise with actual values (only if exceeded)
+        const updatedExercise = { ...trainingExercise };
 
-      if (exceededWeight && lastSet.actualWeight) {
-        updatedExercise.plannedWeightKg = lastSet.actualWeight;
-      }
+        if (exceededWeight && lastSet.actualWeight) {
+          updatedExercise.plannedWeightKg = lastSet.actualWeight;
+        }
 
-      if (exceededTime && lastSet.actualDuration) {
-        updatedExercise.plannedSeconds = lastSet.actualDuration;
-      }
+        if (exceededTime && lastSet.actualDuration) {
+          updatedExercise.plannedSeconds = lastSet.actualDuration;
+        }
 
-      if (exceededReps && lastSet.actualReps) {
-        updatedExercise.plannedReps = lastSet.actualReps;
-      }
+        if (exceededReps && lastSet.actualReps) {
+          updatedExercise.plannedReps = lastSet.actualReps;
+        }
 
-      // Reset achieved flag since parameters were increased to new targets
-      updatedExercise.plannedParametersAchieved = false;
+        // Reset achieved flag since parameters were increased to new targets
+        updatedExercise.plannedParametersAchieved = false;
 
-      // Replace the exercise in the training
-      updatedTraining.exercises[exerciseIndex] = updatedExercise;
+        // Replace the exercise in the training
+        updatedTraining.exercises[exerciseIndex] = updatedExercise;
 
-      // Also update the exercise dictionary with last set values
-      const exercise = trainingExercise.exercise;
-      const updatedExerciseDict = { ...exercise };
+        // Also update the exercise dictionary with last set values
+        const exercise = trainingExercise.exercise;
+        const updatedExerciseDict = { ...exercise };
 
-      if (exceededWeight && lastSet.actualWeight && exercise.type === 'weight') {
-        (updatedExerciseDict as any).lastSetWeightKg = lastSet.actualWeight;
-      }
+        if (exceededWeight && lastSet.actualWeight && exercise.type === 'weight') {
+          (updatedExerciseDict as any).lastSetWeightKg = lastSet.actualWeight;
+        }
 
-      if (exceededTime && lastSet.actualDuration && exercise.type === 'time') {
-        (updatedExerciseDict as any).lastSetSeconds = lastSet.actualDuration;
-      }
+        if (exceededTime && lastSet.actualDuration && exercise.type === 'time') {
+          (updatedExerciseDict as any).lastSetSeconds = lastSet.actualDuration;
+        }
 
-      if (exceededReps && lastSet.actualReps && exercise.type === 'reps_only') {
-        (updatedExerciseDict as any).lastSetReps = lastSet.actualReps;
-      }
+        if (exceededReps && lastSet.actualReps && exercise.type === 'reps_only') {
+          (updatedExerciseDict as any).lastSetReps = lastSet.actualReps;
+        }
 
-      updatedExercises.push(updatedExerciseDict);
-    });
+        updatedExercises.push(updatedExerciseDict);
+      },
+    );
 
     return {
       success: true,

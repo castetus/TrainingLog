@@ -103,6 +103,7 @@ export default function TrainingForm() {
 
   const handleExerciseChange = useCallback(
     (exercise: Exercise) => {
+      console.log('exercise', exercise);
       setNewExerciseData((prev) => ({
         ...prev,
         exercise,
@@ -172,6 +173,7 @@ export default function TrainingForm() {
       plannedSeconds:
         newExerciseData.plannedDuration > 0 ? newExerciseData.plannedDuration : undefined,
       notes: newExerciseData.notes,
+      plannedParametersAchieved: false, // Initialize as false for new exercises
     };
     setFormData((prev) => ({
       ...prev,
@@ -191,6 +193,8 @@ export default function TrainingForm() {
       delete rest.newReps;
       return rest;
     });
+
+    console.log('newExercise', newExercise);
 
     setShowAddExerciseForm(false);
     // Reset form data
@@ -295,6 +299,8 @@ export default function TrainingForm() {
 
     const originalExercise = formData.exercises[index];
 
+    console.log('originalExercise', originalExercise);
+
     // Check if any parameters were increased
     const parametersIncreased =
       editFormData.plannedSets > originalExercise.plannedSets ||
@@ -314,9 +320,7 @@ export default function TrainingForm() {
       plannedWeightKg: editFormData.plannedWeightKg,
       plannedSeconds: editFormData.plannedSeconds,
       // Reset achieved flag if parameters were increased
-      plannedParametersAchieved: parametersIncreased
-        ? false
-        : originalExercise.plannedParametersAchieved,
+      plannedParametersAchieved: parametersIncreased ? false : false, // Always reset to false when editing
     };
 
     setFormData((prev) => ({

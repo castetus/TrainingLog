@@ -100,7 +100,7 @@ export default function WorkoutForm() {
             plannedWeight: ex.plannedWeightKg, // Use planned weight value
             plannedDuration: ex.plannedSeconds, // Use planned duration value
             actualSets: [], // Initialize with empty actual sets
-            plannedParametersAchieved: ex.plannedParametersAchieved, // Pass the flag
+            plannedParametersAchieved: ex.plannedParametersAchieved || false, // Preserve training's achievement flag
           })),
         }));
       }
@@ -298,9 +298,7 @@ export default function WorkoutForm() {
                             <Typography variant="subtitle2" fontWeight="medium">
                               {exercise.exercise.name}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {exercise.exercise.description}
-                            </Typography>
+
                           </Stack>
                         </TableCell>
                         <TableCell align="center">
