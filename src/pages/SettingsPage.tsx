@@ -21,7 +21,6 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-  Chip,
   Button,
   Dialog,
   DialogTitle,
@@ -55,6 +54,8 @@ export default function SettingsPage() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [isClearingCache, setIsClearingCache] = useState(false);
+  const [showClearCacheDialog, setShowClearCacheDialog] = useState(false);
 
   // const handleNotificationToggle = () => {
   //   setNotificationsEnabled(!notificationsEnabled);
@@ -146,6 +147,33 @@ export default function SettingsPage() {
   const handleCloseImportDialog = () => {
     setShowImportDialog(false);
     setImportResult(null);
+  };
+
+  const handleOpenClearCache = () => setShowClearCacheDialog(true);
+  const handleCancelClearCache = () => setShowClearCacheDialog(false);
+  
+  const handleConfirmClearCache = async () => {
+    setIsClearingCache(true);
+    try {
+      // Clear all caches
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      }
+      
+      // Unregister all service workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+      }
+    } catch (error) {
+      console.error('Failed to clear cache:', error);
+    } finally {
+      setIsClearingCache(false);
+      setShowClearCacheDialog(false);
+      // Reload the app to get fresh files
+      window.location.reload();
+    }
   };
 
   return (
@@ -335,11 +363,21 @@ export default function SettingsPage() {
                 />
               </ListItem> */}
               <Divider />
-              <ListItem secondaryAction={<Chip label="Safe" color="success" size="small" />}>
+              <ListItem>
                 <ListItemText
                   primary="Clear Cache"
-                  secondary="Remove temporary data and refresh the app"
+                  secondary="Remove temporary cached assets and refresh the app (data is preserved)"
                 />
+                <Stack direction="column" spacing={1} sx={{ mt: 1 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={handleOpenClearCache}
+                    disabled={isClearingCache}
+                  >
+                    {isClearingCache ? 'Clearing...' : 'Clear cached files'}
+                  </Button>
+                </Stack>
               </ListItem>
             </List>
           </CardContent>
@@ -493,6 +531,39 @@ export default function SettingsPage() {
         <DialogActions>
           <Button onClick={handleCloseImportDialog} disabled={isImporting}>
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Clear Cache Confirmation Dialog */}
+      <Dialog open={showClearCacheDialog} onClose={handleCancelClearCache} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <WarningIcon color="warning" />
+            <Typography variant="h6">Clear Cached Files</Typography>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" gutterBottom>
+            This will clear all cached files and force the app to download fresh assets.
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            <strong>Note:</strong> Your workout data, exercises, and settings will be preserved. 
+            The app will reload automatically after clearing the cache.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelClearCache} disabled={isClearingCache}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmClearCache}
+            color="warning"
+            variant="contained"
+            disabled={isClearingCache}
+            startIcon={isClearingCache ? undefined : <WarningIcon />}
+          >
+            {isClearingCache ? 'Clearing...' : 'Clear Cache'}
           </Button>
         </DialogActions>
       </Dialog>
