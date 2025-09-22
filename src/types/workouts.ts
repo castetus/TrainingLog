@@ -50,6 +50,10 @@ export interface Workout {
   updatedAt: string;
   /** When the workout was completed (optional) */
   completedAt?: string;
+  /** Whether the workout is fully completed */
+  completed?: boolean;
+  /** Whether the workout was saved in an incomplete state */
+  incompleted?: boolean;
 }
 
 export interface CreateWorkoutData {
@@ -59,6 +63,10 @@ export interface CreateWorkoutData {
   duration?: number;
   exercises: WorkoutExercise[];
   trainingId?: string;
+  /** Whether the workout is fully completed */
+  completed?: boolean;
+  /** Whether the workout was saved in an incomplete state */
+  incompleted?: boolean;
 }
 
 export interface UpdateWorkoutData extends Partial<CreateWorkoutData> {

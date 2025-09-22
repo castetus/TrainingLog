@@ -33,20 +33,25 @@ export default function WorkoutListItem({ workout }: WorkoutListItemProps) {
           primary={
             <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
               <span>{workout.name}</span>
-              <Chip
-                label={formatDate(workout.date)}
-                size="small"
-                variant="outlined"
-                color="primary"
-              />
-              {shouldShowDuration() && (
+              <Box display="flex" alignItems="center" gap={1}>
+                {workout.incompleted && (
+                  <Chip label="Incomplete" size="small" variant="filled" color="warning" />
+                )}
                 <Chip
-                  label={formatDuration(workout.duration)}
+                  label={formatDate(workout.date)}
                   size="small"
                   variant="outlined"
-                  color="secondary"
+                  color="primary"
                 />
-              )}
+                {shouldShowDuration() && (
+                  <Chip
+                    label={formatDuration(workout.duration)}
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                  />
+                )}
+              </Box>
             </Box>
           }
           secondary={

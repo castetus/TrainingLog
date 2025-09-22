@@ -1,4 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import {
   Box,
@@ -55,6 +56,9 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
   // Track if user is intentionally finishing workout (to avoid navigation blocking)
   const [isFinishingWorkout, setIsFinishingWorkout] = useState(false);
 
+  // Track if user has explicitly paused the workout
+  const [isWorkoutPaused, setIsWorkoutPaused] = useState(false);
+
   // Navigation blocker for preventing accidental exits
   const confirmExit = useCallback(async () => {
     return await confirm({
@@ -67,13 +71,45 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     });
   }, [confirm]);
 
-  const shouldBlockNavigation = !isWorkoutFinished && !showUpdateModal && !isFinishingWorkout;
+  const shouldBlockNavigation = !isWorkoutFinished && !showUpdateModal && !isFinishingWorkout && !isWorkoutPaused;
 
   useNavigationBlocker({
     when: shouldBlockNavigation, // Block navigation when workout is active and not in update modal
-    onConfirmExit: () => {
-      setIsWorkoutFinished(true);
-      navigate(Routes.HOME);
+    onConfirmExit: async () => {
+      try {
+        // Calculate current duration when leaving (in minutes for database)
+        const currentDurationMinutes = Math.floor(
+          (new Date().getTime() - startTime.getTime()) / (1000 * 60),
+        );
+
+        // Prepare workout with current actual sets data
+        const workoutWithCurrentResults = {
+          ...workout,
+          exercises: workout.exercises.map((exercise, index) => ({
+            ...exercise,
+            actualSets: actualSetsByExercise[index] || exercise.actualSets || [],
+          })),
+        };
+
+        // Save workout with current progress and incomplete status
+        await update({
+          id: workout.id,
+          duration: currentDurationMinutes,
+          exercises: workoutWithCurrentResults.exercises,
+          incompleted: true,
+          completed: false,
+        });
+
+        // Update exercise lastSet values with current performance
+        await updateExerciseLastSetValues(workoutWithCurrentResults.exercises);
+
+        console.log('Workout saved with incomplete status');
+      } catch (error) {
+        console.error('Failed to save workout progress:', error);
+      } finally {
+        setIsWorkoutFinished(true);
+        navigate(Routes.HOME);
+      }
     },
     onCancelExit: () => {
       // Stay on current page - no action needed
@@ -137,6 +173,56 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     });
   };
 
+  const handlePauseWorkout = async () => {
+    const confirmed = await confirm({
+      title: 'Pause Workout',
+      message: 'Save your current progress and pause this workout? You can resume it later.',
+      confirmText: 'Pause',
+      cancelText: 'Continue',
+      danger: false,
+    });
+
+    if (confirmed) {
+      // Disable navigation blocking immediately after confirmation
+      setIsWorkoutPaused(true);
+      
+      try {
+        // Calculate current duration when pausing (in minutes for database)
+        const currentDurationMinutes = Math.floor(
+          (new Date().getTime() - startTime.getTime()) / (1000 * 60),
+        );
+
+        // Prepare workout with current actual sets data
+        const workoutWithCurrentResults = {
+          ...workout,
+          exercises: workout.exercises.map((exercise, index) => ({
+            ...exercise,
+            actualSets: actualSetsByExercise[index] || exercise.actualSets || [],
+          })),
+        };
+
+        // Save workout with current progress and incomplete status
+        await update({
+          id: workout.id,
+          duration: currentDurationMinutes,
+          exercises: workoutWithCurrentResults.exercises,
+          incompleted: true,
+          completed: false,
+        });
+
+        // Update exercise lastSet values with current performance
+        await updateExerciseLastSetValues(workoutWithCurrentResults.exercises);
+
+        console.log('Workout paused and saved');
+        navigate(Routes.HOME);
+      } catch (error) {
+        console.error('Failed to pause workout:', error);
+        // Reset the flag if there was an error
+        setIsWorkoutPaused(false);
+      }
+    }
+  };
+
   const handleFinishWorkout = async () => {
     setIsFinishingWorkout(true);
 
@@ -169,6 +255,8 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           id: workout.id,
           duration: finalDurationMinutes,
           exercises: workoutWithResults.exercises,
+          completed: true,
+          incompleted: false,
         });
 
         // Now finish the workout
@@ -176,6 +264,8 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           id: workout.id,
           duration: finalDurationMinutes,
           exercises: workoutWithResults.exercises,
+          completed: true,
+          incompleted: false,
         });
 
         // Update exercise lastSet values with actual performance
@@ -329,8 +419,18 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           </Accordion>
         ))}
 
-        {/* Finish Workout Button */}
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+        {/* Workout Action Buttons */}
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
+          <Button
+            variant="outlined"
+            color="warning"
+            size="large"
+            startIcon={<PauseIcon />}
+            onClick={handlePauseWorkout}
+            sx={{ px: 4, py: 1.5 }}
+          >
+            Pause Workout
+          </Button>
           <Button
             variant="contained"
             color="success"
