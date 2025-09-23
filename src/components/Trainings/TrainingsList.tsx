@@ -2,6 +2,7 @@ import { List, Box, Divider, Typography } from '@mui/material';
 
 import { useTrainingsController } from '@/controllers/trainingsController';
 import { useConfirm } from '@/providers/confirmProvider';
+
 import TrainingListItem from './TrainingListItem';
 
 export default function TrainingsList() {
@@ -17,7 +18,6 @@ export default function TrainingsList() {
       await removeTraining(id);
     }
   };
-
 
   return (
     <>

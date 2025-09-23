@@ -74,14 +74,15 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     });
   }, [confirm]);
 
-  const shouldBlockNavigation = !isWorkoutFinished && !showUpdateModal && !isFinishingWorkout && !isWorkoutPaused;
+  const shouldBlockNavigation =
+    !isWorkoutFinished && !showUpdateModal && !isFinishingWorkout && !isWorkoutPaused;
 
   useNavigationBlocker({
     when: shouldBlockNavigation, // Block navigation when workout is active and not in update modal
     onConfirmExit: async () => {
       // Disable navigation blocking immediately to prevent double confirmation
       setIsWorkoutFinished(true);
-      
+
       try {
         // Calculate total duration when leaving (in minutes for database)
         const sessionDurationInSeconds = Math.floor(
@@ -195,7 +196,7 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
     if (confirmed) {
       // Disable navigation blocking immediately after confirmation
       setIsWorkoutPaused(true);
-      
+
       try {
         // Calculate total duration when pausing (in minutes for database)
         const sessionDurationInSeconds = Math.floor(

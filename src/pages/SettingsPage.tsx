@@ -6,7 +6,7 @@ import PaletteIcon from '@mui/icons-material/Palette';
 // import SettingsIcon from '@mui/icons-material/Settings';
 import StorageIcon from '@mui/icons-material/Storage';
 import UploadIcon from '@mui/icons-material/Upload';
-import WarningIcon from '@mui/icons-material/Warning';
+// import WarningIcon from '@mui/icons-material/Warning';
 import {
   Box,
   Typography,
@@ -33,6 +33,7 @@ import { useState } from 'react';
 
 import { useExercisesController } from '@/controllers/exercisesController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
+import { useConfirm } from '@/providers/confirmProvider';
 import { useTheme } from '@/providers/themeProvider';
 import { formatShortDate } from '@/utils';
 import {
@@ -45,17 +46,13 @@ export default function SettingsPage() {
   const { list: workouts, loadAll, remove } = useWorkoutsController();
   const { create: createExercise, loadAll: loadExercises } = useExercisesController();
   const { mode, toggleMode } = useTheme();
-  // const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  // const [autoSave, setAutoSave] = useState(true);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [workoutToDelete, setWorkoutToDelete] = useState<{ id: string; name: string } | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const confirm = useConfirm();
+
   const [showWorkoutManagement, setShowWorkoutManagement] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isImporting, setIsImporting] = useState(false);
-  const [isClearingCache, setIsClearingCache] = useState(false);
-  const [showClearCacheDialog, setShowClearCacheDialog] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // const handleNotificationToggle = () => {
   //   setNotificationsEnabled(!notificationsEnabled);
@@ -65,30 +62,15 @@ export default function SettingsPage() {
   //   setAutoSave(!autoSave);
   // };
 
-  const handleDeleteWorkout = (workoutId: string, workoutName: string) => {
-    setWorkoutToDelete({ id: workoutId, name: workoutName });
-    setShowDeleteDialog(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!workoutToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      await remove(workoutToDelete.id);
+  const handleDeleteWorkout = async (workoutId: string, workoutName: string) => {
+    const ok = await confirm({
+      title: `Delete "${workoutName}"?`,
+      danger: true,
+    });
+    if (ok) {
+      await remove(workoutId);
       await loadAll();
-      setShowDeleteDialog(false);
-      setWorkoutToDelete(null);
-    } catch (error) {
-      console.error('Failed to delete workout:', error);
-    } finally {
-      setIsDeleting(false);
     }
-  };
-
-  const handleCancelDelete = () => {
-    setShowDeleteDialog(false);
-    setWorkoutToDelete(null);
   };
 
   const toggleWorkoutManagement = () => {
@@ -149,18 +131,25 @@ export default function SettingsPage() {
     setImportResult(null);
   };
 
-  const handleOpenClearCache = () => setShowClearCacheDialog(true);
-  const handleCancelClearCache = () => setShowClearCacheDialog(false);
-  
+  const handleUpdateApp = async () => {
+    const ok = await confirm({
+      title: 'Update App',
+      danger: true,
+    });
+    if (ok) {
+      handleConfirmClearCache();
+    }
+  };
+
   const handleConfirmClearCache = async () => {
-    setIsClearingCache(true);
+    setIsUpdating(true);
     try {
       // Clear all caches
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map((name) => caches.delete(name)));
       }
-      
+
       // Unregister all service workers
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
@@ -169,8 +158,7 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Failed to clear cache:', error);
     } finally {
-      setIsClearingCache(false);
-      setShowClearCacheDialog(false);
+      setIsUpdating(false);
       // Reload the app to get fresh files
       window.location.reload();
     }
@@ -217,7 +205,7 @@ export default function SettingsPage() {
                 </Typography>
               ) : (
                 <List>
-                  {workouts.map((workout, index) => (
+                  {workouts.reverse().map((workout, index) => (
                     <div key={workout.id}>
                       <ListItem
                         secondaryAction={
@@ -363,19 +351,18 @@ export default function SettingsPage() {
                 />
               </ListItem> */}
               <Divider />
-              <ListItem style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <ListItemText
-                  primary="Clear Cache"
-                  secondary="Remove temporary cached assets and refresh the app (data is preserved)"
-                />
+              <ListItem
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
+              >
+                <ListItemText primary="Update App" />
                 <Stack direction="column" spacing={1} sx={{ mt: 1 }}>
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={handleOpenClearCache}
-                    disabled={isClearingCache}
+                    onClick={handleUpdateApp}
+                    disabled={isUpdating}
                   >
-                    {isClearingCache ? 'Clearing...' : 'Clear cached files'}
+                    {isUpdating ? 'Updating...' : 'Update'}
                   </Button>
                 </Stack>
               </ListItem>
@@ -405,39 +392,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </Stack>
-
-      {/* Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onClose={handleCancelDelete} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <WarningIcon color="error" />
-            <Typography variant="h6">Delete Workout</Typography>
-          </Stack>
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" gutterBottom>
-            Are you sure you want to delete "{workoutToDelete?.name}"?
-          </Typography>
-          <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            <strong>Warning:</strong> This action cannot be undone. The workout and all its data
-            will be permanently deleted.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete} disabled={isDeleting}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmDelete}
-            color="error"
-            variant="contained"
-            disabled={isDeleting}
-            startIcon={isDeleting ? undefined : <DeleteIcon />}
-          >
-            {isDeleting ? 'Deleting...' : 'Delete Workout'}
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       {/* Import Dialog */}
       <Dialog open={showImportDialog} onClose={handleCloseImportDialog} maxWidth="md" fullWidth>
@@ -536,7 +490,7 @@ export default function SettingsPage() {
       </Dialog>
 
       {/* Clear Cache Confirmation Dialog */}
-      <Dialog open={showClearCacheDialog} onClose={handleCancelClearCache} maxWidth="sm" fullWidth>
+      {/* <Dialog open={showClearCacheDialog} onClose={handleCancelClearCache} maxWidth="sm" fullWidth>
         <DialogTitle>
           <Stack direction="row" spacing={1} alignItems="center">
             <WarningIcon color="warning" />
@@ -548,25 +502,25 @@ export default function SettingsPage() {
             This will clear all cached files and force the app to download fresh assets.
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            <strong>Note:</strong> Your workout data, exercises, and settings will be preserved. 
-            The app will reload automatically after clearing the cache.
+            <strong>Note:</strong> Your workout data, exercises, and settings will be preserved. The
+            app will reload automatically after clearing the cache.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelClearCache} disabled={isClearingCache}>
+          <Button onClick={handleCancelClearCache} disabled={isUpdating}>
             Cancel
           </Button>
           <Button
             onClick={handleConfirmClearCache}
             color="warning"
             variant="contained"
-            disabled={isClearingCache}
-            startIcon={isClearingCache ? undefined : <WarningIcon />}
+            disabled={isUpdating}
+            startIcon={isUpdating ? undefined : <WarningIcon />}
           >
-            {isClearingCache ? 'Clearing...' : 'Clear Cache'}
+            {isUpdating ? 'Clearing...' : 'Clear Cache'}
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </Box>
   );
 }
