@@ -30,9 +30,12 @@ export default function WorkoutsList() {
 
   return (
     <List>
-      {workouts.slice().reverse().map((workout) => (
-        <WorkoutListItem key={workout.id} workout={workout} />
-      ))}
+      {workouts
+        .slice()
+        .reverse()
+        .map((workout) => (
+          <WorkoutListItem key={workout.id} workout={workout} />
+        ))}
     </List>
   );
 }

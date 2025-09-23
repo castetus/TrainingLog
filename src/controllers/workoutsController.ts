@@ -32,7 +32,7 @@ export const useWorkoutsController = () => {
     async (id: string): Promise<Workout | null> => {
       try {
         // First check local state
-        const workout = workouts.find(w => w.id === id);
+        const workout = workouts.find((w) => w.id === id);
         if (workout) {
           return workout;
         }
@@ -40,7 +40,7 @@ export const useWorkoutsController = () => {
         // Try to find in database
         const dbWorkout = await db.workouts.get(id);
         if (dbWorkout) {
-          setWorkouts(prev => [...prev.filter(w => w.id !== dbWorkout.id), dbWorkout]);
+          setWorkouts((prev) => [...prev.filter((w) => w.id !== dbWorkout.id), dbWorkout]);
           return dbWorkout;
         }
         return null;
@@ -53,39 +53,36 @@ export const useWorkoutsController = () => {
     [workouts],
   );
 
-  const create = useCallback(
-    async (data: CreateWorkoutData): Promise<Workout> => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const create = useCallback(async (data: CreateWorkoutData): Promise<Workout> => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const newWorkout: Workout = {
-          ...data,
-          id: `w-${Date.now()}`,
-          exercises: data.exercises.map((ex) => ({
-            ...ex,
-            actualSets: ex.actualSets || [], // Use provided actualSets or initialize empty
-          })),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+      const newWorkout: Workout = {
+        ...data,
+        id: `w-${Date.now()}`,
+        exercises: data.exercises.map((ex) => ({
+          ...ex,
+          actualSets: ex.actualSets || [], // Use provided actualSets or initialize empty
+        })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-        // Save to database first
-        const savedWorkout = await db.workouts.put(newWorkout);
+      // Save to database first
+      const savedWorkout = await db.workouts.put(newWorkout);
 
-        // Then update local state
-        setWorkouts(prev => [...prev.filter(w => w.id !== savedWorkout.id), savedWorkout]);
-        return savedWorkout;
-      } catch (error) {
-        setError('Failed to create workout');
-        console.error('Error creating workout:', error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
+      // Then update local state
+      setWorkouts((prev) => [...prev.filter((w) => w.id !== savedWorkout.id), savedWorkout]);
+      return savedWorkout;
+    } catch (error) {
+      setError('Failed to create workout');
+      console.error('Error creating workout:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const update = useCallback(
     async (data: UpdateWorkoutData): Promise<Workout> => {
@@ -93,7 +90,7 @@ export const useWorkoutsController = () => {
         setIsLoading(true);
         setError(null);
 
-        const existingWorkout = workouts.find(w => w.id === data.id);
+        const existingWorkout = workouts.find((w) => w.id === data.id);
         if (!existingWorkout) {
           throw new Error('Workout not found');
         }
@@ -108,7 +105,7 @@ export const useWorkoutsController = () => {
         const savedWorkout = await db.workouts.put(updatedWorkout);
 
         // Then update local state
-        setWorkouts(prev => prev.map(w => w.id === savedWorkout.id ? savedWorkout : w));
+        setWorkouts((prev) => prev.map((w) => (w.id === savedWorkout.id ? savedWorkout : w)));
         return savedWorkout;
       } catch (error) {
         setError('Failed to update workout');
@@ -121,27 +118,24 @@ export const useWorkoutsController = () => {
     [workouts],
   );
 
-  const remove = useCallback(
-    async (id: string): Promise<void> => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const remove = useCallback(async (id: string): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        // Remove from database first
-        await db.workouts.remove(id);
+      // Remove from database first
+      await db.workouts.remove(id);
 
-        // Then remove from local state
-        setWorkouts(prev => prev.filter(w => w.id !== id));
-      } catch (error) {
-        setError('Failed to delete workout');
-        console.error('Error deleting workout:', error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
+      // Then remove from local state
+      setWorkouts((prev) => prev.filter((w) => w.id !== id));
+    } catch (error) {
+      setError('Failed to delete workout');
+      console.error('Error deleting workout:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const finishWorkout = useCallback(
     async (data: UpdateWorkoutData): Promise<Workout> => {
@@ -149,7 +143,7 @@ export const useWorkoutsController = () => {
         setIsLoading(true);
         setError(null);
 
-        const existingWorkout = workouts.find(w => w.id === data.id);
+        const existingWorkout = workouts.find((w) => w.id === data.id);
         if (!existingWorkout) {
           throw new Error('Workout not found');
         }
@@ -166,7 +160,8 @@ export const useWorkoutsController = () => {
         const savedWorkout = await db.workouts.put(finishedWorkout);
 
         // Then update local state
-        setWorkouts(prev => prev.map(w => w.id === savedWorkout.id ? savedWorkout : w));
+        setWorkouts((prev) => prev.map((w) => (w.id === savedWorkout.id ? savedWorkout : w)));
+        loadAll();
         return savedWorkout;
       } catch (error) {
         setError('Failed to finish workout');

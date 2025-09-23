@@ -1,4 +1,4 @@
-import { Stack, TableCell, TableRow, Typography } from '@mui/material';
+import { Stack, Box, Typography } from '@mui/material';
 
 import { AchievedChip } from '@/components/Common';
 import type { WorkoutExercise } from '@/types/workouts';
@@ -25,51 +25,27 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
   };
 
   return (
-    <TableRow>
-      <TableCell>
-        <Stack>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Typography variant="subtitle2" fontWeight="medium">
-              {exerciseViewData.name}
-            </Typography>
-            <AchievedChip show={exercise.plannedParametersAchieved} />
-          </Stack>
-          <Typography variant="caption" color="text.secondary">
-            {exerciseViewData.description}
-          </Typography>
-        </Stack>
-      </TableCell>
-      <TableCell align="center">
-        <Typography variant="body2">{exerciseViewData.plannedSets}</Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Typography variant="body2">
-          {exerciseViewData.plannedReps} ×{' '}
-          {exerciseViewData.plannedWeight && exerciseViewData.plannedWeight}kg
-          {exerciseViewData.plannedDuration && formatTime(exerciseViewData.plannedDuration)}
+    <Box>
+      <Stack direction="column" spacing={0.5}>
+        <Typography variant="subtitle2" fontWeight="medium">
+          {exerciseViewData.name}
         </Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Stack spacing={0.5}>
-          <Typography variant="body2">
-            {lastSet ? (
-              <>
-                {exerciseViewData.actualReps && `${exerciseViewData.actualReps}`}
-                {exerciseViewData.actualReps &&
-                  exerciseViewData.actualWeight &&
-                  ` x ${exerciseViewData.actualWeight}kg`}
-                {exerciseViewData.actualReps &&
-                  exerciseViewData.actualDuration &&
-                  ` x ${formatTime(exerciseViewData.actualDuration)}`}
-              </>
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                No data
-              </Typography>
-            )}
-          </Typography>
-        </Stack>
-      </TableCell>
-    </TableRow>
+
+        <Typography variant="caption" color="text.secondary">
+          {exerciseViewData.description}
+        </Typography>
+      </Stack>
+
+      <Stack spacing={0.5} direction="row" alignItems="center" justifyContent="space-between">
+        <AchievedChip show={exercise.plannedParametersAchieved} />
+        <Typography variant="body2">{exerciseViewData.plannedSets}</Typography>
+
+        <Typography variant="body2">
+          {exerciseViewData.actualReps} × {' '}
+          {exerciseViewData.actualWeight && exerciseViewData.actualWeight} kg
+          {exerciseViewData.actualDuration && formatTime(exerciseViewData.actualDuration)}
+        </Typography>
+      </Stack>
+    </Box>
   );
 }

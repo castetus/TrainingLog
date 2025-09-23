@@ -1,23 +1,11 @@
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import {
-  Box,
-  Typography,
-  Stack,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-} from '@mui/material';
+import { Box, Typography, Stack, Chip, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import type { Workout } from '@/types/workouts';
 import { Routes } from '@/router/routes';
+import type { Workout } from '@/types/workouts';
 import { formatLongDate, formatMediumDate, formatDuration } from '@/utils';
+import { isExerciseCompleted } from '@/utils/isExerciseCompleted';
 
 import WorkoutViewItem from './WorkoutViewItem';
 
@@ -28,8 +16,6 @@ interface WorkoutViewProps {
 export default function WorkoutView({ workout }: WorkoutViewProps) {
   const navigate = useNavigate();
 
-  console.log('workout', workout);
-  
   const formatDate = (dateString: string) => {
     return formatLongDate(dateString);
   };
@@ -42,9 +28,6 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
     <Stack spacing={3}>
       {/* Header Info */}
       <Box>
-        <Typography variant="h5" gutterBottom>
-          {workout.name}
-        </Typography>
         <Stack direction="row" spacing={2} alignItems="center">
           <Chip label={formatDate(workout.date)} color="primary" />
           {workout.duration ? (
@@ -58,7 +41,7 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
             {workout.description}
           </Typography>
         )}
-        
+
         {/* Continue Workout Button for Incomplete Workouts */}
         {workout.incompleted && (
           <Box sx={{ mt: 2 }}>
@@ -80,23 +63,13 @@ export default function WorkoutView({ workout }: WorkoutViewProps) {
         <Typography variant="h6" gutterBottom>
           Exercise Results
         </Typography>
-        <TableContainer component={Paper} variant="outlined">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Exercise</TableCell>
-                <TableCell>Sets</TableCell>
-                <TableCell align="center">Planned</TableCell>
-                <TableCell align="center">Actual</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {workout.exercises.map((workoutExercise, index) => (
-                <WorkoutViewItem key={index} {...workoutExercise} />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Stack direction="column" spacing={2}>
+          {workout.exercises
+            .filter((workoutExercise) => isExerciseCompleted(workoutExercise))
+            .map((workoutExercise, index) => (
+              <WorkoutViewItem key={index} {...workoutExercise} />
+            ))}
+        </Stack>
       </Box>
 
       {/* Overall Notes */}

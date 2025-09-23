@@ -103,7 +103,6 @@ export default function TrainingForm() {
 
   const handleExerciseChange = useCallback(
     (exercise: Exercise) => {
-      console.log('exercise', exercise);
       setNewExerciseData((prev) => ({
         ...prev,
         exercise,
@@ -193,8 +192,6 @@ export default function TrainingForm() {
       delete rest.newReps;
       return rest;
     });
-
-    console.log('newExercise', newExercise);
 
     setShowAddExerciseForm(false);
     // Reset form data
@@ -298,8 +295,6 @@ export default function TrainingForm() {
     });
 
     const originalExercise = formData.exercises[index];
-
-    console.log('originalExercise', originalExercise);
 
     // Check if any parameters were increased
     const parametersIncreased =
