@@ -4,7 +4,6 @@ import { useLocation, useParams, Outlet } from 'react-router-dom';
 
 import { WorkoutsList, WorkoutView, WorkoutForm, WorkoutFlow } from '@/components/Workouts';
 import { useWorkoutsController } from '@/controllers/workoutsController';
-import NestedPageLayout from '@/layouts/NestedPageLayout';
 import type { Workout } from '@/types/workouts';
 
 export default function WorkoutsPage() {
@@ -49,20 +48,14 @@ export default function WorkoutsPage() {
   }
 
   if (isFlowRoute && workout) {
-    return (
-      <NestedPageLayout title={workout.name} subtitle="Workout Session" hideBackButton>
-        <WorkoutFlow workout={workout} />
-      </NestedPageLayout>
-    );
+    return <WorkoutFlow workout={workout} />;
   }
 
   if (isDetailRoute && workout) {
     return (
-      <NestedPageLayout title={workout.name} subtitle="Workout Details">
-        <Stack spacing={3}>
-          <WorkoutView workout={workout} />
-        </Stack>
-      </NestedPageLayout>
+      <Stack spacing={3}>
+        <WorkoutView workout={workout} />
+      </Stack>
     );
   }
 

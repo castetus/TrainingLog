@@ -9,17 +9,11 @@ interface BackButtonProps extends Omit<IconButtonProps, 'onClick'> {
   onClick?: () => void;
 }
 
-export default function BackButton({ to, onClick, sx, ...props }: BackButtonProps) {
+export default function BackButton({ sx, ...props }: BackButtonProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (onClick) {
-      onClick();
-    } else if (to) {
-      navigate(to);
-    } else {
-      navigate(-1); // Go back in browser history
-    }
+    navigate(-1); // Go back in browser history
   };
 
   return (

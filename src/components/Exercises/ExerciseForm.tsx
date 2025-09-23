@@ -14,7 +14,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useExercisesController } from '@/controllers/exercisesController';
-import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
 import { ExerciseType } from '@/types/exercises';
 
@@ -134,79 +133,77 @@ export default function ExerciseForm() {
   };
 
   return (
-    <NestedPageLayout backTo={Routes.EXERCISES} title={title} subtitle={subtitle}>
-      <Box component="form" onSubmit={handleSubmit}>
-        <Stack spacing={2}>
-          {/* Basic Information */}
-          <Stack spacing={1.5}>
-            <Typography variant="h6">Basic Information</Typography>
+    <Box component="form" onSubmit={handleSubmit}>
+      <Stack spacing={2}>
+        {/* Basic Information */}
+        <Stack spacing={1.5}>
+          <Typography variant="h6">Basic Information</Typography>
 
-            <TextField
-              label="Exercise Name"
-              value={formData.name || ''}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              error={!!errors.name}
-              helperText={errors.name}
-              fullWidth
-              required
-              size="small"
-            />
+          <TextField
+            label="Exercise Name"
+            value={formData.name || ''}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            error={!!errors.name}
+            helperText={errors.name}
+            fullWidth
+            required
+            size="small"
+          />
 
-            <TextField
-              label="Description"
-              value={formData.description || ''}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              multiline
-              rows={2}
-              fullWidth
-              size="small"
-            />
+          <TextField
+            label="Description"
+            value={formData.description || ''}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            multiline
+            rows={2}
+            fullWidth
+            size="small"
+          />
 
-            <TextField
-              label="Video URL (optional)"
-              value={formData.videoUrl || ''}
-              onChange={(e) => handleInputChange('videoUrl', e.target.value)}
-              placeholder="https://youtube.com/watch?v=..."
-              fullWidth
-              size="small"
-              helperText="Link to tutorial or demonstration video"
-            />
+          <TextField
+            label="Video URL (optional)"
+            value={formData.videoUrl || ''}
+            onChange={(e) => handleInputChange('videoUrl', e.target.value)}
+            placeholder="https://youtube.com/watch?v=..."
+            fullWidth
+            size="small"
+            helperText="Link to tutorial or demonstration video"
+          />
 
-            <FormControl fullWidth size="small">
-              <InputLabel>Exercise Type</InputLabel>
-              <Select
-                value={formData.type || ''}
-                onChange={(e) => handleTypeChange(e.target.value as ExerciseType | undefined)}
-                label="Exercise Type"
-              >
-                <MenuItem value="">Reps Only</MenuItem>
-                <MenuItem value={ExerciseType.WEIGHT}>Weight-based</MenuItem>
-                <MenuItem value={ExerciseType.TIME}>Time-based</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
-
-          {/* Error Messages */}
-          {errors.load && <FormHelperText error>{errors.load}</FormHelperText>}
-          {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
-
-          {/* Form Actions */}
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" disabled={isLoading}>
-              {isLoading
-                ? isEditing
-                  ? 'Updating...'
-                  : 'Creating...'
-                : isEditing
-                  ? 'Update Exercise'
-                  : 'Create Exercise'}
-            </Button>
-          </Stack>
+          <FormControl fullWidth size="small">
+            <InputLabel>Exercise Type</InputLabel>
+            <Select
+              value={formData.type || ''}
+              onChange={(e) => handleTypeChange(e.target.value as ExerciseType | undefined)}
+              label="Exercise Type"
+            >
+              <MenuItem value="">Reps Only</MenuItem>
+              <MenuItem value={ExerciseType.WEIGHT}>Weight-based</MenuItem>
+              <MenuItem value={ExerciseType.TIME}>Time-based</MenuItem>
+            </Select>
+          </FormControl>
         </Stack>
-      </Box>
-    </NestedPageLayout>
+
+        {/* Error Messages */}
+        {errors.load && <FormHelperText error>{errors.load}</FormHelperText>}
+        {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
+
+        {/* Form Actions */}
+        <Stack direction="row" spacing={2} justifyContent="flex-end">
+          <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" disabled={isLoading}>
+            {isLoading
+              ? isEditing
+                ? 'Updating...'
+                : 'Creating...'
+              : isEditing
+                ? 'Update Exercise'
+                : 'Create Exercise'}
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
   );
 }

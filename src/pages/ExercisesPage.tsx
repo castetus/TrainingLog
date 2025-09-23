@@ -6,7 +6,6 @@ import { Outlet, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ExerciseView } from '@/components/Exercises';
 import ExercisesList from '@/components/Exercises/ExercisesList';
 import { useExercisesController } from '@/controllers/exercisesController';
-import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
 import type { Exercise } from '@/types/exercises';
 
@@ -47,18 +46,16 @@ const ExercisesPage = () => {
 
   if (isDetailRoute && exercise) {
     return (
-      <NestedPageLayout title={exercise.name} subtitle="Exercise Details">
-        <Stack spacing={3}>
-          <ExerciseView exercise={exercise} />
+      <Stack spacing={3}>
+        <ExerciseView exercise={exercise} />
 
-          {/* Edit button at bottom */}
-          <Stack direction="row" justifyContent="flex-end">
-            <Button variant="contained" startIcon={<EditIcon />} onClick={handleEdit}>
-              Edit Exercise
-            </Button>
-          </Stack>
+        {/* Edit button at bottom */}
+        <Stack direction="row" justifyContent="flex-end">
+          <Button variant="contained" startIcon={<EditIcon />} onClick={handleEdit}>
+            Edit Exercise
+          </Button>
         </Stack>
-      </NestedPageLayout>
+      </Stack>
     );
   }
 

@@ -25,7 +25,6 @@ import { useNavigate } from 'react-router-dom';
 import { AchievedChip } from '@/components/Common';
 import { useTrainingsController } from '@/controllers/trainingsController';
 import { useWorkoutsController } from '@/controllers/workoutsController';
-import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
 import { ExerciseType } from '@/types/exercises';
 import type { CreateWorkoutData } from '@/types/workouts';
@@ -160,187 +159,182 @@ export default function WorkoutForm() {
   };
 
   return (
-    <NestedPageLayout
-      title="Start Workout"
-      subtitle="Begin a new workout session based on a training plan"
-    >
-      <Box component="form" onSubmit={handleStartWorkout}>
-        <Stack spacing={2}>
-          {/* Training Selection */}
-          <Stack spacing={1.5}>
-            <Typography variant="h6">Select Training Plan</Typography>
+    <Box component="form" onSubmit={handleStartWorkout}>
+      <Stack spacing={2}>
+        {/* Training Selection */}
+        <Stack spacing={1.5}>
+          <Typography variant="h6">Select Training Plan</Typography>
 
-            {trainings.length === 0 ? (
-              <Box
-                sx={{
-                  textAlign: 'center',
-                  py: 3,
-                  px: 2,
-                  border: 1,
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  color: 'text.secondary',
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  No Training Plans Available
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  You need to create at least one training plan before starting a workout.
-                </Typography>
-                <Typography variant="body2">
-                  Go to the Trainings page to create your first training plan.
-                </Typography>
-              </Box>
-            ) : (
-              <FormControl fullWidth size="small" error={!!errors.training}>
-                <InputLabel>Select Training</InputLabel>
-                <Select
-                  value={selectedTrainingId}
-                  onChange={(e) => handleTrainingChange(e.target.value)}
-                  label="Select Training"
-                >
-                  <MenuItem value="">
-                    <em>Choose a training plan...</em>
-                  </MenuItem>
-                  {trainings.map((training) => {
-                    const today = new Date().getDay();
-                    const isToday = training.dayOfTheWeek === today;
-
-                    return (
-                      <MenuItem key={training.id} value={training.id}>
-                        <Stack>
-                          <Typography variant="body2" component="div">
-                            {training.name}
-                            {isToday && (
-                              <Chip
-                                label="Today"
-                                size="small"
-                                color="primary"
-                                sx={{ ml: 1, height: 20 }}
-                              />
-                            )}
-                          </Typography>
-                          {training.dayOfTheWeek !== undefined && (
-                            <Typography variant="caption" color="text.secondary">
-                              {getDayName(training.dayOfTheWeek)}
-                            </Typography>
-                          )}
-                        </Stack>
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-                {errors.training && <FormHelperText error>{errors.training}</FormHelperText>}
-              </FormControl>
-            )}
-          </Stack>
-
-          {/* Workout Details */}
-          <Stack spacing={1.5}>
-            <Typography variant="h6">Workout Details</Typography>
-
-            <TextField
-              label="Workout Name"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              error={!!errors.name}
-              helperText={errors.name}
-              fullWidth
-              required
-              size="small"
-              placeholder="Auto-generated from training and date"
-            />
-
-            <TextField
-              label="Description"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              multiline
-              rows={2}
-              fullWidth
-              size="small"
-            />
-
-            <TextField
-              label="Date"
-              type="date"
-              value={formData.date}
-              onChange={(e) => handleInputChange('date', e.target.value)}
-              error={!!errors.date}
-              helperText={errors.date}
-              fullWidth
-              required
-              size="small"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Stack>
-
-          {/* Form Actions */}
-          <Stack direction="row" justifyContent="center">
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={isLoading || trainings.length === 0 || !selectedTrainingId}
-              startIcon={<PlayArrowIcon />}
+          {trainings.length === 0 ? (
+            <Box
+              sx={{
+                textAlign: 'center',
+                py: 3,
+                px: 2,
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                color: 'text.secondary',
+              }}
             >
-              {isLoading ? 'Starting...' : 'Start Workout'}
-            </Button>
-          </Stack>
+              <Typography variant="h6" gutterBottom>
+                No Training Plans Available
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                You need to create at least one training plan before starting a workout.
+              </Typography>
+              <Typography variant="body2">
+                Go to the Trainings page to create your first training plan.
+              </Typography>
+            </Box>
+          ) : (
+            <FormControl fullWidth size="small" error={!!errors.training}>
+              <InputLabel>Select Training</InputLabel>
+              <Select
+                value={selectedTrainingId}
+                onChange={(e) => handleTrainingChange(e.target.value)}
+                label="Select Training"
+              >
+                <MenuItem value="">
+                  <em>Choose a training plan...</em>
+                </MenuItem>
+                {trainings.map((training) => {
+                  const today = new Date().getDay();
+                  const isToday = training.dayOfTheWeek === today;
 
-          {/* Exercises Preview */}
-          {formData.exercises.length > 0 && (
-            <Stack spacing={1.5}>
-              <Typography variant="h6">Exercises Preview</Typography>
-              <TableContainer component={Paper} variant="outlined">
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Exercise</TableCell>
-                      <TableCell align="center">Sets</TableCell>
-                      <TableCell align="center">Planned</TableCell>
-                      <TableCell align="center">Status</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {formData.exercises.map((exercise, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Stack>
-                            <Typography variant="subtitle2" fontWeight="medium">
-                              {exercise.exercise.name}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2">{exercise.plannedSets}</Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2">
-                            {exercise.plannedReps} reps
-                            {exercise.exercise.type === ExerciseType.WEIGHT &&
-                              exercise.plannedWeight &&
-                              ` X ${exercise.plannedWeight}kg`}
-                            {exercise.exercise.type === ExerciseType.TIME &&
-                              exercise.plannedDuration &&
-                              ` X ${exercise.plannedDuration}s`}
+                  return (
+                    <MenuItem key={training.id} value={training.id}>
+                      <Stack>
+                        <Typography variant="body2" component="div">
+                          {training.name}
+                          {isToday && (
+                            <Chip
+                              label="Today"
+                              size="small"
+                              color="primary"
+                              sx={{ ml: 1, height: 20 }}
+                            />
+                          )}
+                        </Typography>
+                        {training.dayOfTheWeek !== undefined && (
+                          <Typography variant="caption" color="text.secondary">
+                            {getDayName(training.dayOfTheWeek)}
                           </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <AchievedChip show={exercise.plannedParametersAchieved} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Stack>
+                        )}
+                      </Stack>
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+              {errors.training && <FormHelperText error>{errors.training}</FormHelperText>}
+            </FormControl>
           )}
-
-          {/* Error Messages */}
-          {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
         </Stack>
-      </Box>
-    </NestedPageLayout>
+
+        {/* Workout Details */}
+        <Stack spacing={1.5}>
+          <Typography variant="h6">Workout Details</Typography>
+
+          <TextField
+            label="Workout Name"
+            value={formData.name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            error={!!errors.name}
+            helperText={errors.name}
+            fullWidth
+            required
+            size="small"
+            placeholder="Auto-generated from training and date"
+          />
+
+          <TextField
+            label="Description"
+            value={formData.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            multiline
+            rows={2}
+            fullWidth
+            size="small"
+          />
+
+          <TextField
+            label="Date"
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleInputChange('date', e.target.value)}
+            error={!!errors.date}
+            helperText={errors.date}
+            fullWidth
+            required
+            size="small"
+            InputLabelProps={{ shrink: true }}
+          />
+        </Stack>
+
+        {/* Form Actions */}
+        <Stack direction="row" justifyContent="center">
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isLoading || trainings.length === 0 || !selectedTrainingId}
+            startIcon={<PlayArrowIcon />}
+          >
+            {isLoading ? 'Starting...' : 'Start Workout'}
+          </Button>
+        </Stack>
+
+        {/* Exercises Preview */}
+        {formData.exercises.length > 0 && (
+          <Stack spacing={1.5}>
+            <Typography variant="h6">Exercises Preview</Typography>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Exercise</TableCell>
+                    <TableCell align="center">Sets</TableCell>
+                    <TableCell align="center">Planned</TableCell>
+                    <TableCell align="center">Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {formData.exercises.map((exercise, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Stack>
+                          <Typography variant="subtitle2" fontWeight="medium">
+                            {exercise.exercise.name}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2">{exercise.plannedSets}</Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2">
+                          {exercise.plannedReps} reps
+                          {exercise.exercise.type === ExerciseType.WEIGHT &&
+                            exercise.plannedWeight &&
+                            ` X ${exercise.plannedWeight}kg`}
+                          {exercise.exercise.type === ExerciseType.TIME &&
+                            exercise.plannedDuration &&
+                            ` X ${exercise.plannedDuration}s`}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <AchievedChip show={exercise.plannedParametersAchieved} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Stack>
+        )}
+
+        {/* Error Messages */}
+        {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
+      </Stack>
+    </Box>
   );
 }

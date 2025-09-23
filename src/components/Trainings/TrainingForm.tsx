@@ -26,7 +26,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AchievedChip } from '@/components/Common';
 import { useExercisesController } from '@/controllers/exercisesController';
 import { useTrainingsController } from '@/controllers/trainingsController';
-import NestedPageLayout from '@/layouts/NestedPageLayout';
 import { Routes } from '@/router/routes';
 import type { Exercise } from '@/types/exercises';
 import { ExerciseType } from '@/types/exercises';
@@ -392,376 +391,372 @@ export default function TrainingForm() {
   };
 
   return (
-    <NestedPageLayout backTo={Routes.TRAININGS} title={title} subtitle={subtitle}>
-      <Box component="form" onSubmit={handleSubmit}>
-        <Stack spacing={2}>
-          {/* Basic Information */}
-          <Stack spacing={1.5}>
-            <Typography variant="h6">Basic Information</Typography>
+    <Box component="form" onSubmit={handleSubmit}>
+      <Stack spacing={2}>
+        {/* Basic Information */}
+        <Stack spacing={1.5}>
+          <Typography variant="h6">Basic Information</Typography>
 
-            <TextField
-              label="Training Name"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              error={!!errors.name}
-              helperText={errors.name}
-              fullWidth
-              required
-              size="small"
-            />
+          <TextField
+            label="Training Name"
+            value={formData.name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            error={!!errors.name}
+            helperText={errors.name}
+            fullWidth
+            required
+            size="small"
+          />
 
-            <TextField
-              label="Description"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              multiline
-              rows={2}
-              fullWidth
-              size="small"
-            />
-          </Stack>
+          <TextField
+            label="Description"
+            value={formData.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            multiline
+            rows={2}
+            fullWidth
+            size="small"
+          />
+        </Stack>
 
-          {/* Exercises */}
-          <Stack spacing={1.5}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography variant="h6">Exercises</Typography>
-              {!showAddExerciseForm ? (
-                <Button
-                  startIcon={<AddIcon />}
-                  onClick={addExercise}
-                  variant="outlined"
-                  size="small"
-                  disabled={exercises.length === 0}
-                >
-                  Add Exercise
-                </Button>
-              ) : (
-                <Stack direction="row" spacing={1}>
-                  <IconButton onClick={cancelAddExercise} color="error" size="small" title="Cancel">
-                    <CloseIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={handleAddExercise}
-                    color="primary"
-                    size="small"
-                    title="Add Exercise"
-                  >
-                    <CheckIcon />
-                  </IconButton>
-                </Stack>
-              )}
-            </Stack>
-
-            <AddExerciseSubform
-              showAddExerciseForm={showAddExerciseForm}
-              newExerciseData={newExerciseData}
-              onExerciseChange={handleExerciseChange}
-              onSetsChange={(sets) => {
-                setNewExerciseData((prev) => ({ ...prev, plannedSets: sets }));
-                if (errors.newSets) {
-                  setErrors((prev) => ({ ...prev, newSets: '' }));
-                }
-              }}
-              onRepsChange={(reps) => {
-                setNewExerciseData((prev) => ({ ...prev, plannedReps: reps }));
-                if (errors.newReps) {
-                  setErrors((prev) => ({ ...prev, newReps: '' }));
-                }
-              }}
-              onWeightChange={(weight) =>
-                setNewExerciseData((prev) => ({ ...prev, plannedWeight: weight }))
-              }
-              onDurationChange={(duration) =>
-                setNewExerciseData((prev) => ({ ...prev, plannedDuration: duration }))
-              }
-              onNotesChange={(notes) => setNewExerciseData((prev) => ({ ...prev, notes }))}
-              mockExercises={exercises}
-              errors={{
-                exercise: errors.newExercise,
-                sets: errors.newSets,
-                reps: errors.newReps,
-              }}
-            />
-
-            {errors.exercises && <FormHelperText error>{errors.exercises}</FormHelperText>}
-
-            {formData.exercises.length === 0 ? (
-              <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                No exercises added yet. Add your first exercise below.
-              </Typography>
+        {/* Exercises */}
+        <Stack spacing={1.5}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Typography variant="h6">Exercises</Typography>
+            {!showAddExerciseForm ? (
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addExercise}
+                variant="outlined"
+                size="small"
+                disabled={exercises.length === 0}
+              >
+                Add Exercise
+              </Button>
             ) : (
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ width: '30%' }}>Exercise</TableCell>
-                      <TableCell align="center" sx={{ width: '10%' }}>
-                        Sets
-                      </TableCell>
-                      <TableCell align="center" sx={{ width: '10%' }}>
-                        Reps
-                      </TableCell>
-                      <TableCell align="center" sx={{ width: '12%' }}>
-                        Weight/Duration
-                      </TableCell>
-                      <TableCell align="center" sx={{ width: '8%' }}>
-                        Status
-                      </TableCell>
-                      <TableCell align="center" sx={{ width: '8%' }}>
-                        Actions
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {formData.exercises.map((exercise, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Stack>
-                            <Typography
-                              variant="subtitle2"
-                              fontWeight="medium"
-                              sx={{
-                                cursor: 'pointer',
-                                color: 'primary.main',
-                                '&:hover': {
-                                  textDecoration: 'underline',
-                                  color: 'primary.dark',
-                                },
-                              }}
-                              onClick={() =>
-                                navigate(
-                                  Routes.EXERCISE_DETAIL.replace(':id', exercise.exercise.id),
-                                )
-                              }
-                            >
-                              {exercise.exercise.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {exercise.exercise.description}
-                            </Typography>
-                            {errors[`exercise${index}Exercise`] && (
-                              <FormHelperText error sx={{ mt: 0.5 }}>
-                                {errors[`exercise${index}Exercise`]}
-                              </FormHelperText>
-                            )}
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Stack alignItems="center">
-                            {editingExerciseIndex === index ? (
-                              <Stack alignItems="center">
-                                <TextField
-                                  type="number"
-                                  value={editFormData.plannedSets || ''}
-                                  onChange={(e) =>
-                                    setEditFormData((prev) => ({
-                                      ...prev,
-                                      plannedSets: parseInt(e.target.value) || 0,
-                                    }))
-                                  }
-                                  size="small"
-                                  sx={{ width: 60 }}
-                                  error={!!errors.editSets}
-                                />
-                                {errors.editSets && (
-                                  <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
-                                    {errors.editSets}
-                                  </FormHelperText>
-                                )}
-                              </Stack>
-                            ) : (
-                              <Typography variant="body2">{exercise.plannedSets}</Typography>
-                            )}
-                            {errors[`exercise${index}Sets`] && (
-                              <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
-                                {errors[`exercise${index}Sets`]}
-                              </FormHelperText>
-                            )}
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Stack alignItems="center">
-                            {editingExerciseIndex === index ? (
-                              <Stack alignItems="center">
-                                <TextField
-                                  type="number"
-                                  value={editFormData.plannedReps || ''}
-                                  onChange={(e) =>
-                                    setEditFormData((prev) => ({
-                                      ...prev,
-                                      plannedReps: parseInt(e.target.value) || 0,
-                                    }))
-                                  }
-                                  size="small"
-                                  sx={{ width: 60 }}
-                                  error={!!errors.editReps}
-                                />
-                                {errors.editReps && (
-                                  <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
-                                    {errors.editReps}
-                                  </FormHelperText>
-                                )}
-                              </Stack>
-                            ) : (
-                              <Typography variant="body2">{exercise.plannedReps || 10}</Typography>
-                            )}
-                            {errors[`exercise${index}Reps`] && (
-                              <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
-                                {errors[`exercise${index}Reps`]}
-                              </FormHelperText>
-                            )}
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Stack alignItems="center">
-                            {editingExerciseIndex === index ? (
-                              <Stack alignItems="center">
-                                <Stack direction="row" spacing={1}>
-                                  {exercise.exercise.type === ExerciseType.WEIGHT && (
-                                    <TextField
-                                      type="number"
-                                      value={editFormData.plannedWeightKg || ''}
-                                      onChange={(e) =>
-                                        setEditFormData((prev) => ({
-                                          ...prev,
-                                          plannedWeightKg: parseFloat(e.target.value) || undefined,
-                                        }))
-                                      }
-                                      size="small"
-                                      sx={{ width: 70 }}
-                                      placeholder="kg"
-                                      error={!!errors.editWeight}
-                                    />
-                                  )}
-                                  {exercise.exercise.type === ExerciseType.TIME && (
-                                    <TextField
-                                      type="number"
-                                      value={editFormData.plannedSeconds || ''}
-                                      onChange={(e) =>
-                                        setEditFormData((prev) => ({
-                                          ...prev,
-                                          plannedSeconds: parseInt(e.target.value) || undefined,
-                                        }))
-                                      }
-                                      size="small"
-                                      sx={{ width: 70 }}
-                                      placeholder="s"
-                                      error={!!errors.editTime}
-                                    />
-                                  )}
-                                  {exercise.exercise.type === ExerciseType.REPS_ONLY && (
-                                    <Typography variant="body2">—</Typography>
-                                  )}
-                                </Stack>
-                                {(errors.editWeight || errors.editTime) && (
-                                  <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
-                                    {errors.editWeight || errors.editTime}
-                                  </FormHelperText>
-                                )}
-                              </Stack>
-                            ) : (
-                              <Typography variant="body2">
-                                {exercise.exercise.type === ExerciseType.WEIGHT &&
-                                exercise.plannedWeightKg
-                                  ? `${exercise.plannedWeightKg}kg`
-                                  : exercise.exercise.type === ExerciseType.TIME &&
-                                      exercise.plannedSeconds
-                                    ? `${exercise.plannedSeconds}s`
-                                    : '—'}
-                              </Typography>
-                            )}
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="center">
-                          <AchievedChip show={exercise.plannedParametersAchieved} />
-                        </TableCell>
-                        <TableCell align="center">
-                          <Stack direction="row" spacing={0.5} justifyContent="center">
-                            {editingExerciseIndex === index ? (
-                              <>
-                                <IconButton
-                                  onClick={() => saveEditExercise(index)}
-                                  color="success"
-                                  size="small"
-                                  title="Save changes"
-                                >
-                                  <SaveIcon />
-                                </IconButton>
-                                <IconButton
-                                  onClick={cancelEditExercise}
-                                  color="inherit"
-                                  size="small"
-                                  title="Cancel editing"
-                                >
-                                  <CancelIcon />
-                                </IconButton>
-                              </>
-                            ) : (
-                              <>
-                                <IconButton
-                                  onClick={() => startEditExercise(index)}
-                                  color="primary"
-                                  size="small"
-                                  title="Edit exercise parameters"
-                                >
-                                  <EditIcon />
-                                </IconButton>
-                                <IconButton
-                                  onClick={() => removeExercise(index)}
-                                  color="error"
-                                  size="small"
-                                  title="Remove exercise"
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <Stack direction="row" spacing={1}>
+                <IconButton onClick={cancelAddExercise} color="error" size="small" title="Cancel">
+                  <CloseIcon />
+                </IconButton>
+                <IconButton
+                  onClick={handleAddExercise}
+                  color="primary"
+                  size="small"
+                  title="Add Exercise"
+                >
+                  <CheckIcon />
+                </IconButton>
+              </Stack>
             )}
           </Stack>
 
-          {/* Notes */}
-          <Stack spacing={1.5}>
-            <Typography variant="h6">Session Notes</Typography>
-            <TextField
-              label="Training Notes"
-              value={formData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              multiline
-              rows={3}
-              fullWidth
-              size="small"
-              placeholder="How did the training go? Any observations or areas for improvement?"
-            />
-          </Stack>
+          <AddExerciseSubform
+            showAddExerciseForm={showAddExerciseForm}
+            newExerciseData={newExerciseData}
+            onExerciseChange={handleExerciseChange}
+            onSetsChange={(sets) => {
+              setNewExerciseData((prev) => ({ ...prev, plannedSets: sets }));
+              if (errors.newSets) {
+                setErrors((prev) => ({ ...prev, newSets: '' }));
+              }
+            }}
+            onRepsChange={(reps) => {
+              setNewExerciseData((prev) => ({ ...prev, plannedReps: reps }));
+              if (errors.newReps) {
+                setErrors((prev) => ({ ...prev, newReps: '' }));
+              }
+            }}
+            onWeightChange={(weight) =>
+              setNewExerciseData((prev) => ({ ...prev, plannedWeight: weight }))
+            }
+            onDurationChange={(duration) =>
+              setNewExerciseData((prev) => ({ ...prev, plannedDuration: duration }))
+            }
+            onNotesChange={(notes) => setNewExerciseData((prev) => ({ ...prev, notes }))}
+            mockExercises={exercises}
+            errors={{
+              exercise: errors.newExercise,
+              sets: errors.newSets,
+              reps: errors.newReps,
+            }}
+          />
 
-          {/* Error Messages */}
-          {errors.load && <FormHelperText error>{errors.load}</FormHelperText>}
-          {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
+          {errors.exercises && <FormHelperText error>{errors.exercises}</FormHelperText>}
 
-          {/* Form Actions */}
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" disabled={isLoading} onClick={handleSubmit}>
-              {isLoading
-                ? isEditing
-                  ? 'Updating...'
-                  : 'Creating...'
-                : isEditing
-                  ? 'Update Training'
-                  : 'Create Training'}
-            </Button>
-          </Stack>
+          {formData.exercises.length === 0 ? (
+            <Typography color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              No exercises added yet. Add your first exercise below.
+            </Typography>
+          ) : (
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ width: '30%' }}>Exercise</TableCell>
+                    <TableCell align="center" sx={{ width: '10%' }}>
+                      Sets
+                    </TableCell>
+                    <TableCell align="center" sx={{ width: '10%' }}>
+                      Reps
+                    </TableCell>
+                    <TableCell align="center" sx={{ width: '12%' }}>
+                      Weight/Duration
+                    </TableCell>
+                    <TableCell align="center" sx={{ width: '8%' }}>
+                      Status
+                    </TableCell>
+                    <TableCell align="center" sx={{ width: '8%' }}>
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {formData.exercises.map((exercise, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Stack>
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight="medium"
+                            sx={{
+                              cursor: 'pointer',
+                              color: 'primary.main',
+                              '&:hover': {
+                                textDecoration: 'underline',
+                                color: 'primary.dark',
+                              },
+                            }}
+                            onClick={() =>
+                              navigate(Routes.EXERCISE_DETAIL.replace(':id', exercise.exercise.id))
+                            }
+                          >
+                            {exercise.exercise.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {exercise.exercise.description}
+                          </Typography>
+                          {errors[`exercise${index}Exercise`] && (
+                            <FormHelperText error sx={{ mt: 0.5 }}>
+                              {errors[`exercise${index}Exercise`]}
+                            </FormHelperText>
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Stack alignItems="center">
+                          {editingExerciseIndex === index ? (
+                            <Stack alignItems="center">
+                              <TextField
+                                type="number"
+                                value={editFormData.plannedSets || ''}
+                                onChange={(e) =>
+                                  setEditFormData((prev) => ({
+                                    ...prev,
+                                    plannedSets: parseInt(e.target.value) || 0,
+                                  }))
+                                }
+                                size="small"
+                                sx={{ width: 60 }}
+                                error={!!errors.editSets}
+                              />
+                              {errors.editSets && (
+                                <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
+                                  {errors.editSets}
+                                </FormHelperText>
+                              )}
+                            </Stack>
+                          ) : (
+                            <Typography variant="body2">{exercise.plannedSets}</Typography>
+                          )}
+                          {errors[`exercise${index}Sets`] && (
+                            <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
+                              {errors[`exercise${index}Sets`]}
+                            </FormHelperText>
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Stack alignItems="center">
+                          {editingExerciseIndex === index ? (
+                            <Stack alignItems="center">
+                              <TextField
+                                type="number"
+                                value={editFormData.plannedReps || ''}
+                                onChange={(e) =>
+                                  setEditFormData((prev) => ({
+                                    ...prev,
+                                    plannedReps: parseInt(e.target.value) || 0,
+                                  }))
+                                }
+                                size="small"
+                                sx={{ width: 60 }}
+                                error={!!errors.editReps}
+                              />
+                              {errors.editReps && (
+                                <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
+                                  {errors.editReps}
+                                </FormHelperText>
+                              )}
+                            </Stack>
+                          ) : (
+                            <Typography variant="body2">{exercise.plannedReps || 10}</Typography>
+                          )}
+                          {errors[`exercise${index}Reps`] && (
+                            <FormHelperText error sx={{ mt: 0.5, fontSize: '0.7rem' }}>
+                              {errors[`exercise${index}Reps`]}
+                            </FormHelperText>
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Stack alignItems="center">
+                          {editingExerciseIndex === index ? (
+                            <Stack alignItems="center">
+                              <Stack direction="row" spacing={1}>
+                                {exercise.exercise.type === ExerciseType.WEIGHT && (
+                                  <TextField
+                                    type="number"
+                                    value={editFormData.plannedWeightKg || ''}
+                                    onChange={(e) =>
+                                      setEditFormData((prev) => ({
+                                        ...prev,
+                                        plannedWeightKg: parseFloat(e.target.value) || undefined,
+                                      }))
+                                    }
+                                    size="small"
+                                    sx={{ width: 70 }}
+                                    placeholder="kg"
+                                    error={!!errors.editWeight}
+                                  />
+                                )}
+                                {exercise.exercise.type === ExerciseType.TIME && (
+                                  <TextField
+                                    type="number"
+                                    value={editFormData.plannedSeconds || ''}
+                                    onChange={(e) =>
+                                      setEditFormData((prev) => ({
+                                        ...prev,
+                                        plannedSeconds: parseInt(e.target.value) || undefined,
+                                      }))
+                                    }
+                                    size="small"
+                                    sx={{ width: 70 }}
+                                    placeholder="s"
+                                    error={!!errors.editTime}
+                                  />
+                                )}
+                                {exercise.exercise.type === ExerciseType.REPS_ONLY && (
+                                  <Typography variant="body2">—</Typography>
+                                )}
+                              </Stack>
+                              {(errors.editWeight || errors.editTime) && (
+                                <FormHelperText error sx={{ fontSize: '0.6rem', mt: 0.5 }}>
+                                  {errors.editWeight || errors.editTime}
+                                </FormHelperText>
+                              )}
+                            </Stack>
+                          ) : (
+                            <Typography variant="body2">
+                              {exercise.exercise.type === ExerciseType.WEIGHT &&
+                              exercise.plannedWeightKg
+                                ? `${exercise.plannedWeightKg}kg`
+                                : exercise.exercise.type === ExerciseType.TIME &&
+                                    exercise.plannedSeconds
+                                  ? `${exercise.plannedSeconds}s`
+                                  : '—'}
+                            </Typography>
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="center">
+                        <AchievedChip show={exercise.plannedParametersAchieved} />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Stack direction="row" spacing={0.5} justifyContent="center">
+                          {editingExerciseIndex === index ? (
+                            <>
+                              <IconButton
+                                onClick={() => saveEditExercise(index)}
+                                color="success"
+                                size="small"
+                                title="Save changes"
+                              >
+                                <SaveIcon />
+                              </IconButton>
+                              <IconButton
+                                onClick={cancelEditExercise}
+                                color="inherit"
+                                size="small"
+                                title="Cancel editing"
+                              >
+                                <CancelIcon />
+                              </IconButton>
+                            </>
+                          ) : (
+                            <>
+                              <IconButton
+                                onClick={() => startEditExercise(index)}
+                                color="primary"
+                                size="small"
+                                title="Edit exercise parameters"
+                              >
+                                <EditIcon />
+                              </IconButton>
+                              <IconButton
+                                onClick={() => removeExercise(index)}
+                                color="error"
+                                size="small"
+                                title="Remove exercise"
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </>
+                          )}
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </Stack>
-      </Box>
-    </NestedPageLayout>
+
+        {/* Notes */}
+        <Stack spacing={1.5}>
+          <Typography variant="h6">Session Notes</Typography>
+          <TextField
+            label="Training Notes"
+            value={formData.notes}
+            onChange={(e) => handleInputChange('notes', e.target.value)}
+            multiline
+            rows={3}
+            fullWidth
+            size="small"
+            placeholder="How did the training go? Any observations or areas for improvement?"
+          />
+        </Stack>
+
+        {/* Error Messages */}
+        {errors.load && <FormHelperText error>{errors.load}</FormHelperText>}
+        {errors.submit && <FormHelperText error>{errors.submit}</FormHelperText>}
+
+        {/* Form Actions */}
+        <Stack direction="row" spacing={2} justifyContent="flex-end">
+          <Button variant="outlined" onClick={handleCancel} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" disabled={isLoading} onClick={handleSubmit}>
+            {isLoading
+              ? isEditing
+                ? 'Updating...'
+                : 'Creating...'
+              : isEditing
+                ? 'Update Training'
+                : 'Create Training'}
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
   );
 }

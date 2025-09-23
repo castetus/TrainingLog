@@ -4,6 +4,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { Box, Container, Typography, Fab, AppBar, Toolbar, IconButton } from '@mui/material';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import { BackButton } from '@/components/Common';
 import Navbar from '@/components/Navbar';
 import { Routes } from '@/router/routes';
 
@@ -68,6 +69,11 @@ const MainLayout = () => {
       {/* Header with Settings */}
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
+          {isNestedRoute ? (
+            <BackButton sx={{ mt: 0.5 }} />
+          ) : (
+            <div style={{ width: 40, height: 40 }} />
+          )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Training Log
           </Typography>
