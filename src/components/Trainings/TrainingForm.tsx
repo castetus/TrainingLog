@@ -40,8 +40,6 @@ export default function TrainingForm() {
   const { list: exercises } = useExercisesController();
 
   const isEditing = !!id;
-  const title = isEditing ? 'Edit Training' : 'New Training';
-  const subtitle = isEditing ? `Editing training with ID: ${id}` : 'Create a new training session';
 
   // Form state
   const [formData, setFormData] = useState<TrainingFormData>({

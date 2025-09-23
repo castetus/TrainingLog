@@ -1,6 +1,6 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton, type IconButtonProps } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useMatches, useNavigate } from 'react-router-dom';
 
 interface BackButtonProps extends Omit<IconButtonProps, 'onClick'> {
   /** Where to navigate back to. If not provided, uses browser history */
@@ -11,9 +11,11 @@ interface BackButtonProps extends Omit<IconButtonProps, 'onClick'> {
 
 export default function BackButton({ sx, ...props }: BackButtonProps) {
   const navigate = useNavigate();
+  const matches = useMatches();
+  const target = matches.at(-1 - 1);
 
   const handleClick = () => {
-    navigate(-1); // Go back in browser history
+    navigate(target?.pathname || '/');
   };
 
   return (

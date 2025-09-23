@@ -23,10 +23,6 @@ export default function ExerciseForm() {
   const { findById, create, update } = useExercisesController();
 
   const isEditing = !!id;
-  const title = isEditing ? 'Edit Exercise' : 'New Exercise';
-  const subtitle = isEditing
-    ? `Editing exercise with ID: ${id}`
-    : 'Create a new exercise definition for your training vocabulary';
 
   // Form state - simplified for vocabulary only
   const [formData, setFormData] = useState<{
