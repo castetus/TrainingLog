@@ -37,14 +37,14 @@ export default function WorkoutViewItem(exercise: WorkoutExercise) {
       </Stack>
 
       <Stack spacing={0.5} direction="row" alignItems="center" justifyContent="space-between">
-        <AchievedChip show={exercise.plannedParametersAchieved} />
-        <Typography variant="body2">{exerciseViewData.plannedSets}</Typography>
 
-        <Typography variant="body2">
-          {exerciseViewData.actualReps} × {' '}
+        <Typography variant="body2">Sets: {exerciseViewData.actualSets} | 
+          Reps: {exerciseViewData.actualReps} × {' '}
           {exerciseViewData.actualWeight && exerciseViewData.actualWeight} kg
           {exerciseViewData.actualDuration && formatTime(exerciseViewData.actualDuration)}
         </Typography>
+
+        <AchievedChip show={exercise.plannedParametersAchieved} />
       </Stack>
     </Box>
   );
