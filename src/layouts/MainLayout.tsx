@@ -69,11 +69,7 @@ const MainLayout = () => {
       {/* Header with Settings */}
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
-          {isNestedRoute ? (
-            <BackButton sx={{ mt: 0.5 }} />
-          ) : (
-            <div style={{ width: 40, height: 40 }} />
-          )}
+          {isNestedRoute ? <BackButton /> : <div style={{ width: 40, height: 40 }} />}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Training Log
           </Typography>
