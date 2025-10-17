@@ -1,4 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -63,6 +65,32 @@ export default function TrainingForm() {
     plannedWeightKg: undefined,
     plannedSeconds: undefined,
   });
+
+  const moveExerciseUp = (index: number) => {
+    if (index <= 0) return;
+    setFormData((prev) => {
+      const next = { ...prev };
+      const items = [...next.exercises];
+      const tmp = items[index - 1];
+      items[index - 1] = items[index];
+      items[index] = tmp;
+      next.exercises = items;
+      return next;
+    });
+  };
+
+  const moveExerciseDown = (index: number) => {
+    if (index >= formData.exercises.length - 1) return;
+    setFormData((prev) => {
+      const next = { ...prev };
+      const items = [...next.exercises];
+      const tmp = items[index + 1];
+      items[index + 1] = items[index];
+      items[index] = tmp;
+      next.exercises = items;
+      return next;
+    });
+  };
 
   // Load existing training data if editing
   useEffect(() => {
@@ -670,7 +698,31 @@ export default function TrainingForm() {
                         <AchievedChip show={exercise.plannedParametersAchieved} />
                       </TableCell>
                       <TableCell align="center">
-                        <Stack direction="row" spacing={0.5} justifyContent="center">
+                        <Stack
+                          direction="row"
+                          spacing={0.5}
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <IconButton
+                            onClick={() => moveExerciseUp(index)}
+                            size="small"
+                            title="Move up"
+                            disabled={index === 0 || editingExerciseIndex !== null}
+                          >
+                            <ArrowUpwardIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => moveExerciseDown(index)}
+                            size="small"
+                            title="Move down"
+                            disabled={
+                              index === formData.exercises.length - 1 ||
+                              editingExerciseIndex !== null
+                            }
+                          >
+                            <ArrowDownwardIcon fontSize="small" />
+                          </IconButton>
                           {editingExerciseIndex === index ? (
                             <>
                               <IconButton
