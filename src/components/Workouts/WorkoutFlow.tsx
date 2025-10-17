@@ -355,70 +355,78 @@ export default function WorkoutFlow({ workout }: WorkoutFlowProps) {
           </Typography>
         </Box>
 
-        {workout.exercises.map((workoutExercise, index) => (
-          <Accordion key={index} defaultExpanded={index === 0}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                <Stack direction="row" alignItems="center" spacing={1} sx={{ flexGrow: 1 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: isExerciseCompleted(workoutExercise) ? 'success.main' : 'inherit',
-                    }}
-                  >
-                    {workoutExercise.exercise.name}
-                  </Typography>
+        {workout.exercises.map((workoutExercise, index) => {
+          const effectiveWorkoutExercise = actualSetsByExercise[index]
+            ? { ...workoutExercise, actualSets: actualSetsByExercise[index] }
+            : workoutExercise;
+
+          return (
+            <Accordion key={index} defaultExpanded={index === 0}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
+                  <Stack direction="row" alignItems="center" spacing={1} sx={{ flexGrow: 1 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color: isExerciseCompleted(effectiveWorkoutExercise)
+                          ? 'success.main'
+                          : 'inherit',
+                      }}
+                    >
+                      {workoutExercise.exercise.name}
+                    </Typography>
+                  </Stack>
+                  {workoutExercise.exercise.videoUrl && (
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => window.open(workoutExercise.exercise.videoUrl, '_blank')}
+                      sx={{ ml: 1 }}
+                    >
+                      <PlayArrowIcon />
+                    </IconButton>
+                  )}
+                  <Stack direction="row" alignItems="start" width="100%" spacing={2}>
+                    {isExerciseCompleted(effectiveWorkoutExercise) && (
+                      <Chip
+                        label="✓"
+                        color="success"
+                        size="small"
+                        sx={{ minWidth: 24, height: 24 }}
+                      />
+                    )}
+                    <AchievedChip show={workoutExercise.plannedParametersAchieved} />
+                    <Chip
+                      label={`${workoutExercise.plannedSets} × ${workoutExercise.plannedReps}`}
+                      color="primary"
+                      size="small"
+                    />
+                    {workoutExercise.plannedWeight && (
+                      <Chip
+                        label={`${workoutExercise.plannedWeight}kg`}
+                        color="secondary"
+                        size="small"
+                      />
+                    )}
+                    {workoutExercise.plannedDuration && (
+                      <Chip
+                        label={`${workoutExercise.plannedDuration}s`}
+                        color="secondary"
+                        size="small"
+                      />
+                    )}
+                  </Stack>
                 </Stack>
-                {workoutExercise.exercise.videoUrl && (
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => window.open(workoutExercise.exercise.videoUrl, '_blank')}
-                    sx={{ ml: 1 }}
-                  >
-                    <PlayArrowIcon />
-                  </IconButton>
-                )}
-                <Stack direction="row" alignItems="start" width="100%" spacing={2}>
-                  {isExerciseCompleted(workoutExercise) && (
-                    <Chip
-                      label="✓"
-                      color="success"
-                      size="small"
-                      sx={{ minWidth: 24, height: 24 }}
-                    />
-                  )}
-                  <AchievedChip show={workoutExercise.plannedParametersAchieved} />
-                  <Chip
-                    label={`${workoutExercise.plannedSets} × ${workoutExercise.plannedReps}`}
-                    color="primary"
-                    size="small"
-                  />
-                  {workoutExercise.plannedWeight && (
-                    <Chip
-                      label={`${workoutExercise.plannedWeight}kg`}
-                      color="secondary"
-                      size="small"
-                    />
-                  )}
-                  {workoutExercise.plannedDuration && (
-                    <Chip
-                      label={`${workoutExercise.plannedDuration}s`}
-                      color="secondary"
-                      size="small"
-                    />
-                  )}
-                </Stack>
-              </Stack>
-            </AccordionSummary>
-            <WorkoutExerciseContent
-              workoutExercise={workoutExercise}
-              exerciseIndex={index}
-              workoutId={workout.id}
-              onActualSetsUpdate={handleActualSetsUpdate}
-            />
-          </Accordion>
-        ))}
+              </AccordionSummary>
+              <WorkoutExerciseContent
+                workoutExercise={workoutExercise}
+                exerciseIndex={index}
+                workoutId={workout.id}
+                onActualSetsUpdate={handleActualSetsUpdate}
+              />
+            </Accordion>
+          );
+        })}
 
         {/* Workout Action Buttons */}
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
